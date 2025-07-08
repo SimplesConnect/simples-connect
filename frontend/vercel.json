@@ -1,36 +1,11 @@
 {
-  "name": "simples-connect-frontend",
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "https://simples-connect-backend.vercel.app/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "https://simples-connect-backend.vercel.app/api/$1"
     }
   ],
-  "env": {
-    "NODE_ENV": "production"
-  },
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm ci",
   "framework": "vite"
-} 
+}
