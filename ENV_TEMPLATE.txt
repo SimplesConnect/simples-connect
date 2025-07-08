@@ -1,0 +1,29 @@
+# Copy this content to your backend/.env file
+
+# Supabase Configuration (Replace with your actual values)
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_KEY=your_supabase_service_key
+
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_51RhtlSCZ786xVLD8cRnkUaHzYFK1Rdhzc3FNBHlQsbZ9q03Nea4b1jWALXDYm0wUyNOMf7ISC3tu2n7rRsjis1hN001EO4RMSx
+STRIPE_PUBLISHABLE_KEY=pk_test_51RhtlSCZ786xVLD8uQNGT3ObUPPibeq0N0El1DF6sSfHFV4XOZdNQAFRm5ncgyKZAKP491iCs5N4OOYJAhAxJt9c00tokfht6j
+STRIPE_WEBHOOK_SECRET=
+DOMAIN=http://localhost:5173
+
+# Stripe Price IDs (Generated from your Stripe account)
+STRIPE_COMMUNITY_MONTHLY_PRICE=price_1Ri7AFCZ786xVLD8eEEFMc4G
+STRIPE_COMMUNITY_YEARLY_PRICE=price_1Ri7AFCZ786xVLD8M6Eoregk
+STRIPE_PREMIUM_MONTHLY_PRICE=price_1Ri7AGCZ786xVLD8dRWI8wVF
+STRIPE_PREMIUM_YEARLY_PRICE=price_1Ri7AGCZ786xVLD8q94BQrne
+STRIPE_VIP_MONTHLY_PRICE=price_1Ri7AGCZ786xVLD8FFNF8aH5
+STRIPE_VIP_YEARLY_PRICE=price_1Ri7AHCZ786xVLD8fis5WNj8
+
+# Promo Codes
+STRIPE_LAUNCH_PROMO=LUV50
+
+# JWT Secret (Replace with your actual secret)
+JWT_SECRET=your_jwt_secret_here
+
+# Server Configuration
+PORT=5000 

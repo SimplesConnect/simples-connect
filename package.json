@@ -1,0 +1,31 @@
+{
+  "name": "simples-connect",
+  "version": "1.0.0",
+  "description": "A dating app for Ugandans around the world",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "start": "npm run dev",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "dating",
+    "uganda",
+    "diaspora",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Simples Connect Team",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^3.4.17"
+  }
+}
