@@ -16,14 +16,21 @@ export const useMatching = () => {
 
   // Get authentication headers
   const getAuthHeaders = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) {
-      throw new Error('No authentication token found');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('🔐 No authentication token found. Please log in again.');
+      }
+      return {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json'
+      };
+    } catch (err) {
+      if (err.message.includes('Supabase not configured')) {
+        throw new Error('🔧 Authentication service not configured. Please check your environment variables.');
+      }
+      throw err;
     }
-    return {
-      'Authorization': `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json'
-    };
   }, []);
 
   // Fetch potential matches using backend API
@@ -44,7 +51,16 @@ export const useMatching = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 401) {
+          throw new Error('🔐 Authentication expired. Please log in again.');
+        } else if (response.status === 403) {
+          throw new Error('🚫 Access denied. Please check your account status.');
+        } else if (response.status === 404) {
+          throw new Error('🔍 Matching service not found. Please contact support.');
+        } else if (response.status >= 500) {
+          throw new Error('🔧 Server error. Please try again later.');
+        }
+        throw new Error(`❌ HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -58,7 +74,15 @@ export const useMatching = () => {
       setCurrentIndex(0);
     } catch (err) {
       console.error('Error fetching potential matches:', err);
-      setError(err.message);
+      
+      // Provide more specific error messages
+      if (err.message.includes('fetch')) {
+        setError('🌐 Network error. Please check your connection and try again.');
+      } else if (err.message.includes('configured')) {
+        setError('🔧 Service not configured. Please check the setup guide.');
+      } else {
+        setError(err.message || '❌ Unable to load matches. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -80,7 +104,12 @@ export const useMatching = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 401) {
+          throw new Error('🔐 Authentication expired. Please log in again.');
+        } else if (response.status >= 500) {
+          throw new Error('🔧 Server error. Please try again.');
+        }
+        throw new Error(`❌ HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -99,7 +128,7 @@ export const useMatching = () => {
       };
     } catch (err) {
       console.error('Error handling like:', err);
-      setError(err.message);
+      setError(err.message || '❌ Unable to process like. Please try again.');
       return { isMatch: false, matchData: null };
     }
   }, [user, getAuthHeaders]);
@@ -120,7 +149,12 @@ export const useMatching = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 401) {
+          throw new Error('🔐 Authentication expired. Please log in again.');
+        } else if (response.status >= 500) {
+          throw new Error('🔧 Server error. Please try again.');
+        }
+        throw new Error(`❌ HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -133,7 +167,7 @@ export const useMatching = () => {
       setCurrentIndex(prev => prev + 1);
     } catch (err) {
       console.error('Error handling pass:', err);
-      setError(err.message);
+      setError(err.message || '❌ Unable to process pass. Please try again.');
     }
   }, [user, getAuthHeaders]);
 
@@ -148,6 +182,10 @@ export const useMatching = () => {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          console.warn('Authentication expired while fetching matches');
+          return;
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -160,51 +198,58 @@ export const useMatching = () => {
       setMatches(data.matches || []);
     } catch (err) {
       console.error('Error fetching matches:', err);
+      // Don't set error for matches fetch as it's not critical
     }
   }, [user, getAuthHeaders]);
 
-  // Set up real-time subscriptions
+  // Set up real-time subscriptions with error handling
   useEffect(() => {
     if (!user) return;
 
-    // Subscribe to new matches
-    const channel = supabase
-      .channel('matches_realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'matches',
-          filter: `user1_id=eq.${user.id},user2_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('New match received!', payload);
-          fetchMatches(); // Refresh matches when new match is created
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_interactions',
-          filter: `target_user_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('Someone interacted with you!', payload);
-          // You can add notifications here
-        }
-      )
-      .subscribe();
+    try {
+      // Subscribe to new matches
+      const channel = supabase
+        .channel('matches_realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'matches',
+            filter: `user1_id=eq.${user.id},user2_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('New match received!', payload);
+            fetchMatches(); // Refresh matches when new match is created
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'user_interactions',
+            filter: `target_user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Someone interacted with you!', payload);
+            // You can add notifications here
+          }
+        )
+        .subscribe();
 
-    setRealtimeChannel(channel);
+      setRealtimeChannel(channel);
 
-    return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
-    };
+      // Cleanup on unmount
+      return () => {
+        if (channel) {
+          channel.unsubscribe();
+        }
+      };
+    } catch (err) {
+      console.warn('Real-time subscriptions not available:', err);
+      // Continue without real-time features
+    }
   }, [user, fetchMatches]);
 
   // Load initial data
@@ -215,19 +260,23 @@ export const useMatching = () => {
     }
   }, [user, fetchPotentialMatches, fetchMatches]);
 
+  // Computed values
   const currentProfile = profiles[currentIndex] || null;
   const hasMoreProfiles = currentIndex < profiles.length;
+  const profilesRemaining = Math.max(0, profiles.length - currentIndex);
 
   return {
     currentProfile,
+    profiles,
+    currentIndex,
     hasMoreProfiles,
+    profilesRemaining,
     loading,
     error,
     matches,
     handleLike,
     handlePass,
     fetchPotentialMatches,
-    fetchMatches,
-    profilesRemaining: profiles.length - currentIndex
+    fetchMatches
   };
 }; 

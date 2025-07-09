@@ -102,15 +102,44 @@ const AuthProvider = ({ children }) => {
 
   // Sign in with Google
   const signInWithGoogle = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth-callback`
-      }
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth-callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
 
-    if (error) throw error;
-    return data;
+      if (error) {
+        console.error('Google OAuth error:', error);
+        
+        // Provide more specific error messages
+        if (error.message.includes('not configured')) {
+          throw new Error('🔧 Google OAuth not configured. Please check your environment variables and Supabase settings.');
+        } else if (error.message.includes('invalid_client')) {
+          throw new Error('🔧 Invalid Google OAuth client. Please check your Google Cloud Console configuration.');
+        } else if (error.message.includes('redirect_uri_mismatch')) {
+          throw new Error('🔧 OAuth redirect URL mismatch. Please update your Google OAuth settings.');
+        } else {
+          throw new Error('🔧 Google sign-in failed. Please try again or contact support.');
+        }
+      }
+
+      return data;
+    } catch (err) {
+      console.error('Google sign-in error:', err);
+      
+      // Handle configuration errors
+      if (err.message.includes('Supabase not configured')) {
+        throw new Error('🔧 Authentication service not configured. Please check your environment variables.');
+      }
+      
+      throw err;
+    }
   };
 
   // Sign out
