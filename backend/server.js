@@ -1,12 +1,16 @@
-const app = require('./app');
+const express = require('express');
+const cors = require('cors');
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Export for Vercel serverless functions
-module.exports = app;
+app.use(cors());
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Simples Connect backend is live 🚀');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
