@@ -4,7 +4,7 @@ import { Heart, Play, ThumbsUp, Share2, MessageCircle, Users, Sparkles, Video, C
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import SubscriptionStatus from './SubscriptionStatus';
+
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -87,18 +87,7 @@ const Dashboard = () => {
       }, 5000);
     }
     
-    if (location.state?.subscriptionSuccess && location.state?.message) {
-      setSuccessMessage(location.state.message);
-      setShowSuccessMessage(true);
-      
-      // Clear the location state to prevent showing message on refresh
-      navigate(location.pathname, { replace: true });
-      
-      // Auto-hide message after 5 seconds
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 5000);
-    }
+
   }, [location.state, navigate, location.pathname]);
 
   // Fetch dashboard statistics
@@ -298,10 +287,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Subscription Status */}
-        <div className="mb-8">
-          <SubscriptionStatus />
-        </div>
+
 
         {/* Events, Lounge, Resources Section */}
         <div className="mb-8">

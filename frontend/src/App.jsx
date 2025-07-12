@@ -15,8 +15,6 @@ import EditProfile from './components/EditProfile';
 import Settings from './components/Settings';
 import FlowTest from './components/FlowTest';
 import AuthCallback from './components/AuthCallback';
-import Subscription from './components/Subscription';
-import SubscriptionDebug from './components/SubscriptionDebug';
 import { useAuth } from './context/AuthContext';
 
 // Layout component for authenticated pages
@@ -131,26 +129,6 @@ const AppContent = () => {
               <PrivateRoute>
                 <AuthenticatedLayout>
                   <FlowTest />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/subscription"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <Subscription />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/debug-subscription"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <SubscriptionDebug />
                 </AuthenticatedLayout>
               </PrivateRoute>
             }

@@ -5,7 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const matchingRoutes = require('./routes/matching');
 const messagesRoutes = require('./routes/messages');
-const subscriptionRoutes = require('./routes/subscription');
+
 const usersRoutes = require('./routes/users');
 
 const app = express();
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/matching', matchingRoutes);
 app.use('/api/messages', messagesRoutes);
-app.use('/api/subscription', subscriptionRoutes);
+
 app.use('/api/users', usersRoutes);
 
 app.get('/', (req, res) => {

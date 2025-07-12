@@ -12,8 +12,32 @@
   ],
   "routes": [
     {
+      "src": "/api/matching/discover",
+      "dest": "/api/matching/discover.js"
+    },
+    {
+      "src": "/api/matching/matches",
+      "dest": "/api/matching/matches.js"
+    },
+    {
+      "src": "/api/matching/interact",
+      "dest": "/api/matching/interact.js"
+    },
+    {
+      "src": "/api/match/discover",
+      "dest": "/api/match/discover.js"
+    },
+    {
+      "src": "/api/users/dashboard-stats",
+      "dest": "/api/users/dashboard-stats.js"
+    },
+    {
+      "src": "/api/users/recent-activity",
+      "dest": "/api/users/recent-activity.js"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/server.js"
     },
     {
       "src": "/(.*)",

@@ -1,6 +1,6 @@
 // src/components/common/Header.jsx
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, Crown } from 'lucide-react';
+import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -55,14 +55,7 @@ const Header = () => {
                 </button>
               );
             })}
-            {/* Premium Upgrade Button */}
-            <button
-              onClick={() => navigate('/subscription')}
-              className="flex items-center gap-2 bg-gradient-to-r from-simples-rose to-simples-lavender text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all"
-            >
-              <Crown className="w-4 h-4" />
-              Upgrade
-            </button>
+
           </nav>
 
           {/* Desktop User Menu */}
@@ -116,16 +109,7 @@ const Header = () => {
                   >
                     Settings
                   </button>
-                  <button
-                    onClick={() => {
-                      navigate('/subscription');
-                      setUserMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-simples-rose hover:bg-simples-rose/10 transition-colors flex items-center gap-2"
-                  >
-                    <Crown className="w-4 h-4" />
-                    Upgrade to Premium
-                  </button>
+
                   <hr className="my-2 border-simples-silver" />
                   <button
                     onClick={handleSignOut}
