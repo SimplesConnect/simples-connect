@@ -66,7 +66,7 @@ router.get('/potential-matches', requireAuth, async (req, res) => {
 });
 
 // Add discover endpoint as alias to potential-matches
-router.get('/discover', requireAuth, async (req, res) => {
+router.get('/discover', async (req, res) => {
   try {
     const userId = req.user.id;
     console.log('Fetching potential matches for user:', userId);
