@@ -3,7 +3,7 @@ const cors = require('cors');
 
 // Import all route modules
 const authRoutes = require('./routes/auth');
-const matchRoutes = require('./routes/match');
+const matchingRoutes = require('./routes/matching');
 const messagesRoutes = require('./routes/messages');
 const subscriptionRoutes = require('./routes/subscription');
 const usersRoutes = require('./routes/users');
@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Mount all routes
 app.use('/api/auth', authRoutes);
-app.use('/api/match', matchRoutes);
+app.use('/api/matching', matchingRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/users', usersRoutes);

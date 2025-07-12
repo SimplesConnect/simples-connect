@@ -23,7 +23,7 @@ const extractUser = async (req) => {
   return data.user;
 };
 
-// Vercel serverless function for /api/match/discover
+// Vercel serverless function for /api/matching/discover
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');

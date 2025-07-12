@@ -65,6 +65,68 @@ router.get('/potential-matches', requireAuth, async (req, res) => {
   }
 });
 
+// Add discover endpoint as alias to potential-matches
+router.get('/discover', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log('Fetching potential matches for user:', userId);
+    
+    // Get users that current user has already interacted with
+    const { data: interactions } = await supabase
+      .from('user_interactions')
+      .select('target_user_id')
+      .eq('user_id', userId);
+    
+    const interactedUserIds = interactions?.map(i => i.target_user_id) || [];
+    console.log('Already interacted with:', interactedUserIds.length, 'users');
+    
+    // Build the query to exclude interacted users
+    let query = supabase
+      .from('profiles')
+      .select(`
+        id,
+        full_name,
+        birthdate,
+        bio,
+        profile_picture_url,
+        interests,
+        location,
+        gender,
+        looking_for,
+        created_at
+      `)
+      .neq('id', userId)
+      .eq('is_profile_complete', true)
+      .order('created_at', { ascending: false })
+      .limit(20);
+    
+    // Exclude already interacted users if any exist
+    if (interactedUserIds.length > 0) {
+      query = query.not('id', 'in', `(${interactedUserIds.join(',')})`);
+    }
+    
+    const { data: potentialMatches, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching potential matches:', error);
+      throw error;
+    }
+    
+    console.log('Found potential matches:', potentialMatches?.length || 0);
+    res.json({ 
+      success: true, 
+      matches: potentialMatches || [],
+      count: potentialMatches?.length || 0
+    });
+  } catch (error) {
+    console.error('Error fetching potential matches:', error);
+    res.status(400).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
 // Record user interaction (like/pass) and check for mutual matches
 router.post('/interact', requireAuth, async (req, res) => {
   try {
