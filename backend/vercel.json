@@ -24,6 +24,10 @@
       "dest": "/api/matching/interact.js"
     },
     {
+      "src": "/api/matching/stats",
+      "dest": "/api/matching/stats.js"
+    },
+    {
       "src": "/api/match/discover",
       "dest": "/api/match/discover.js"
     },
@@ -34,6 +38,22 @@
     {
       "src": "/api/users/recent-activity",
       "dest": "/api/users/recent-activity.js"
+    },
+    {
+      "src": "/api/messages/conversations",
+      "dest": "/api/messages/conversations.js"
+    },
+    {
+      "src": "/api/messages/send",
+      "dest": "/api/messages/send.js"
+    },
+    {
+      "src": "/api/messages/match/(.*)",
+      "dest": "/api/messages/match.js"
+    },
+    {
+      "src": "/api/messages/read/(.*)",
+      "dest": "/api/messages/read.js"
     },
     {
       "src": "/api/(.*)",
