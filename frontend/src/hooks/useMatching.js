@@ -12,7 +12,8 @@ export const useMatching = () => {
   const [realtimeChannel, setRealtimeChannel] = useState(null);
 
   // API base URL - use relative URL to work with any port
-  const API_BASE_URL = '/api';
+  import { getApiUrl } from '../config/api';
+const API_BASE_URL = getApiUrl();
 
   // Get authentication headers
   const getAuthHeaders = useCallback(async () => {

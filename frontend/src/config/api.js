@@ -4,7 +4,7 @@ const config = {
     API_BASE_URL: 'http://localhost:5000',
   },
   production: {
-    API_BASE_URL: '', // Use relative URLs in production (handled by Vercel proxy)
+    API_BASE_URL: 'https://simples-connect.onrender.com', // Use relative URLs in production (handled by render proxy)
   }
 };
 
