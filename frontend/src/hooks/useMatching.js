@@ -46,7 +46,7 @@ export const useMatching = () => {
       console.log('Fetching potential matches for user:', user.id);
 
       const headers = await getAuthHeaders();
-      const response = await fetch(`${API_BASE_URL}/matching/potential-matches`, {
+      const response = await fetch(`${API_BASE_URL}/match/discover`, {
         headers
       });
 
