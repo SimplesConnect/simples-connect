@@ -11,9 +11,8 @@ export const useMatching = () => {
   const [matches, setMatches] = useState([]);
   const [realtimeChannel, setRealtimeChannel] = useState(null);
 
-  // API base URL - use relative URL to work with any port
-  import { getApiUrl } from '../config/api';
-const API_BASE_URL = getApiUrl();
+  // API base URL - hardcoded to working Render backend
+  const API_BASE_URL = 'https://simples-connect.onrender.com/api';
 
   // Get authentication headers
   const getAuthHeaders = useCallback(async () => {
@@ -281,4 +280,4 @@ const API_BASE_URL = getApiUrl();
     fetchPotentialMatches,
     fetchMatches
   };
-}; 
+};
