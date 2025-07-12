@@ -5,7 +5,6 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const matchingRoutes = require('./routes/matching');
 const messagesRoutes = require('./routes/messages');
-
 const usersRoutes = require('./routes/users');
 
 const app = express();
@@ -17,12 +16,20 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/matching', matchingRoutes);
 app.use('/api/messages', messagesRoutes);
-
 app.use('/api/users', usersRoutes);
 
 app.get('/', (req, res) => {
   res.send('Simples Connect backend is live 🚀');
 });
 
-// Export app for Vercel serverless functions
+// Get port from environment or default to 10000
+const PORT = process.env.PORT || 10000;
+
+// Start the server - THIS WAS MISSING!
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🎯 Simples Connect backend is ready!`);
+});
+
+// Export app for Vercel serverless functions (if needed)
 module.exports = app;
