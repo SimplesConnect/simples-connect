@@ -46,6 +46,7 @@ export const useMatching = () => {
       console.log('Fetching potential matches for user:', user.id);
 
       const headers = await getAuthHeaders();
+      // FIXED: updated endpoint to match other routes
       const response = await fetch(`${API_BASE_URL}/matching/discover`, {
         headers
       });
