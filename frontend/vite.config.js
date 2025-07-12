@@ -9,7 +9,7 @@ export default defineConfig({
       '/api': {
         target: process.env.NODE_ENV === 'production' 
           ? 'https://simples-connect.onrender.com'
-          : 'http://localhost:5000',
+          : 'http://https://simples-connect.onrender.com',
         changeOrigin: true,
         secure: false,
       }
