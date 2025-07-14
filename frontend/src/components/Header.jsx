@@ -1,6 +1,6 @@
 // src/components/common/Header.jsx
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users } from 'lucide-react';
+import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, Calendar, Coffee, BookOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,6 +24,9 @@ const Header = () => {
     { name: 'Discover', path: '/discover', icon: Heart },
     { name: 'Matches', path: '/matches', icon: Users },
     { name: 'Messages', path: '/messages', icon: MessageCircle },
+    { name: 'Events', path: '/events', icon: Calendar },
+    { name: 'Lounge', path: '/lounge', icon: Coffee },
+    { name: 'Resources', path: '/resources', icon: BookOpen },
   ];
 
   return (
