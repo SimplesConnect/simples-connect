@@ -19,7 +19,10 @@ import {
   Sparkles,
   Crown,
   Mic,
-  Volume2
+  Volume2,
+  Pause,
+  BookOpen,
+  Users
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -34,6 +37,9 @@ const Lounge = () => {
   const [musicSubmissions, setMusicSubmissions] = useState([]);
   const [currentVideoId, setCurrentVideoId] = useState('DQOI1r_w0jM');
   const [playingTrack, setPlayingTrack] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   // Podcast episodes data
   const podcastEpisodes = [
@@ -69,6 +75,16 @@ const Lounge = () => {
     }
   ];
 
+  // Featured song (from Suno or similar)
+  const featuredSong = {
+    id: 'featured',
+    artist_name: 'Suno AI',
+    song_title: 'Love\'s Digital Dream',
+    album_cover_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
+    genre: 'Electronic Pop',
+    url: 'https://suno.com/s/TKGt8pl7IZygtARp'
+  };
+
   // Sample music data
   const sampleMusicTracks = [
     {
@@ -94,22 +110,6 @@ const Lounge = () => {
       youtube_url: 'https://www.youtube.com/watch?v=hLQl3WQQoQ0',
       album_cover_url: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=400&h=400&fit=crop',
       genre: 'Soul'
-    },
-    {
-      id: 4,
-      artist_name: 'Ed Sheeran',
-      song_title: 'Perfect',
-      youtube_url: 'https://www.youtube.com/watch?v=2Vv-BfVoq4g',
-      album_cover_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop',
-      genre: 'Pop'
-    },
-    {
-      id: 5,
-      artist_name: 'Bruno Mars',
-      song_title: 'Just The Way You Are',
-      youtube_url: 'https://www.youtube.com/watch?v=LjhCEhWiKXk',
-      album_cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop',
-      genre: 'Pop'
     }
   ];
 
@@ -282,6 +282,16 @@ const Lounge = () => {
     setPlayingTrack(null);
   };
 
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Hero Section */}
@@ -289,11 +299,6 @@ const Lounge = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-simples-ocean/10 to-simples-sky/10 blur-3xl" />
         <div className="relative bg-gradient-to-r from-simples-cloud to-simples-silver px-6 py-16">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-simples-ocean/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
-              <Coffee className="w-5 h-5 text-simples-ocean" />
-              <span className="text-simples-ocean font-medium">Premium Lounge</span>
-            </div>
-            
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-6">
               The Lounge
             </h1>
@@ -307,31 +312,32 @@ const Lounge = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-16">
-        {/* DiaLuv Podcast Section */}
-        <div className="mb-20">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-2xl flex items-center justify-center">
-                <Mic className="w-6 h-6 text-white" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - DiaLuv Show */}
+          <div className="lg:col-span-2">
+            {/* DiaLuv Show Section */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-2xl flex items-center justify-center">
+                    <Mic className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-simples-midnight">DiaLuv Show</h2>
+                    <p className="text-simples-storm">Dating insights and real conversations</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-simples-storm">
+                  <div className="w-2 h-2 bg-simples-rose rounded-full animate-pulse" />
+                  <span className="text-sm">Live Series</span>
+                </div>
               </div>
-              <div>
-                <h2 className="text-3xl font-bold text-simples-midnight">DiaLuv Podcast</h2>
-                <p className="text-simples-storm">Dating insights and real conversations</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-simples-storm">
-              <div className="w-2 h-2 bg-simples-rose rounded-full animate-pulse" />
-              <span className="text-sm">Live Series</span>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Video Player */}
-            <div className="lg:col-span-2">
-              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
+              {/* Main Video Player */}
+              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver mb-6">
                 <YouTubePlayer
                   videoId={currentVideoId}
-                  title={podcastEpisodes.find(ep => ep.videoId === currentVideoId)?.title || "DiaLuv Podcast"}
+                  title={podcastEpisodes.find(ep => ep.videoId === currentVideoId)?.title || "DiaLuv Show"}
                   className="mb-6 rounded-2xl overflow-hidden"
                 />
                 
@@ -356,226 +362,196 @@ const Lounge = () => {
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Episode Queue */}
-            <div className="lg:col-span-1">
+              {/* Episode Queue - Horizontal */}
               <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
-                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                   <Play className="w-5 h-5 text-simples-ocean" />
                   Episode Queue
                 </h3>
                 
-                <div className="space-y-4">
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-simples-storm scrollbar-thumb-simples-silver">
                   {podcastEpisodes.map((episode, index) => (
-                    <VideoThumbnail
-                      key={episode.videoId}
-                      videoId={episode.videoId}
-                      title={episode.title}
-                      duration={episode.duration}
-                      description={episode.description}
-                      isActive={currentVideoId === episode.videoId}
-                      onClick={handleVideoClick}
-                    />
+                    <div key={episode.videoId} className="flex-shrink-0 w-64">
+                      <VideoThumbnail
+                        videoId={episode.videoId}
+                        title={episode.title}
+                        duration={episode.duration}
+                        description={episode.description}
+                        isActive={currentVideoId === episode.videoId}
+                        onClick={handleVideoClick}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Vibes & Music Section */}
-        <div className="mb-20">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-2xl flex items-center justify-center">
-                <Music className="w-6 h-6 text-white" />
+          {/* Right Column - Community Cards */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Vibe + Music Card */}
+            <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
+                  <Music className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
+                  <p className="text-simples-silver text-sm">Feel the rhythm</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-3xl font-bold text-simples-midnight">Vibes & Music</h2>
-                <p className="text-simples-storm">Discover the soundtrack of love</p>
-              </div>
-            </div>
-            <PremiumButton
-              onClick={() => setActiveModal('music')}
-              variant="outline"
-              size="medium"
-              icon={Plus}
-            >
-              Submit Music
-            </PremiumButton>
-          </div>
 
-          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-8 shadow-2xl border border-simples-silver">
-            {/* Featured Track */}
-            {musicSubmissions.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                  <Crown className="w-6 h-6 text-simples-ocean" />
-                  Featured Track
-                </h3>
-                <div className="flex flex-col lg:flex-row gap-8 items-center">
-                  <div className="flex-shrink-0">
-                    <div className="relative group">
-                      <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-2xl">
-                        {musicSubmissions[0].album_cover_url ? (
-                          <img 
-                            src={musicSubmissions[0].album_cover_url}
-                            alt="Album cover"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-simples-ocean to-simples-sky flex items-center justify-center">
-                            <Music className="w-16 h-16 text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => handlePlayTrack(musicSubmissions[0].id)}
-                        className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
-                      >
-                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl">
-                          <Play className="w-8 h-8 text-black ml-1" />
-                        </div>
-                      </button>
-                    </div>
+              {/* Featured Song */}
+              <div className="mb-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden">
+                    <img 
+                      src={featuredSong.album_cover_url}
+                      alt="Album cover"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <div className="flex-1 text-center lg:text-left">
-                    <h4 className="text-3xl font-bold text-white mb-2">
-                      {musicSubmissions[0].song_title}
-                    </h4>
-                    <p className="text-xl text-simples-silver mb-4">
-                      {musicSubmissions[0].artist_name}
-                    </p>
-                    {musicSubmissions[0].genre && (
-                      <div className="inline-block bg-gradient-to-r from-simples-ocean to-simples-sky text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
-                        {musicSubmissions[0].genre}
-                      </div>
+                  <div className="flex-1">
+                    <h4 className="text-white font-medium text-sm">{featuredSong.song_title}</h4>
+                    <p className="text-simples-silver text-xs">{featuredSong.artist_name}</p>
+                  </div>
+                  <button
+                    onClick={togglePlay}
+                    className="w-8 h-8 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center hover:scale-105 transition-transform"
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-4 h-4 text-white" />
+                    ) : (
+                      <Play className="w-4 h-4 text-white ml-0.5" />
                     )}
-                    <div className="flex items-center justify-center lg:justify-start gap-4">
-                      <div className="flex items-center gap-1 text-simples-silver">
-                        <Heart className="w-4 h-4" />
-                        <span>142</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-simples-silver">
-                        <Volume2 className="w-4 h-4" />
-                        <span>2.3k plays</span>
-                      </div>
+                  </button>
+                </div>
+
+                {/* Music Player Bar */}
+                <div className="bg-simples-storm rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-simples-silver text-xs">{formatTime(currentTime)}</span>
+                    <div className="flex-1 bg-simples-midnight rounded-full h-1">
+                      <div 
+                        className="bg-gradient-to-r from-simples-ocean to-simples-sky h-1 rounded-full transition-all duration-300"
+                        style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                      />
+                    </div>
+                    <span className="text-simples-silver text-xs">{formatTime(duration)}</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <Volume2 className="w-4 h-4 text-simples-silver" />
+                    <div className="flex-1 bg-simples-midnight rounded-full h-1">
+                      <div className="bg-simples-ocean h-1 rounded-full w-3/4" />
                     </div>
                   </div>
                 </div>
               </div>
-            )}
 
-            {/* Music Grid */}
-            <div className="mb-8">
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-simples-ocean" />
-                Community Favorites
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {musicSubmissions.slice(1, 5).map((track) => (
-                  <MusicCard
-                    key={track.id}
-                    track={track}
-                    isPlaying={playingTrack === track.id}
-                    onPlay={handlePlayTrack}
-                    onPause={handlePauseTrack}
-                    size="medium"
-                  />
+              {/* Mini Playlist */}
+              <div className="space-y-2">
+                <h4 className="text-white font-medium text-sm mb-2">Up Next</h4>
+                {musicSubmissions.slice(0, 2).map((track) => (
+                  <div key={track.id} className="flex items-center gap-2 p-2 bg-simples-storm rounded-lg">
+                    <div className="w-8 h-8 rounded overflow-hidden">
+                      <img 
+                        src={track.album_cover_url}
+                        alt="Album cover"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white text-xs font-medium">{track.song_title}</p>
+                      <p className="text-simples-silver text-xs">{track.artist_name}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Community Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Share Your Story */}
-          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-8 shadow-2xl border border-simples-silver">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-xl flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">Share Your Story</h3>
-                  <p className="text-simples-silver text-sm">Inspire others with your journey</p>
-                </div>
-              </div>
-              <PremiumButton
-                onClick={() => setActiveModal('story')}
-                variant="ghost"
-                size="small"
-                icon={Plus}
-              >
-                Share
-              </PremiumButton>
-            </div>
-
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <MessageCircle className="w-8 h-8 text-white" />
-              </div>
-              <h4 className="text-lg font-semibold text-white mb-3">
-                Your Story Matters
-              </h4>
-              <p className="text-simples-silver text-sm mb-6 leading-relaxed">
-                Share your dating experiences, lessons learned, and moments of growth. 
-                Your story could be the inspiration someone needs.
-              </p>
-              <PremiumButton
-                onClick={() => setActiveModal('story')}
-                variant="outline"
-                size="medium"
-                icon={Heart}
-              >
-                Share Your Journey
-              </PremiumButton>
-            </div>
-          </div>
-
-          {/* Ask the Community */}
-          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-8 shadow-2xl border border-simples-silver">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
+            {/* Ask a Question Card */}
+            <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-xl flex items-center justify-center">
                   <HelpCircle className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">Ask the Community</h3>
-                  <p className="text-simples-silver text-sm">Get wisdom from the collective</p>
+                  <h3 className="text-lg font-bold text-white">Ask a Question</h3>
+                  <p className="text-simples-silver text-sm">Get community wisdom</p>
                 </div>
               </div>
-              <PremiumButton
-                onClick={() => setActiveModal('question')}
-                variant="ghost"
-                size="small"
-                icon={Plus}
-              >
-                Ask
-              </PremiumButton>
+
+              <div className="text-center py-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <HelpCircle className="w-6 h-6 text-white" />
+                </div>
+                <p className="text-simples-silver text-sm mb-4 leading-relaxed">
+                  Ask questions about dating, relationships, and personal growth.
+                </p>
+                <div className="space-y-2">
+                  <PremiumButton
+                    onClick={() => setActiveModal('question')}
+                    variant="primary"
+                    size="small"
+                    icon={HelpCircle}
+                    className="w-full bg-gradient-to-r from-simples-tropical to-simples-lavender text-white font-medium"
+                  >
+                    Ask Question
+                  </PremiumButton>
+                  <PremiumButton
+                    onClick={() => window.open('/questions', '_blank')}
+                    variant="outline"
+                    size="small"
+                    icon={BookOpen}
+                    className="w-full border-simples-silver text-simples-silver hover:bg-simples-silver hover:text-simples-midnight"
+                  >
+                    Answer Questions
+                  </PremiumButton>
+                </div>
+              </div>
             </div>
 
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <HelpCircle className="w-8 h-8 text-white" />
+            {/* Share Your Story Card */}
+            <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-xl flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Share Your Story</h3>
+                  <p className="text-simples-silver text-sm">Inspire others</p>
+                </div>
               </div>
-              <h4 className="text-lg font-semibold text-white mb-3">
-                Seek Wisdom
-              </h4>
-              <p className="text-simples-silver text-sm mb-6 leading-relaxed">
-                Our community is here to support you. Ask questions about dating, 
-                relationships, and personal growth.
-              </p>
-              <PremiumButton
-                onClick={() => setActiveModal('question')}
-                variant="outline"
-                size="medium"
-                icon={HelpCircle}
-              >
-                Ask Question
-              </PremiumButton>
+
+              <div className="text-center py-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Heart className="w-6 h-6 text-white" />
+                </div>
+                <p className="text-simples-silver text-sm mb-4 leading-relaxed">
+                  Share your dating experiences and moments of growth.
+                </p>
+                <div className="space-y-2">
+                  <PremiumButton
+                    onClick={() => setActiveModal('story')}
+                    variant="primary"
+                    size="small"
+                    icon={Heart}
+                    className="w-full bg-gradient-to-r from-simples-rose to-simples-lavender text-white font-medium"
+                  >
+                    Share Story
+                  </PremiumButton>
+                  <PremiumButton
+                    onClick={() => window.open('/stories', '_blank')}
+                    variant="outline"
+                    size="small"
+                    icon={Users}
+                    className="w-full border-simples-silver text-simples-silver hover:bg-simples-silver hover:text-simples-midnight"
+                  >
+                    Read Stories
+                  </PremiumButton>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -650,7 +626,7 @@ const Lounge = () => {
                         type="text"
                         value={musicFormData.artistName}
                         onChange={(e) => handleInputChange('music', 'artistName', e.target.value)}
-                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                         placeholder="Artist or band name"
                         required
                       />
@@ -661,7 +637,7 @@ const Lounge = () => {
                         type="text"
                         value={musicFormData.songTitle}
                         onChange={(e) => handleInputChange('music', 'songTitle', e.target.value)}
-                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                         placeholder="Song title"
                         required
                       />
@@ -673,7 +649,7 @@ const Lounge = () => {
                       type="url"
                       value={musicFormData.youtubeUrl}
                       onChange={(e) => handleInputChange('music', 'youtubeUrl', e.target.value)}
-                      className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                      className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                       placeholder="https://www.youtube.com/watch?v=..."
                       required
                     />
@@ -685,7 +661,7 @@ const Lounge = () => {
                         type="url"
                         value={musicFormData.albumCoverUrl}
                         onChange={(e) => handleInputChange('music', 'albumCoverUrl', e.target.value)}
-                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                         placeholder="https://example.com/cover.jpg"
                       />
                     </div>
@@ -695,7 +671,7 @@ const Lounge = () => {
                         type="text"
                         value={musicFormData.genre}
                         onChange={(e) => handleInputChange('music', 'genre', e.target.value)}
-                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                         placeholder="e.g., Pop, Rock, R&B"
                       />
                     </div>
@@ -734,7 +710,7 @@ const Lounge = () => {
                       type="text"
                       value={activeModal === 'story' ? storyFormData.title : questionFormData.title}
                       onChange={(e) => handleInputChange(activeModal, 'title', e.target.value)}
-                      className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                      className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                       placeholder={activeModal === 'story' ? 'Give your story a title' : 'What\'s your question about?'}
                       required
                     />
@@ -747,7 +723,7 @@ const Lounge = () => {
                       value={activeModal === 'story' ? storyFormData.content : questionFormData.content}
                       onChange={(e) => handleInputChange(activeModal, 'content', e.target.value)}
                       rows={6}
-                      className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300 resize-none"
+                      className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300 resize-none"
                       placeholder={activeModal === 'story' ? 'Share your dating experience or life journey...' : 'Ask for advice about dating, relationships, or personal growth...'}
                       required
                     />
@@ -758,7 +734,7 @@ const Lounge = () => {
                       id={`${activeModal}-anonymous`}
                       checked={activeModal === 'story' ? storyFormData.anonymous : questionFormData.anonymous}
                       onChange={(e) => handleInputChange(activeModal, 'anonymous', e.target.checked)}
-                      className="w-5 h-5 text-amber-400 bg-slate-700 border-slate-600 rounded focus:ring-amber-400 focus:ring-2"
+                      className="w-5 h-5 text-simples-ocean bg-simples-storm border-simples-silver rounded focus:ring-simples-ocean focus:ring-2"
                     />
                     <label htmlFor={`${activeModal}-anonymous`} className="text-white font-medium">
                       {activeModal === 'story' ? 'Post anonymously' : 'Ask anonymously'}

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Calendar, Plus, Send, X, User, Mail, FileText, Clock, Sparkles, Crown } from 'lucide-react';
+import { Calendar, Plus, Send, X, User, Mail, FileText, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { PremiumButton, LocationFilter, EventCategoryCard } from '../components/premium';
+import { PremiumButton } from '../components/premium';
 
 const Events = () => {
   const { user } = useAuth();
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(null);
   const [formData, setFormData] = useState({
     eventName: '',
     description: '',
@@ -17,37 +16,6 @@ const Events = () => {
     userName: '',
     email: ''
   });
-
-  const eventCategories = [
-    {
-      type: 'meetups',
-      name: 'Exclusive Meetups',
-      description: 'Elite gatherings for sophisticated singles in premier locations',
-      upcomingCount: 3,
-      totalCount: 12
-    },
-    {
-      type: 'activities',
-      name: 'Curated Activities',
-      description: 'Unique experiences designed for meaningful connections',
-      upcomingCount: 7,
-      totalCount: 24
-    },
-    {
-      type: 'business',
-      name: 'Professional Events',
-      description: 'Network with successful professionals in your industry',
-      upcomingCount: 2,
-      totalCount: 8
-    },
-    {
-      type: 'community',
-      name: 'Community Galas',
-      description: 'Celebrate life and love with our exclusive community',
-      upcomingCount: 1,
-      totalCount: 6
-    }
-  ];
 
   const handleInputChange = (e) => {
     setFormData({
@@ -110,137 +78,61 @@ const Events = () => {
     });
   };
 
-  const handleLocationChange = (location) => {
-    setSelectedLocation(location);
-  };
-
-  const handleCategoryClick = (category) => {
-    console.log('Category clicked:', category);
-    // TODO: Navigate to filtered events page
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-simples-ocean/10 to-simples-sky/10 blur-3xl" />
         <div className="relative bg-gradient-to-r from-simples-cloud to-simples-silver px-6 py-16">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-simples-ocean/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
-              <Crown className="w-5 h-5 text-simples-ocean" />
-              <span className="text-simples-ocean font-medium">Premium Events</span>
-            </div>
-            
+          <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-6">
-              Exclusive Events
+              Events
             </h1>
             
             <p className="text-xl md:text-2xl text-simples-storm mb-8 max-w-3xl mx-auto leading-relaxed">
-              Where exceptional individuals gather to create extraordinary connections
+              Connect with fellow Ugandans in the diaspora through cultural celebrations, romantic meetups, and community building events.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <PremiumButton
-                onClick={() => setShowSuggestionModal(true)}
-                variant="primary"
-                size="large"
-                icon={Plus}
-                className="min-w-[200px]"
-              >
-                Suggest an Event
-              </PremiumButton>
-              
-              <div className="w-full sm:w-80">
-                <LocationFilter 
-                  onLocationChange={handleLocationChange}
-                  placeholder="Filter by location"
-                />
-              </div>
-            </div>
+            <PremiumButton
+              onClick={() => setShowSuggestionModal(true)}
+              variant="primary"
+              size="large"
+              icon={Plus}
+              className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white font-medium hover:shadow-lg transition-all duration-300"
+            >
+              Suggest Event
+            </PremiumButton>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        {/* Event Categories */}
-        <div className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Curated Event Categories
-            </h2>
-            <p className="text-xl text-simples-storm max-w-2xl mx-auto">
-              Discover premium experiences designed for discerning individuals
-            </p>
+      <div className="max-w-4xl mx-auto px-6 py-16">
+        {/* Simple Message */}
+        <div className="text-center py-16">
+          <div className="w-24 h-24 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+            <Calendar className="w-12 h-12 text-white" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {eventCategories.map((category, index) => (
-              <EventCategoryCard
-                key={category.type}
-                category={category}
-                onClick={() => handleCategoryClick(category)}
-                className={`transform transition-all duration-500 hover:scale-105 ${
-                  index % 2 === 0 ? 'md:translate-y-4' : ''
-                }`}
-              />
-            ))}
+          <h2 className="text-3xl font-bold text-simples-midnight mb-4">
+            No events found
+          </h2>
+          
+          <p className="text-lg text-simples-storm mb-8 max-w-2xl mx-auto">
+            Try adjusting your filters or check back later for new events.
+          </p>
+
+          <div className="bg-white rounded-3xl p-8 shadow-lg border border-simples-silver mb-8">
+            <p className="text-simples-storm text-lg leading-relaxed">
+              We're working on bringing you the best events there is. Stay tuned for amazing experiences that will connect you with your community!
+            </p>
           </div>
         </div>
 
-        {/* Empty State */}
-        <div className="text-center py-16">
-          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-12 shadow-2xl border border-simples-silver">
-            <div className="w-24 h-24 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
-              <Calendar className="w-12 h-12 text-white" />
-            </div>
-            
-            <h3 className="text-3xl font-bold text-white mb-4">
-              Preparing Something Extraordinary
-            </h3>
-            
-            <p className="text-xl text-simples-silver mb-8 max-w-2xl mx-auto leading-relaxed">
-              Our team is curating exclusive events that match the sophistication of our community. 
-              Be the first to know when we launch our premium event series.
-            </p>
-            
-            <div className="bg-gradient-to-r from-simples-storm to-simples-midnight rounded-2xl p-8 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="w-8 h-8 text-white" />
-                  </div>
-                  <h4 className="text-white font-semibold mb-2">Exclusive Venues</h4>
-                  <p className="text-simples-silver text-sm">Premium locations across major cities</p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Crown className="w-8 h-8 text-white" />
-                  </div>
-                  <h4 className="text-white font-semibold mb-2">Curated Experiences</h4>
-                  <p className="text-simples-silver text-sm">Thoughtfully designed for meaningful connections</p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                  <h4 className="text-white font-semibold mb-2">Elite Community</h4>
-                  <p className="text-simples-silver text-sm">Connect with like-minded professionals</p>
-                </div>
-              </div>
-            </div>
-            
-            <PremiumButton
-              onClick={() => setShowSuggestionModal(true)}
-              variant="luxury"
-              size="large"
-              icon={Plus}
-              className="mx-auto"
-            >
-              Shape Our Event Calendar
-            </PremiumButton>
+        {/* Future Events Grid Container - Hidden for now */}
+        <div className="hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Events will be displayed here when available */}
           </div>
         </div>
       </div>
