@@ -120,22 +120,22 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 to-rose-600/20 blur-3xl" />
-        <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-16">
+        <div className="absolute inset-0 bg-gradient-to-r from-simples-ocean/10 to-simples-sky/10 blur-3xl" />
+        <div className="relative bg-gradient-to-r from-simples-cloud to-simples-silver px-6 py-16">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-amber-400/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
-              <Crown className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 font-medium">Premium Events</span>
+            <div className="inline-flex items-center gap-2 bg-simples-ocean/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
+              <Crown className="w-5 h-5 text-simples-ocean" />
+              <span className="text-simples-ocean font-medium">Premium Events</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-amber-400 to-rose-400 bg-clip-text text-transparent mb-6">
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-6">
               Exclusive Events
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-simples-storm mb-8 max-w-3xl mx-auto leading-relaxed">
               Where exceptional individuals gather to create extraordinary connections
             </p>
             
@@ -169,7 +169,7 @@ const Events = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Curated Event Categories
             </h2>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+            <p className="text-xl text-simples-storm max-w-2xl mx-auto">
               Discover premium experiences designed for discerning individuals
             </p>
           </div>
@@ -190,8 +190,8 @@ const Events = () => {
 
         {/* Empty State */}
         <div className="text-center py-16">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-12 shadow-2xl border border-slate-700">
-            <div className="w-24 h-24 bg-gradient-to-r from-amber-400 to-rose-400 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
+          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-12 shadow-2xl border border-simples-silver">
+            <div className="w-24 h-24 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
               <Calendar className="w-12 h-12 text-white" />
             </div>
             
@@ -199,35 +199,35 @@ const Events = () => {
               Preparing Something Extraordinary
             </h3>
             
-            <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-simples-silver mb-8 max-w-2xl mx-auto leading-relaxed">
               Our team is curating exclusive events that match the sophistication of our community. 
               Be the first to know when we launch our premium event series.
             </p>
             
-            <div className="bg-gradient-to-r from-slate-700 to-slate-800 rounded-2xl p-8 mb-8">
+            <div className="bg-gradient-to-r from-simples-storm to-simples-midnight rounded-2xl p-8 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-rose-400 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-xl flex items-center justify-center mx-auto mb-4">
                     <Sparkles className="w-8 h-8 text-white" />
                   </div>
                   <h4 className="text-white font-semibold mb-2">Exclusive Venues</h4>
-                  <p className="text-slate-400 text-sm">Premium locations across major cities</p>
+                  <p className="text-simples-silver text-sm">Premium locations across major cities</p>
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-rose-400 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-xl flex items-center justify-center mx-auto mb-4">
                     <Crown className="w-8 h-8 text-white" />
                   </div>
                   <h4 className="text-white font-semibold mb-2">Curated Experiences</h4>
-                  <p className="text-slate-400 text-sm">Thoughtfully designed for meaningful connections</p>
+                  <p className="text-simples-silver text-sm">Thoughtfully designed for meaningful connections</p>
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-xl flex items-center justify-center mx-auto mb-4">
                     <User className="w-8 h-8 text-white" />
                   </div>
                   <h4 className="text-white font-semibold mb-2">Elite Community</h4>
-                  <p className="text-slate-400 text-sm">Connect with like-minded professionals</p>
+                  <p className="text-simples-silver text-sm">Connect with like-minded professionals</p>
                 </div>
               </div>
             </div>
@@ -248,24 +248,24 @@ const Events = () => {
       {/* Suggestion Modal */}
       {showSuggestionModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-2xl border border-slate-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl shadow-2xl border border-simples-silver w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-8">
               {/* Modal Header */}
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-amber-400 to-rose-400 rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-2xl flex items-center justify-center">
                     <Plus className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-white">
                       Suggest an Event
                     </h2>
-                    <p className="text-slate-400">Help us create extraordinary experiences</p>
+                    <p className="text-simples-silver">Help us create extraordinary experiences</p>
                   </div>
                 </div>
                 <button
                   onClick={closeModal}
-                  className="text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-700"
+                  className="text-simples-silver hover:text-white transition-colors p-2 rounded-full hover:bg-simples-storm"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -273,16 +273,16 @@ const Events = () => {
 
               {/* Success Message */}
               {success && (
-                <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 mb-8">
+                <div className="bg-simples-tropical/10 border border-simples-tropical/20 rounded-2xl p-6 mb-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-simples-tropical rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-green-400 font-semibold">Event suggestion submitted!</p>
-                      <p className="text-green-300 text-sm">Our events team will review your suggestion.</p>
+                      <p className="text-simples-tropical font-semibold">Event suggestion submitted!</p>
+                      <p className="text-simples-tropical text-sm">Our events team will review your suggestion.</p>
                     </div>
                   </div>
                 </div>
@@ -295,13 +295,13 @@ const Events = () => {
                     Event Name *
                   </label>
                   <div className="relative">
-                    <FileText className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <FileText className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-silver" />
                     <input
                       type="text"
                       name="eventName"
                       value={formData.eventName}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                      className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                       placeholder="What's your event vision?"
                       required
                     />
@@ -317,7 +317,7 @@ const Events = () => {
                     value={formData.description}
                     onChange={handleInputChange}
                     rows={4}
-                    className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300 resize-none"
+                    className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300 resize-none"
                     placeholder="Describe your ideal event experience..."
                   />
                 </div>
@@ -327,13 +327,13 @@ const Events = () => {
                     Suggested Date
                   </label>
                   <div className="relative">
-                    <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-silver" />
                     <input
                       type="date"
                       name="suggestedDate"
                       value={formData.suggestedDate}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-700 border border-slate-600 text-white rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                      className="w-full bg-simples-storm border border-simples-silver text-white rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                       min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
@@ -345,13 +345,13 @@ const Events = () => {
                       Your Name *
                     </label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-silver" />
                       <input
                         type="text"
                         name="userName"
                         value={formData.userName}
                         onChange={handleInputChange}
-                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                         placeholder="Your name"
                         required
                       />
@@ -363,13 +363,13 @@ const Events = () => {
                       Email *
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-silver" />
                       <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        className="w-full bg-simples-storm border border-simples-silver text-white placeholder-simples-silver rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-simples-ocean focus:border-transparent transition-all duration-300"
                         placeholder="your@email.com"
                         required
                       />

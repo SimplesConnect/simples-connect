@@ -10,32 +10,32 @@ const EventCategoryCard = ({
 
   const categoryStyles = {
     meetups: {
-      gradient: 'from-rose-500 to-pink-600',
-      hoverGradient: 'hover:from-rose-600 hover:to-pink-700',
+      gradient: 'from-simples-rose to-simples-lavender',
+      hoverGradient: 'hover:from-simples-rose hover:to-simples-lavender',
       icon: Users,
-      shadowColor: 'shadow-rose-500/25',
-      glowColor: 'from-rose-500/20 to-pink-500/20'
+      shadowColor: 'shadow-simples-rose/25',
+      glowColor: 'from-simples-rose/20 to-simples-lavender/20'
     },
     activities: {
-      gradient: 'from-amber-500 to-orange-600',
-      hoverGradient: 'hover:from-amber-600 hover:to-orange-700',
+      gradient: 'from-simples-ocean to-simples-sky',
+      hoverGradient: 'hover:from-simples-ocean hover:to-simples-sky',
       icon: Calendar,
-      shadowColor: 'shadow-amber-500/25',
-      glowColor: 'from-amber-500/20 to-orange-500/20'
+      shadowColor: 'shadow-simples-ocean/25',
+      glowColor: 'from-simples-ocean/20 to-simples-sky/20'
     },
     business: {
-      gradient: 'from-blue-600 to-indigo-700',
-      hoverGradient: 'hover:from-blue-700 hover:to-indigo-800',
+      gradient: 'from-simples-tropical to-simples-ocean',
+      hoverGradient: 'hover:from-simples-tropical hover:to-simples-ocean',
       icon: Briefcase,
-      shadowColor: 'shadow-blue-500/25',
-      glowColor: 'from-blue-500/20 to-indigo-500/20'
+      shadowColor: 'shadow-simples-tropical/25',
+      glowColor: 'from-simples-tropical/20 to-simples-ocean/20'
     },
     community: {
-      gradient: 'from-purple-600 to-violet-700',
-      hoverGradient: 'hover:from-purple-700 hover:to-violet-800',
+      gradient: 'from-simples-lavender to-simples-rose',
+      hoverGradient: 'hover:from-simples-lavender hover:to-simples-rose',
       icon: Heart,
-      shadowColor: 'shadow-purple-500/25',
-      glowColor: 'from-purple-500/20 to-violet-500/20'
+      shadowColor: 'shadow-simples-lavender/25',
+      glowColor: 'from-simples-lavender/20 to-simples-rose/20'
     }
   };
 

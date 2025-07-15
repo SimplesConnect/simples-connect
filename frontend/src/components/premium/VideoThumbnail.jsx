@@ -35,13 +35,13 @@ const VideoThumbnail = ({
   return (
     <div 
       className={`group cursor-pointer transition-all duration-500 ${
-        isActive ? 'ring-2 ring-amber-400/50' : ''
+        isActive ? 'ring-2 ring-simples-ocean/50' : ''
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
     >
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-1">
+      <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-1">
         {/* Thumbnail Container */}
         <div className="relative aspect-video overflow-hidden">
           {!imageError && videoId ? (
@@ -52,7 +52,7 @@ const VideoThumbnail = ({
               onError={handleImageError}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
+            <div className="w-full h-full bg-gradient-to-br from-simples-storm to-simples-midnight flex items-center justify-center">
               <Play className="w-8 h-8 text-white/50" />
             </div>
           )}
@@ -63,7 +63,7 @@ const VideoThumbnail = ({
           {/* Play Button */}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
             <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
-              <Play className="w-6 h-6 text-slate-900 ml-1" />
+              <Play className="w-6 h-6 text-simples-midnight ml-1" />
             </div>
           </div>
 
@@ -85,25 +85,25 @@ const VideoThumbnail = ({
 
           {/* Active Indicator */}
           {isActive && (
-            <div className="absolute top-2 left-2 bg-amber-400 rounded-full px-3 py-1">
-              <span className="text-black text-xs font-bold">NOW PLAYING</span>
+            <div className="absolute top-2 left-2 bg-simples-ocean rounded-full px-3 py-1">
+              <span className="text-white text-xs font-bold">NOW PLAYING</span>
             </div>
           )}
         </div>
 
         {/* Content */}
         <div className="p-4">
-          <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2 group-hover:text-amber-400 transition-colors duration-300">
+          <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2 group-hover:text-simples-ocean transition-colors duration-300">
             {title}
           </h3>
           {description && (
-            <p className="text-slate-400 text-xs line-clamp-2 mb-2">
+            <p className="text-simples-silver text-xs line-clamp-2 mb-2">
               {description}
             </p>
           )}
           
           {/* Episode Metadata */}
-          <div className="flex items-center justify-between text-xs text-slate-500">
+          <div className="flex items-center justify-between text-xs text-simples-silver">
             <span>DiaLuv Podcast</span>
             {duration && (
               <div className="flex items-center gap-1">
@@ -115,7 +115,7 @@ const VideoThumbnail = ({
         </div>
 
         {/* Bottom Gradient Bar */}
-        <div className={`h-1 bg-gradient-to-r from-amber-400 to-rose-400 transform transition-all duration-300 ${
+        <div className={`h-1 bg-gradient-to-r from-simples-ocean to-simples-sky transform transition-all duration-300 ${
           isHovered ? 'scale-x-100' : 'scale-x-0'
         }`} />
       </div>

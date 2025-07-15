@@ -31,15 +31,15 @@ const Header = () => {
   const isActivePath = (path) => location.pathname === path;
 
   return (
-    <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 backdrop-blur-sm border-b border-slate-700/50 sticky top-0 z-40 shadow-2xl">
+    <header className="bg-white/80 backdrop-blur-sm border-b border-simples-silver/50 sticky top-0 z-40 shadow-lg">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-amber-400 to-rose-400 rounded-2xl flex items-center justify-center shadow-2xl">
+            <div className="w-12 h-12 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-2xl flex items-center justify-center shadow-lg">
               <Heart className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-400 to-rose-400 bg-clip-text text-transparent">
+            <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent">
               Simples Connect
             </span>
           </div>
@@ -50,17 +50,17 @@ const Header = () => {
               <button
                 key={item.name}
                 onClick={() => navigate(item.path)}
-                className={`text-lg font-medium transition-all duration-300 hover:text-amber-400 relative group py-2 ${
-                  isActivePath(item.path) ? 'text-amber-400' : 'text-white/80'
+                className={`text-lg font-medium transition-all duration-300 hover:text-simples-ocean relative group py-2 ${
+                  isActivePath(item.path) ? 'text-simples-ocean' : 'text-simples-storm'
                 }`}
               >
                 <span className="relative z-10">{item.name}</span>
                 {/* Active indicator */}
                 {isActivePath(item.path) && (
-                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-amber-400 to-rose-400 rounded-full" />
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full" />
                 )}
                 {/* Hover effect */}
-                <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-400 to-rose-400 rounded-full transition-all duration-300 group-hover:w-full" />
+                <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full transition-all duration-300 group-hover:w-full" />
               </button>
             ))}
           </nav>
@@ -72,13 +72,13 @@ const Header = () => {
               onClick={() => navigate('/messages')}
               className={`relative p-3 rounded-xl transition-all duration-300 ${
                 isActivePath('/messages') 
-                  ? 'bg-amber-400/20 text-amber-400' 
-                  : 'text-white/60 hover:text-amber-400 hover:bg-white/5'
+                  ? 'bg-simples-ocean/20 text-simples-ocean' 
+                  : 'text-simples-storm hover:text-simples-ocean hover:bg-simples-cloud/50'
               }`}
             >
               <MessageCircle className="w-6 h-6" />
               {/* Message notification badge */}
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full flex items-center justify-center">
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-simples-rose rounded-full flex items-center justify-center">
                 <span className="text-xs text-white font-bold">3</span>
               </div>
             </button>
@@ -87,24 +87,24 @@ const Header = () => {
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-4 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 px-4 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-slate-600"
+                className="flex items-center gap-4 bg-white/80 hover:bg-white/90 px-4 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-simples-silver/50"
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-amber-400 to-rose-400 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
-                <span className="hidden md:inline font-medium text-white/90">
+                <span className="hidden md:inline font-medium text-simples-midnight">
                   {user?.user_metadata?.full_name || 'User'}
                 </span>
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 mt-3 w-64 bg-gradient-to-br from-slate-800 to-slate-900 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-700 py-3 z-50">
-                  <div className="px-4 py-3 border-b border-slate-700">
-                    <p className="font-semibold text-white">
+                <div className="absolute right-0 mt-3 w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-simples-silver/50 py-3 z-50">
+                  <div className="px-4 py-3 border-b border-simples-silver/50">
+                    <p className="font-semibold text-simples-midnight">
                       {user?.user_metadata?.full_name || 'User'}
                     </p>
-                    <p className="text-sm text-slate-400">{user?.email}</p>
+                    <p className="text-sm text-simples-storm">{user?.email}</p>
                   </div>
                   
                   <button
@@ -112,7 +112,7 @@ const Header = () => {
                       navigate(`/profile/${user.id}`);
                       setUserMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-slate-700 transition-all duration-200 flex items-center gap-3"
+                    className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
                   >
                     <User className="w-5 h-5" />
                     View Profile
@@ -122,7 +122,7 @@ const Header = () => {
                       navigate('/edit-profile');
                       setUserMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-slate-700 transition-all duration-200 flex items-center gap-3"
+                    className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
                   >
                     <User className="w-5 h-5" />
                     Edit Profile
@@ -132,15 +132,15 @@ const Header = () => {
                       navigate('/settings');
                       setUserMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-slate-700 transition-all duration-200 flex items-center gap-3"
+                    className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
                   >
                     <Settings className="w-5 h-5" />
                     Settings
                   </button>
-                  <hr className="my-2 border-slate-700" />
+                  <hr className="my-2 border-simples-silver/50" />
                   <button
                     onClick={handleSignOut}
-                    className="w-full text-left px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 flex items-center gap-3"
+                    className="w-full text-left px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 flex items-center gap-3"
                   >
                     <LogOut className="w-5 h-5" />
                     Sign Out
@@ -151,7 +151,7 @@ const Header = () => {
 
             {/* Mobile Menu Toggle */}
             <button
-              className="lg:hidden text-white/80 hover:text-amber-400 transition-colors p-2"
+              className="lg:hidden text-simples-storm hover:text-simples-ocean transition-colors p-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -161,7 +161,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <nav className="lg:hidden py-6 border-t border-slate-700/50">
+          <nav className="lg:hidden py-6 border-t border-simples-silver/50">
             {mainNavItems.map((item) => (
               <button
                 key={item.name}
@@ -170,21 +170,21 @@ const Header = () => {
                   setMobileMenuOpen(false);
                 }}
                 className={`w-full flex items-center gap-4 py-4 font-medium transition-all duration-200 ${
-                  isActivePath(item.path) ? 'text-amber-400' : 'text-white/80 hover:text-white'
+                  isActivePath(item.path) ? 'text-simples-ocean' : 'text-simples-storm hover:text-simples-midnight'
                 }`}
               >
                 <item.icon className="w-5 h-5" />
                 {item.name}
               </button>
             ))}
-            <hr className="my-4 border-slate-700" />
+            <hr className="my-4 border-simples-silver/50" />
             <button
               onClick={() => {
                 navigate('/messages');
                 setMobileMenuOpen(false);
               }}
               className={`w-full flex items-center gap-4 py-4 font-medium transition-all duration-200 ${
-                isActivePath('/messages') ? 'text-amber-400' : 'text-white/80 hover:text-white'
+                isActivePath('/messages') ? 'text-simples-ocean' : 'text-simples-storm hover:text-simples-midnight'
               }`}
             >
               <MessageCircle className="w-5 h-5" />
@@ -195,7 +195,7 @@ const Header = () => {
                 navigate('/edit-profile');
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center gap-4 py-4 text-white/80 hover:text-white transition-all duration-200 font-medium"
+              className="w-full flex items-center gap-4 py-4 text-simples-storm hover:text-simples-midnight transition-all duration-200 font-medium"
             >
               <User className="w-5 h-5" />
               Edit Profile
@@ -205,14 +205,14 @@ const Header = () => {
                 navigate('/settings');
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center gap-4 py-4 text-white/80 hover:text-white transition-all duration-200 font-medium"
+              className="w-full flex items-center gap-4 py-4 text-simples-storm hover:text-simples-midnight transition-all duration-200 font-medium"
             >
               <Settings className="w-5 h-5" />
               Settings
             </button>
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center gap-4 py-4 text-red-400 hover:text-red-300 transition-all duration-200 font-medium"
+              className="w-full flex items-center gap-4 py-4 text-red-500 hover:text-red-600 transition-all duration-200 font-medium"
             >
               <LogOut className="w-5 h-5" />
               Sign Out

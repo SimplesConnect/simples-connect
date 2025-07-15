@@ -17,11 +17,11 @@ const PremiumButton = ({
   const baseClasses = 'relative inline-flex items-center justify-center font-semibold transition-all duration-300 transform overflow-hidden group';
   
   const variants = {
-    primary: 'bg-gradient-to-r from-amber-400 to-rose-400 text-white shadow-2xl hover:shadow-amber-500/25 hover:from-amber-500 hover:to-rose-500',
-    secondary: 'bg-gradient-to-r from-slate-800 to-slate-900 text-white shadow-2xl hover:shadow-slate-500/25 hover:from-slate-700 hover:to-slate-800',
-    outline: 'border-2 border-amber-400 text-amber-400 bg-transparent hover:bg-amber-400 hover:text-white shadow-xl hover:shadow-amber-500/25',
+    primary: 'bg-gradient-to-r from-simples-ocean to-simples-sky text-white shadow-2xl hover:shadow-simples-ocean/25 hover:from-simples-ocean hover:to-simples-sky',
+    secondary: 'bg-gradient-to-r from-simples-midnight to-simples-storm text-white shadow-2xl hover:shadow-simples-storm/25 hover:from-simples-storm hover:to-simples-midnight',
+    outline: 'border-2 border-simples-ocean text-simples-ocean bg-transparent hover:bg-simples-ocean hover:text-white shadow-xl hover:shadow-simples-ocean/25',
     ghost: 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 shadow-lg hover:shadow-xl',
-    luxury: 'bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-800 text-white shadow-2xl hover:shadow-purple-500/25 hover:from-purple-700 hover:to-indigo-900'
+    luxury: 'bg-gradient-to-r from-simples-lavender via-simples-rose to-simples-tropical text-white shadow-2xl hover:shadow-simples-lavender/25 hover:from-simples-lavender hover:to-simples-tropical'
   };
 
   const sizes = {
@@ -87,7 +87,7 @@ const PremiumButton = ({
       </div>
 
       {/* Glow Effect */}
-      <div className="absolute inset-0 rounded-inherit bg-gradient-to-r from-amber-400/20 to-rose-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+      <div className="absolute inset-0 rounded-inherit bg-gradient-to-r from-simples-ocean/20 to-simples-sky/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
     </button>
   );
 };

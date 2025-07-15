@@ -72,7 +72,7 @@ router.get('/discover', requireAuth, async (req, res) => {
     const userId = req.user.id;
     console.log('Fetching potential matches for user:', userId);
     
-    // Get users that current user has already interacted with
+    // Get users that current user has alreagit hubdy interacted with
     const { data: interactions } = await supabase
       .from('user_interactions')
       .select('target_user_id')

@@ -283,22 +283,22 @@ const Lounge = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 to-rose-600/20 blur-3xl" />
-        <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-16">
+        <div className="absolute inset-0 bg-gradient-to-r from-simples-ocean/10 to-simples-sky/10 blur-3xl" />
+        <div className="relative bg-gradient-to-r from-simples-cloud to-simples-silver px-6 py-16">
           <div className="max-w-6xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-amber-400/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
-              <Coffee className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 font-medium">Premium Lounge</span>
+            <div className="inline-flex items-center gap-2 bg-simples-ocean/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
+              <Coffee className="w-5 h-5 text-simples-ocean" />
+              <span className="text-simples-ocean font-medium">Premium Lounge</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-amber-400 to-rose-400 bg-clip-text text-transparent mb-6">
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-6">
               The Lounge
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-simples-storm mb-8 max-w-3xl mx-auto leading-relaxed">
               Where culture, music, and meaningful conversations create magic
             </p>
           </div>
@@ -311,16 +311,16 @@ const Lounge = () => {
         <div className="mb-20">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-2xl flex items-center justify-center">
                 <Mic className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-white">DiaLuv Podcast</h2>
-                <p className="text-slate-400">Dating insights and real conversations</p>
+                <h2 className="text-3xl font-bold text-simples-midnight">DiaLuv Podcast</h2>
+                <p className="text-simples-storm">Dating insights and real conversations</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            <div className="flex items-center gap-2 text-simples-storm">
+              <div className="w-2 h-2 bg-simples-rose rounded-full animate-pulse" />
               <span className="text-sm">Live Series</span>
             </div>
           </div>
@@ -328,7 +328,7 @@ const Lounge = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Video Player */}
             <div className="lg:col-span-2">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-700">
+              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
                 <YouTubePlayer
                   videoId={currentVideoId}
                   title={podcastEpisodes.find(ep => ep.videoId === currentVideoId)?.title || "DiaLuv Podcast"}
@@ -340,16 +340,16 @@ const Lounge = () => {
                     <h3 className="text-xl font-bold text-white mb-2">
                       {podcastEpisodes.find(ep => ep.videoId === currentVideoId)?.title}
                     </h3>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-simples-silver text-sm">
                       {podcastEpisodes.find(ep => ep.videoId === currentVideoId)?.description}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1 text-slate-400">
+                    <div className="flex items-center gap-1 text-simples-silver">
                       <Heart className="w-4 h-4" />
                       <span className="text-sm">247</span>
                     </div>
-                    <div className="flex items-center gap-1 text-slate-400">
+                    <div className="flex items-center gap-1 text-simples-silver">
                       <ThumbsUp className="w-4 h-4" />
                       <span className="text-sm">89</span>
                     </div>
@@ -360,9 +360,9 @@ const Lounge = () => {
 
             {/* Episode Queue */}
             <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-700">
+              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
                 <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                  <Play className="w-5 h-5 text-amber-400" />
+                  <Play className="w-5 h-5 text-simples-ocean" />
                   Episode Queue
                 </h3>
                 
@@ -388,12 +388,12 @@ const Lounge = () => {
         <div className="mb-20">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-2xl flex items-center justify-center">
                 <Music className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-white">Vibes & Music</h2>
-                <p className="text-slate-400">Discover the soundtrack of love</p>
+                <h2 className="text-3xl font-bold text-simples-midnight">Vibes & Music</h2>
+                <p className="text-simples-storm">Discover the soundtrack of love</p>
               </div>
             </div>
             <PremiumButton
@@ -406,12 +406,12 @@ const Lounge = () => {
             </PremiumButton>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl border border-slate-700">
+          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-8 shadow-2xl border border-simples-silver">
             {/* Featured Track */}
             {musicSubmissions.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                  <Crown className="w-6 h-6 text-amber-400" />
+                  <Crown className="w-6 h-6 text-simples-ocean" />
                   Featured Track
                 </h3>
                 <div className="flex flex-col lg:flex-row gap-8 items-center">
@@ -425,7 +425,7 @@ const Lounge = () => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-amber-400 to-rose-400 flex items-center justify-center">
+                          <div className="w-full h-full bg-gradient-to-br from-simples-ocean to-simples-sky flex items-center justify-center">
                             <Music className="w-16 h-16 text-white" />
                           </div>
                         )}
@@ -444,20 +444,20 @@ const Lounge = () => {
                     <h4 className="text-3xl font-bold text-white mb-2">
                       {musicSubmissions[0].song_title}
                     </h4>
-                    <p className="text-xl text-slate-400 mb-4">
+                    <p className="text-xl text-simples-silver mb-4">
                       {musicSubmissions[0].artist_name}
                     </p>
                     {musicSubmissions[0].genre && (
-                      <div className="inline-block bg-gradient-to-r from-amber-400 to-rose-400 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+                      <div className="inline-block bg-gradient-to-r from-simples-ocean to-simples-sky text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
                         {musicSubmissions[0].genre}
                       </div>
                     )}
                     <div className="flex items-center justify-center lg:justify-start gap-4">
-                      <div className="flex items-center gap-1 text-slate-400">
+                      <div className="flex items-center gap-1 text-simples-silver">
                         <Heart className="w-4 h-4" />
                         <span>142</span>
                       </div>
-                      <div className="flex items-center gap-1 text-slate-400">
+                      <div className="flex items-center gap-1 text-simples-silver">
                         <Volume2 className="w-4 h-4" />
                         <span>2.3k plays</span>
                       </div>
@@ -470,7 +470,7 @@ const Lounge = () => {
             {/* Music Grid */}
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-amber-400" />
+                <Sparkles className="w-6 h-6 text-simples-ocean" />
                 Community Favorites
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -492,15 +492,15 @@ const Lounge = () => {
         {/* Community Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Share Your Story */}
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl border border-slate-700">
+          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-8 shadow-2xl border border-simples-silver">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-rose-500 to-pink-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-xl flex items-center justify-center">
                   <Heart className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">Share Your Story</h3>
-                  <p className="text-slate-400 text-sm">Inspire others with your journey</p>
+                  <p className="text-simples-silver text-sm">Inspire others with your journey</p>
                 </div>
               </div>
               <PremiumButton
@@ -514,13 +514,13 @@ const Lounge = () => {
             </div>
 
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <MessageCircle className="w-8 h-8 text-white" />
               </div>
               <h4 className="text-lg font-semibold text-white mb-3">
                 Your Story Matters
               </h4>
-              <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              <p className="text-simples-silver text-sm mb-6 leading-relaxed">
                 Share your dating experiences, lessons learned, and moments of growth. 
                 Your story could be the inspiration someone needs.
               </p>
@@ -536,15 +536,15 @@ const Lounge = () => {
           </div>
 
           {/* Ask the Community */}
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl border border-slate-700">
+          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-8 shadow-2xl border border-simples-silver">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-xl flex items-center justify-center">
                   <HelpCircle className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">Ask the Community</h3>
-                  <p className="text-slate-400 text-sm">Get wisdom from the collective</p>
+                  <p className="text-simples-silver text-sm">Get wisdom from the collective</p>
                 </div>
               </div>
               <PremiumButton
@@ -558,13 +558,13 @@ const Lounge = () => {
             </div>
 
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <HelpCircle className="w-8 h-8 text-white" />
               </div>
               <h4 className="text-lg font-semibold text-white mb-3">
                 Seek Wisdom
               </h4>
-              <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              <p className="text-simples-silver text-sm mb-6 leading-relaxed">
                 Our community is here to support you. Ask questions about dating, 
                 relationships, and personal growth.
               </p>
@@ -584,15 +584,15 @@ const Lounge = () => {
       {/* Enhanced Modals */}
       {activeModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-2xl border border-slate-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl shadow-2xl border border-simples-silver w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-8">
               {/* Modal Header */}
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                    activeModal === 'music' ? 'bg-gradient-to-r from-purple-500 to-pink-600' :
-                    activeModal === 'story' ? 'bg-gradient-to-r from-rose-500 to-pink-600' :
-                    'bg-gradient-to-r from-blue-500 to-purple-600'
+                    activeModal === 'music' ? 'bg-gradient-to-r from-simples-lavender to-simples-rose' :
+                    activeModal === 'story' ? 'bg-gradient-to-r from-simples-rose to-simples-lavender' :
+                    'bg-gradient-to-r from-simples-tropical to-simples-lavender'
                   }`}>
                     {activeModal === 'music' ? <Music className="w-6 h-6 text-white" /> :
                      activeModal === 'story' ? <Heart className="w-6 h-6 text-white" /> :
@@ -604,7 +604,7 @@ const Lounge = () => {
                        activeModal === 'story' ? 'Share Your Story' :
                        'Ask the Community'}
                     </h2>
-                    <p className="text-slate-400">
+                    <p className="text-simples-silver">
                       {activeModal === 'music' ? 'Share music that moves your soul' :
                        activeModal === 'story' ? 'Your journey inspires others' :
                        'Get wisdom from our community'}
@@ -613,7 +613,7 @@ const Lounge = () => {
                 </div>
                 <button
                   onClick={closeModal}
-                  className="text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-700"
+                  className="text-simples-silver hover:text-white transition-colors p-2 rounded-full hover:bg-simples-storm"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -621,20 +621,20 @@ const Lounge = () => {
 
               {/* Success Message */}
               {success && (
-                <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 mb-8">
+                <div className="bg-simples-tropical/10 border border-simples-tropical/20 rounded-2xl p-6 mb-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-simples-tropical rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-green-400 font-semibold">
+                      <p className="text-simples-tropical font-semibold">
                         {activeModal === 'music' ? 'Music submitted successfully!' :
                          activeModal === 'story' ? 'Story shared successfully!' :
                          'Question submitted successfully!'}
                       </p>
-                      <p className="text-green-300 text-sm">Thank you for contributing to our community.</p>
+                      <p className="text-simples-tropical text-sm">Thank you for contributing to our community.</p>
                     </div>
                   </div>
                 </div>
