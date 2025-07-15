@@ -79,35 +79,38 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-simples-ocean/10 to-simples-sky/10 blur-3xl" />
-        <div className="relative bg-gradient-to-r from-simples-cloud to-simples-silver px-6 py-16">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-6">
-              Events
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-simples-storm mb-8 max-w-3xl mx-auto leading-relaxed">
-              Connect with fellow Ugandans in the diaspora through cultural celebrations, romantic meetups, and community building events.
-            </p>
-            
-            <PremiumButton
-              onClick={() => setShowSuggestionModal(true)}
-              variant="primary"
-              size="large"
-              icon={Plus}
-              className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white font-medium hover:shadow-lg transition-all duration-300"
-            >
-              Suggest Event
-            </PremiumButton>
+    <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <main className="px-4 md:px-6 py-6 max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="card">
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-4">
+                Events
+              </h1>
+              
+              <p className="text-lg md:text-xl text-simples-storm mb-6 max-w-3xl mx-auto leading-relaxed">
+                Connect with fellow Ugandans in the diaspora through cultural celebrations, romantic meetups, and community building events.
+              </p>
+              
+              <PremiumButton
+                onClick={() => setShowSuggestionModal(true)}
+                variant="primary"
+                size="large"
+                icon={Plus}
+                className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white font-medium hover:shadow-lg transition-all duration-300"
+              >
+                Suggest Event
+              </PremiumButton>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-16">
+        {/* Main Content */}
+        <div className="mb-8">
         {/* Simple Message */}
         <div className="text-center py-16">
           <div className="w-24 h-24 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
@@ -129,13 +132,14 @@ const Events = () => {
           </div>
         </div>
 
-        {/* Future Events Grid Container - Hidden for now */}
-        <div className="hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Events will be displayed here when available */}
+          {/* Future Events Grid Container - Hidden for now */}
+          <div className="hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Events will be displayed here when available */}
+            </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Suggestion Modal */}
       {showSuggestionModal && (

@@ -293,25 +293,28 @@ const Lounge = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-simples-ocean/10 to-simples-sky/10 blur-3xl" />
-        <div className="relative bg-gradient-to-r from-simples-cloud to-simples-silver px-6 py-16">
-          <div className="max-w-6xl mx-auto text-center">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-6">
-              The Lounge
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-simples-storm mb-8 max-w-3xl mx-auto leading-relaxed">
-              Where culture, music, and meaningful conversations create magic
-            </p>
+    <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <main className="px-4 md:px-6 py-6 max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="card">
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Coffee className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-4">
+                The Lounge
+              </h1>
+              
+              <p className="text-lg md:text-xl text-simples-storm mb-6 max-w-3xl mx-auto leading-relaxed">
+                Where culture, music, and meaningful conversations create magic
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
+        {/* Main Content */}
+        <div className="mb-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - DiaLuv Show */}
           <div className="lg:col-span-2">
@@ -555,7 +558,7 @@ const Lounge = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Enhanced Modals */}
       {activeModal && (
