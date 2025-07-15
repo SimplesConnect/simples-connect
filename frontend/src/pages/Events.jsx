@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Calendar, Plus, Send, X, User, Mail, FileText, Clock } from 'lucide-react';
+import { Calendar, Plus, Send, X, User, Mail, FileText, Clock, Sparkles, Crown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { PremiumButton, LocationFilter, EventCategoryCard } from '../components/premium';
 
 const Events = () => {
   const { user } = useAuth();
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [formData, setFormData] = useState({
     eventName: '',
     description: '',
@@ -15,6 +17,37 @@ const Events = () => {
     userName: '',
     email: ''
   });
+
+  const eventCategories = [
+    {
+      type: 'meetups',
+      name: 'Exclusive Meetups',
+      description: 'Elite gatherings for sophisticated singles in premier locations',
+      upcomingCount: 3,
+      totalCount: 12
+    },
+    {
+      type: 'activities',
+      name: 'Curated Activities',
+      description: 'Unique experiences designed for meaningful connections',
+      upcomingCount: 7,
+      totalCount: 24
+    },
+    {
+      type: 'business',
+      name: 'Professional Events',
+      description: 'Network with successful professionals in your industry',
+      upcomingCount: 2,
+      totalCount: 8
+    },
+    {
+      type: 'community',
+      name: 'Community Galas',
+      description: 'Celebrate life and love with our exclusive community',
+      upcomingCount: 1,
+      totalCount: 6
+    }
+  ];
 
   const handleInputChange = (e) => {
     setFormData({
@@ -52,7 +85,6 @@ const Events = () => {
         email: ''
       });
 
-      // Close modal after 2 seconds
       setTimeout(() => {
         setShowSuggestionModal(false);
         setSuccess(false);
@@ -78,108 +110,162 @@ const Events = () => {
     });
   };
 
+  const handleLocationChange = (location) => {
+    setSelectedLocation(location);
+  };
+
+  const handleCategoryClick = (category) => {
+    console.log('Category clicked:', category);
+    // TODO: Navigate to filtered events page
+  };
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-simples-cloud via-simples-silver to-simples-light">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-white/50 px-4 py-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-xl flex items-center justify-center shadow-lg">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-simples-midnight">Events</h1>
-                <p className="text-simples-storm">Connect through community gatherings</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 to-rose-600/20 blur-3xl" />
+        <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-16">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-amber-400/10 backdrop-blur-sm rounded-full px-4 py-2 mb-8">
+              <Crown className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 font-medium">Premium Events</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-amber-400 to-rose-400 bg-clip-text text-transparent mb-6">
+              Exclusive Events
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Where exceptional individuals gather to create extraordinary connections
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <PremiumButton
+                onClick={() => setShowSuggestionModal(true)}
+                variant="primary"
+                size="large"
+                icon={Plus}
+                className="min-w-[200px]"
+              >
+                Suggest an Event
+              </PremiumButton>
+              
+              <div className="w-full sm:w-80">
+                <LocationFilter 
+                  onLocationChange={handleLocationChange}
+                  placeholder="Filter by location"
+                />
               </div>
             </div>
-            <button
-              onClick={() => setShowSuggestionModal(true)}
-              className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Suggest an Event
-            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="card max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <div className="w-24 h-24 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+      <div className="max-w-6xl mx-auto px-6 py-16">
+        {/* Event Categories */}
+        <div className="mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Curated Event Categories
+            </h2>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+              Discover premium experiences designed for discerning individuals
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {eventCategories.map((category, index) => (
+              <EventCategoryCard
+                key={category.type}
+                category={category}
+                onClick={() => handleCategoryClick(category)}
+                className={`transform transition-all duration-500 hover:scale-105 ${
+                  index % 2 === 0 ? 'md:translate-y-4' : ''
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Empty State */}
+        <div className="text-center py-16">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-12 shadow-2xl border border-slate-700">
+            <div className="w-24 h-24 bg-gradient-to-r from-amber-400 to-rose-400 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
               <Calendar className="w-12 h-12 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-simples-midnight mb-4">
-              No events scheduled yet
-            </h2>
-            <p className="text-simples-storm text-lg leading-relaxed">
-              Check back soon for exciting meetups and community gatherings! 
-              We're working on bringing amazing events to connect our community.
-            </p>
-          </div>
-
-          <div className="bg-gradient-to-r from-simples-cloud to-simples-silver rounded-xl p-6 mb-8">
-            <h3 className="text-lg font-semibold text-simples-midnight mb-2">
-              Have an event idea?
+            
+            <h3 className="text-3xl font-bold text-white mb-4">
+              Preparing Something Extraordinary
             </h3>
-            <p className="text-simples-storm mb-4">
-              Help us create memorable experiences by suggesting events you'd love to attend.
+            
+            <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Our team is curating exclusive events that match the sophistication of our community. 
+              Be the first to know when we launch our premium event series.
             </p>
-            <button
+            
+            <div className="bg-gradient-to-r from-slate-700 to-slate-800 rounded-2xl p-8 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-amber-400 to-rose-400 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                  <h4 className="text-white font-semibold mb-2">Exclusive Venues</h4>
+                  <p className="text-slate-400 text-sm">Premium locations across major cities</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-rose-400 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Crown className="w-8 h-8 text-white" />
+                  </div>
+                  <h4 className="text-white font-semibold mb-2">Curated Experiences</h4>
+                  <p className="text-slate-400 text-sm">Thoughtfully designed for meaningful connections</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <User className="w-8 h-8 text-white" />
+                  </div>
+                  <h4 className="text-white font-semibold mb-2">Elite Community</h4>
+                  <p className="text-slate-400 text-sm">Connect with like-minded professionals</p>
+                </div>
+              </div>
+            </div>
+            
+            <PremiumButton
               onClick={() => setShowSuggestionModal(true)}
-              className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-2 mx-auto"
+              variant="luxury"
+              size="large"
+              icon={Plus}
+              className="mx-auto"
             >
-              <Plus className="w-5 h-5" />
-              Suggest an Event
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-sky rounded-xl flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-simples-midnight mb-2">Meetups</h4>
-              <p className="text-simples-storm text-sm">Connect with other singles in your area</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-simples-midnight mb-2">Activities</h4>
-              <p className="text-simples-storm text-sm">Fun group activities and workshops</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-tropical rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-8 h-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-simples-midnight mb-2">Special Events</h4>
-              <p className="text-simples-storm text-sm">Unique experiences and celebrations</p>
-            </div>
+              Shape Our Event Calendar
+            </PremiumButton>
           </div>
         </div>
       </div>
 
       {/* Suggestion Modal */}
       {showSuggestionModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-2xl border border-slate-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
               {/* Modal Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-xl flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-white" />
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-amber-400 to-rose-400 rounded-2xl flex items-center justify-center">
+                    <Plus className="w-6 h-6 text-white" />
                   </div>
-                  <h2 className="text-xl font-bold text-simples-midnight">
-                    Suggest an Event
-                  </h2>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">
+                      Suggest an Event
+                    </h2>
+                    <p className="text-slate-400">Help us create extraordinary experiences</p>
+                  </div>
                 </div>
                 <button
                   onClick={closeModal}
-                  className="text-simples-storm hover:text-simples-midnight transition-colors"
+                  className="text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-700"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -187,135 +273,130 @@ const Events = () => {
 
               {/* Success Message */}
               {success && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <p className="text-green-800 font-semibold">
-                      Event suggestion submitted successfully!
-                    </p>
+                    <div>
+                      <p className="text-green-400 font-semibold">Event suggestion submitted!</p>
+                      <p className="text-green-300 text-sm">Our events team will review your suggestion.</p>
+                    </div>
                   </div>
-                  <p className="text-green-700 text-sm mt-1">
-                    We'll review your suggestion and get back to you soon.
-                  </p>
                 </div>
               )}
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
+                  <label className="block text-white font-medium mb-3">
                     Event Name *
                   </label>
                   <div className="relative">
-                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-storm" />
+                    <FileText className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
                       type="text"
                       name="eventName"
                       value={formData.eventName}
                       onChange={handleInputChange}
-                      className="input-field pl-10"
-                      placeholder="What's your event idea?"
+                      className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                      placeholder="What's your event vision?"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
+                  <label className="block text-white font-medium mb-3">
                     Description
                   </label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    rows={3}
-                    className="input-field resize-none"
-                    placeholder="Tell us more about your event idea..."
+                    rows={4}
+                    className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300 resize-none"
+                    placeholder="Describe your ideal event experience..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
+                  <label className="block text-white font-medium mb-3">
                     Suggested Date
                   </label>
                   <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-storm" />
+                    <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
                       type="date"
                       name="suggestedDate"
                       value={formData.suggestedDate}
                       onChange={handleInputChange}
-                      className="input-field pl-10"
+                      className="w-full bg-slate-700 border border-slate-600 text-white rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
                       min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
-                    Your Name *
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-storm" />
-                    <input
-                      type="text"
-                      name="userName"
-                      value={formData.userName}
-                      onChange={handleInputChange}
-                      className="input-field pl-10"
-                      placeholder="Your name"
-                      required
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-white font-medium mb-3">
+                      Your Name *
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="userName"
+                        value={formData.userName}
+                        onChange={handleInputChange}
+                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        placeholder="Your name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-white font-medium mb-3">
+                      Email *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-400 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300"
+                        placeholder="your@email.com"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
-                    Email *
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-storm" />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="input-field pl-10"
-                      placeholder="your@email.com"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
+                <div className="flex gap-4 pt-6">
+                  <PremiumButton
                     onClick={closeModal}
-                    className="flex-1 bg-simples-silver text-simples-midnight px-6 py-3 rounded-xl font-semibold hover:bg-simples-storm/20 transition-colors"
+                    variant="ghost"
+                    size="large"
+                    className="flex-1"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </PremiumButton>
+                  <PremiumButton
                     type="submit"
+                    variant="primary"
+                    size="large"
+                    loading={loading}
                     disabled={loading}
-                    className="flex-1 bg-gradient-to-r from-simples-ocean to-simples-sky text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50"
+                    icon={Send}
+                    className="flex-1"
                   >
-                    {loading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5" />
-                        Submit Suggestion
-                      </>
-                    )}
-                  </button>
+                    Submit Suggestion
+                  </PremiumButton>
                 </div>
               </form>
             </div>

@@ -220,28 +220,40 @@ const Dashboard = () => {
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-simples-cloud/50 rounded-xl">
+              <div 
+                className="text-center p-4 bg-simples-cloud/50 rounded-xl cursor-pointer hover:bg-simples-cloud/70 transition-colors"
+                onClick={() => navigate('/matches')}
+              >
                 <Users className="w-6 h-6 text-simples-ocean mx-auto mb-2" />
                 <p className="text-2xl font-bold text-simples-midnight">
                   {loadingStats ? '...' : dashboardStats.newMatches}
                 </p>
                 <p className="text-sm text-simples-storm">New Matches</p>
               </div>
-              <div className="text-center p-4 bg-simples-cloud/50 rounded-xl">
+              <div 
+                className="text-center p-4 bg-simples-cloud/50 rounded-xl cursor-pointer hover:bg-simples-cloud/70 transition-colors"
+                onClick={() => navigate('/messages')}
+              >
                 <MessageCircle className="w-6 h-6 text-simples-tropical mx-auto mb-2" />
                 <p className="text-2xl font-bold text-simples-midnight">
                   {loadingStats ? '...' : dashboardStats.messages}
                 </p>
                 <p className="text-sm text-simples-storm">Messages</p>
               </div>
-              <div className="text-center p-4 bg-simples-cloud/50 rounded-xl">
+              <div 
+                className="text-center p-4 bg-simples-cloud/50 rounded-xl cursor-pointer hover:bg-simples-cloud/70 transition-colors"
+                onClick={() => navigate('/discover')}
+              >
                 <Heart className="w-6 h-6 text-simples-rose mx-auto mb-2" />
                 <p className="text-2xl font-bold text-simples-midnight">
                   {loadingStats ? '...' : dashboardStats.likes}
                 </p>
                 <p className="text-sm text-simples-storm">Likes</p>
               </div>
-              <div className="text-center p-4 bg-simples-cloud/50 rounded-xl">
+              <div 
+                className="text-center p-4 bg-simples-cloud/50 rounded-xl cursor-pointer hover:bg-simples-cloud/70 transition-colors"
+                onClick={() => navigate('/discover')}
+              >
                 <Sparkles className="w-6 h-6 text-simples-lavender mx-auto mb-2" />
                 <p className="text-2xl font-bold text-simples-midnight">
                   {loadingStats ? '...' : dashboardStats.superLikes}
@@ -293,7 +305,10 @@ const Dashboard = () => {
         <div className="mb-8">
           <div className="grid md:grid-cols-3 gap-6">
             {/* Events Card */}
-            <div className="card group hover:shadow-xl transition-all duration-300 cursor-pointer">
+            <div 
+              className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => navigate('/events')}
+            >
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                   <Calendar className="w-8 h-8 text-white" />
@@ -302,7 +317,7 @@ const Dashboard = () => {
                   Events
                 </h3>
                 <p className="text-simples-storm mb-4">
-                  Join community events and meetups to connect with other Ugandans.
+                  Join exclusive events and meetups to connect with other singles.
                 </p>
                 <button className="btn-primary w-full">
                   View Events
@@ -311,7 +326,10 @@ const Dashboard = () => {
             </div>
 
             {/* Lounge Card */}
-            <div className="card group hover:shadow-xl transition-all duration-300 cursor-pointer">
+            <div 
+              className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => navigate('/lounge')}
+            >
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                   <Coffee className="w-8 h-8 text-white" />
@@ -320,7 +338,7 @@ const Dashboard = () => {
                   Lounge
                 </h3>
                 <p className="text-simples-storm mb-4">
-                  Relax and chat with the community in our casual lounge space.
+                  Discover music, share stories, and connect with the community.
                 </p>
                 <button className="btn-secondary w-full">
                   Enter Lounge
@@ -329,7 +347,10 @@ const Dashboard = () => {
             </div>
 
             {/* Resources Card */}
-            <div className="card group hover:shadow-xl transition-all duration-300 cursor-pointer">
+            <div 
+              className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => navigate('/resources')}
+            >
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-simples-rose to-simples-sky rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                   <BookOpen className="w-8 h-8 text-white" />
