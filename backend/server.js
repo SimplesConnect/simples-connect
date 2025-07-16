@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const matchingRoutes = require('./routes/matching');
 const messagesRoutes = require('./routes/messages');
 const usersRoutes = require('./routes/users');
+const audioRoutes = require('./routes/audio');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/matching', matchingRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/audio', audioRoutes);
 
 app.get('/', (req, res) => {
   res.send('Simples Connect backend is live 🚀');

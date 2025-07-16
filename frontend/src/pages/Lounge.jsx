@@ -298,18 +298,32 @@ const Lounge = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Fetch audio tracks from database
+  // Fetch audio tracks from YOUR backend API
   const fetchAudioTracks = async () => {
     try {
       setLoadingTracks(true);
-      const response = await fetch('/api/audio/tracks?featured=true&limit=10');
-      const data = await response.json();
+      console.log('Fetching audio tracks from backend...');
       
-      if (data.success && data.tracks) {
+      // Use your actual backend URL
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/audio/tracks?featured=true&limit=10`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Audio tracks response:', data);
+      
+      if (data.success && data.tracks && data.tracks.length > 0) {
+        console.log('Found audio tracks:', data.tracks.length);
         setAudioTracks(data.tracks);
+      } else {
+        console.log('No audio tracks found in database');
+        setAudioTracks([]);
       }
     } catch (error) {
       console.error('Error fetching audio tracks:', error);
+      setAudioTracks([]);
     } finally {
       setLoadingTracks(false);
     }
@@ -442,13 +456,24 @@ const Lounge = () => {
                 </div>
               </div>
             ) : audioTracks.length > 0 ? (
-              <AudioPlayer 
-                tracks={audioTracks}
-                currentTrackIndex={currentTrackIndex}
-                onTrackChange={handleTrackChange}
-                showQueue={true}
-                className="shadow-2xl border border-simples-silver"
-              />
+              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
+                    <Music className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
+                    <p className="text-simples-silver text-sm">Love-themed playlist</p>
+                  </div>
+                </div>
+                <AudioPlayer 
+                  tracks={audioTracks}
+                  currentTrackIndex={currentTrackIndex}
+                  onTrackChange={handleTrackChange}
+                  showQueue={true}
+                  className="shadow-2xl border border-simples-silver"
+                />
+              </div>
             ) : (
               <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
                 <div className="flex items-center gap-3 mb-4">
@@ -770,4 +795,4 @@ const Lounge = () => {
   );
 };
 
-export default Lounge; 
+export default Lounge;

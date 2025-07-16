@@ -27,5 +27,8 @@
     "concurrently": "^8.2.2",
     "postcss": "^8.5.5",
     "tailwindcss": "^3.4.17"
+  },
+  "dependencies": {
+    "formidable": "^3.5.4"
   }
 }
