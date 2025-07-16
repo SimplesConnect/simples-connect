@@ -6,7 +6,8 @@ import {
   SkipForward, 
   Heart,
   Volume2,
-  VolumeX
+  VolumeX,
+  Music
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -303,6 +304,17 @@ const AudioPlayer = ({
   return (
     <div className={`bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver ${className}`}>
       <audio ref={audioRef} preload="metadata" />
+      
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
+          <Music className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
+          <p className="text-simples-silver text-sm">Love-themed playlist</p>
+        </div>
+      </div>
       
       {/* Current Track Display */}
       <div className="flex items-center gap-4 mb-6">
