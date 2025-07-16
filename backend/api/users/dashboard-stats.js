@@ -57,11 +57,12 @@ module.exports = async (req, res) => {
         .eq('target_user_id', userId)
         .eq('interaction_type', 'like');
       
-      // Get unread messages count (simplified)
+      // Get unread messages count - FIXED: Use correct column name
       const { data: unreadMessages } = await supabase
         .from('messages')
         .select('id')
-        .neq('sender_id', userId)
+        .eq('receiver_id', userId)  // Only messages sent TO this user
+        .neq('sender_id', userId)    // Exclude messages sent BY this user
         .eq('is_read', false);
       
       const stats = {

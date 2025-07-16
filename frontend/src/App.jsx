@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthProvider from './context/AuthContext';
+import { MessageProvider } from './context/MessageContext';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -36,6 +37,19 @@ const AuthenticatedLayout = ({ children }) => {
   );
 };
 
+// Layout component for public pages (accessible without login)
+const PublicLayout = ({ children }) => {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1">
+        {children}
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
 // App content component that can use auth context
 const AppContent = () => {
   const { user } = useAuth();
@@ -47,6 +61,56 @@ const AppContent = () => {
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth-callback" element={<AuthCallback />} />
+          
+          {/* Public Routes with Header (accessible without login) */}
+          <Route
+            path="/events"
+            element={
+              <PublicLayout>
+                <Events />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/lounge"
+            element={
+              <PublicLayout>
+                <Lounge />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources"
+            element={
+              <PublicLayout>
+                <Resources />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/policies"
+            element={
+              <PublicLayout>
+                <Policies />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/safety-tips"
+            element={
+              <PublicLayout>
+                <SafetyTips />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/community-guidelines"
+            element={
+              <PublicLayout>
+                <CommunityGuidelines />
+              </PublicLayout>
+            }
+          />
           
           {/* Protected Routes with Header */}
           <Route
@@ -139,66 +203,6 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/events"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <Events />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/lounge"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <Lounge />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/resources"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <Resources />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/policies"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <Policies />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/safety-tips"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <SafetyTips />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/community-guidelines"
-            element={
-              <PrivateRoute>
-                <AuthenticatedLayout>
-                  <CommunityGuidelines />
-                </AuthenticatedLayout>
-              </PrivateRoute>
-            }
-          />
           
           {/* Redirect any unknown routes to dashboard if authenticated, otherwise to landing */}
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -215,10 +219,6 @@ function App() {
         <AppContent />
       </MessageProvider>
     </AuthProvider>
-  );
-}
-
-export default App;
   );
 }
 
