@@ -56,6 +56,18 @@
       "dest": "/api/messages/read.js"
     },
     {
+      "src": "/api/audio/tracks",
+      "dest": "/api/audio/tracks.js"
+    },
+    {
+      "src": "/api/audio/upload",
+      "dest": "/api/audio/upload.js"
+    },
+    {
+      "src": "/api/audio/play",
+      "dest": "/api/audio/play.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/server.js"
     },

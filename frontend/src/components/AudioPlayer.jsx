@@ -4,12 +4,9 @@ import {
   Pause, 
   SkipBack, 
   SkipForward, 
-  Volume2, 
-  VolumeX, 
   Heart,
-  MoreHorizontal,
-  Repeat,
-  Shuffle
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -18,7 +15,6 @@ const AudioPlayer = ({
   tracks = [], 
   currentTrackIndex = 0, 
   onTrackChange,
-  showQueue = true,
   className = ""
 }) => {
   const { user } = useAuth();
@@ -33,8 +29,6 @@ const AudioPlayer = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [likedTracks, setLikedTracks] = useState(new Set());
-  const [isRepeat, setIsRepeat] = useState(false);
-  const [isShuffle, setIsShuffle] = useState(false);
   const [playStartTime, setPlayStartTime] = useState(null);
 
   const currentTrack = tracks[currentTrackIndex];
@@ -86,13 +80,33 @@ const AudioPlayer = ({
   useEffect(() => {
     if (currentTrack && audioRef.current) {
       const audio = audioRef.current;
+      const wasPlaying = isPlaying;
+      
       audio.src = currentTrack.file_url;
-      audio.volume = volume;
+      audio.volume = isMuted ? 0 : volume;
       setError(null);
       setCurrentTime(0);
       setDuration(0);
+      
+      // Auto-play if a track was already playing
+      if (wasPlaying) {
+        audio.load();
+        audio.addEventListener('loadeddata', () => {
+          audio.volume = isMuted ? 0 : volume;
+          audio.play().then(() => {
+            setIsPlaying(true);
+            setPlayStartTime(Date.now());
+            console.log('Auto-play successful for new track');
+          }).catch(error => {
+            console.error('Auto-play failed:', error);
+            setIsPlaying(false);
+          });
+        }, { once: true });
+      } else {
+        audio.volume = isMuted ? 0 : volume;
+      }
     }
-  }, [currentTrack, volume]);
+  }, [currentTrackIndex]);
 
   const loadLikedTracks = async () => {
     try {
@@ -197,6 +211,7 @@ const AudioPlayer = ({
   };
 
   const handleTrackEnd = async () => {
+    console.log('Track ended, moving to next track');
     setIsPlaying(false);
     
     // Record completed play
@@ -206,43 +221,31 @@ const AudioPlayer = ({
     }
     setPlayStartTime(null);
 
-    // Handle repeat/shuffle logic
-    if (isRepeat) {
-      // Replay current track
-      const audio = audioRef.current;
-      audio.currentTime = 0;
-      audio.play();
-      setIsPlaying(true);
-      setPlayStartTime(Date.now());
-    } else {
-      // Move to next track
+    // Auto-play next track after a short delay
+    setTimeout(() => {
       nextTrack();
-    }
+    }, 500);
   };
 
   const nextTrack = () => {
-    if (tracks.length === 0) return;
-    
-    let nextIndex;
-    if (isShuffle) {
-      nextIndex = Math.floor(Math.random() * tracks.length);
-    } else {
-      nextIndex = (currentTrackIndex + 1) % tracks.length;
+    if (tracks.length === 0) {
+      console.log('No tracks available');
+      return;
     }
     
+    const nextIndex = (currentTrackIndex + 1) % tracks.length;
+    console.log(`Moving to next track: ${currentTrackIndex} -> ${nextIndex}`);
     onTrackChange?.(nextIndex);
   };
 
   const prevTrack = () => {
-    if (tracks.length === 0) return;
-    
-    let prevIndex;
-    if (isShuffle) {
-      prevIndex = Math.floor(Math.random() * tracks.length);
-    } else {
-      prevIndex = currentTrackIndex === 0 ? tracks.length - 1 : currentTrackIndex - 1;
+    if (tracks.length === 0) {
+      console.log('No tracks available');
+      return;
     }
     
+    const prevIndex = currentTrackIndex === 0 ? tracks.length - 1 : currentTrackIndex - 1;
+    console.log(`Moving to previous track: ${currentTrackIndex} -> ${prevIndex}`);
     onTrackChange?.(prevIndex);
   };
 
@@ -254,7 +257,7 @@ const AudioPlayer = ({
     const percent = (e.clientX - rect.left) / rect.width;
     const newTime = percent * duration;
     
-    audio.currentTime = newTime;
+        audio.currentTime = newTime;
     setCurrentTime(newTime);
   };
 
@@ -298,37 +301,26 @@ const AudioPlayer = ({
   }
 
   return (
-    <div className={`bg-gradient-to-r from-simples-midnight to-simples-storm rounded-2xl p-6 text-white ${className}`}>
+    <div className={`bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver ${className}`}>
       <audio ref={audioRef} preload="metadata" />
       
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-2xl flex items-center justify-center">
-          <Play className="w-6 h-6 text-white" />
-        </div>
-        <div>
-          <h3 className="text-xl font-bold">Vibe + Music</h3>
-          <p className="text-simples-cloud">Feel the rhythm</p>
-        </div>
-      </div>
-
-      {/* Current Track */}
+      {/* Current Track Display */}
       <div className="flex items-center gap-4 mb-6">
         <img 
-          src={currentTrack.cover_image_url || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&h=80&fit=crop'} 
+          src={currentTrack.cover_image_url || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=64&h=64&fit=crop'} 
           alt={currentTrack.title}
-          className="w-16 h-16 rounded-lg object-cover"
+          className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
         />
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-white truncate">{currentTrack.title}</h4>
-          <p className="text-simples-cloud truncate">{currentTrack.artist_name}</p>
+          <h4 className="font-semibold text-white text-lg truncate">{currentTrack.title}</h4>
+          <p className="text-simples-silver text-sm truncate">{currentTrack.artist_name}</p>
         </div>
         <button 
           onClick={() => toggleLike(currentTrack.id)}
-          className={`p-2 rounded-full transition-colors ${
+          className={`p-2 rounded-lg transition-colors ${
             likedTracks.has(currentTrack.id) 
               ? 'text-simples-rose hover:text-red-400' 
-              : 'text-simples-cloud hover:text-white'
+              : 'text-simples-silver hover:text-white'
           }`}
           disabled={!user}
         >
@@ -337,8 +329,8 @@ const AudioPlayer = ({
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between text-xs text-simples-cloud mb-2">
+      <div className="mb-6">
+        <div className="flex items-center justify-between text-sm text-simples-silver mb-2">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
@@ -348,69 +340,52 @@ const AudioPlayer = ({
           onClick={handleProgressChange}
         >
           <div 
-            className="h-full bg-gradient-to-r from-simples-sky to-simples-ocean rounded-full transition-all duration-150"
+            className="h-full bg-gradient-to-r from-simples-ocean to-simples-tropical rounded-full transition-all duration-150"
             style={{ width: duration ? `${(currentTime / duration) * 100}%` : '0%' }}
           />
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsShuffle(!isShuffle)}
-            className={`p-2 rounded-full transition-colors ${
-              isShuffle ? 'text-simples-sky' : 'text-simples-cloud hover:text-white'
-            }`}
-          >
-            <Shuffle className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setIsRepeat(!isRepeat)}
-            className={`p-2 rounded-full transition-colors ${
-              isRepeat ? 'text-simples-sky' : 'text-simples-cloud hover:text-white'
-            }`}
-          >
-            <Repeat className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={prevTrack}
-            className="text-simples-cloud hover:text-white transition-colors"
-            disabled={tracks.length <= 1}
-          >
-            <SkipBack className="w-6 h-6" />
-          </button>
-          
-          <button 
-            onClick={togglePlay}
-            className="w-12 h-12 bg-white text-simples-midnight rounded-full flex items-center justify-center hover:bg-simples-cloud transition-colors shadow-lg"
-            disabled={isLoading || !!error}
-          >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-simples-ocean border-t-transparent rounded-full animate-spin" />
-            ) : isPlaying ? (
-              <Pause className="w-6 h-6" />
-            ) : (
-              <Play className="w-6 h-6 ml-0.5" />
-            )}
-          </button>
-          
-          <button 
-            onClick={nextTrack}
-            className="text-simples-cloud hover:text-white transition-colors"
-            disabled={tracks.length <= 1}
-          >
-            <SkipForward className="w-6 h-6" />
-          </button>
-        </div>
+      <div className="flex items-center justify-between">
+        <button 
+          onClick={prevTrack}
+          className="text-simples-silver hover:text-white transition-colors p-2"
+          disabled={tracks.length <= 1}
+          title="Previous"
+        >
+          <SkipBack className="w-6 h-6" />
+        </button>
+        
+        <button 
+          onClick={togglePlay}
+          className="w-14 h-14 bg-gradient-to-r from-simples-ocean to-simples-tropical rounded-full flex items-center justify-center text-white hover:from-simples-tropical hover:to-simples-ocean transition-all duration-300 shadow-lg"
+          disabled={isLoading || !!error}
+          title={isPlaying ? 'Pause' : 'Play'}
+        >
+          {isLoading ? (
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : isPlaying ? (
+            <Pause className="w-6 h-6" />
+          ) : (
+            <Play className="w-6 h-6 ml-0.5" />
+          )}
+        </button>
+        
+        <button 
+          onClick={nextTrack}
+          className="text-simples-silver hover:text-white transition-colors p-2"
+          disabled={tracks.length <= 1}
+          title="Next"
+        >
+          <SkipForward className="w-6 h-6" />
+        </button>
 
         <div className="flex items-center gap-2">
           <button 
             onClick={toggleMute}
-            className="text-simples-cloud hover:text-white transition-colors"
+            className="text-simples-silver hover:text-white transition-colors p-2"
+            title={isMuted ? 'Unmute' : 'Mute'}
           >
             {isMuted || volume === 0 ? (
               <VolumeX className="w-5 h-5" />
@@ -424,41 +399,15 @@ const AudioPlayer = ({
             max="100"
             value={isMuted ? 0 : volume * 100}
             onChange={handleVolumeChange}
-            className="w-20 h-1 bg-simples-storm rounded-full appearance-none cursor-pointer slider"
+            className="w-20 h-2 bg-simples-storm rounded-full appearance-none cursor-pointer slider"
           />
         </div>
       </div>
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 mb-4">
-          <p className="text-red-200 text-sm">{error}</p>
-        </div>
-      )}
-
-      {/* Queue */}
-      {showQueue && tracks.length > 1 && (
-        <div>
-          <h5 className="text-sm font-semibold text-simples-cloud mb-3">Up Next</h5>
-          <div className="space-y-2 max-h-32 overflow-y-auto">
-            {tracks.slice(currentTrackIndex + 1, currentTrackIndex + 4).map((track, index) => (
-              <div 
-                key={track.id}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-                onClick={() => onTrackChange?.(currentTrackIndex + 1 + index)}
-              >
-                <img 
-                  src={track.cover_image_url || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=40&h=40&fit=crop'} 
-                  alt={track.title}
-                  className="w-10 h-10 rounded object-cover"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{track.title}</p>
-                  <p className="text-xs text-simples-cloud truncate">{track.artist_name}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mt-4">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 

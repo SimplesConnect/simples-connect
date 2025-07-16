@@ -298,14 +298,14 @@ const Lounge = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Fetch audio tracks from YOUR backend API
+  // Fetch audio tracks from backend API
   const fetchAudioTracks = async () => {
     try {
       setLoadingTracks(true);
       console.log('Fetching audio tracks from backend...');
       
-      // Use your actual backend URL
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/audio/tracks?featured=true&limit=10`);
+      // Use the Vercel proxy to call backend API
+      const response = await fetch('/api/audio/tracks?featured=true&limit=10');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -442,52 +442,21 @@ const Lounge = () => {
             {/* Vibe + Music Card */}
             {loadingTracks ? (
               <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
-                    <Music className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
-                    <p className="text-simples-silver text-sm">Loading tracks...</p>
-                  </div>
-                </div>
                 <div className="flex items-center justify-center py-8">
                   <div className="w-8 h-8 border-2 border-simples-ocean border-t-transparent rounded-full animate-spin"></div>
                 </div>
               </div>
             ) : audioTracks.length > 0 ? (
-              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
-                    <Music className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
-                    <p className="text-simples-silver text-sm">Love-themed playlist</p>
-                  </div>
-                </div>
-                <AudioPlayer 
-                  tracks={audioTracks}
-                  currentTrackIndex={currentTrackIndex}
-                  onTrackChange={handleTrackChange}
-                  showQueue={true}
-                  className="shadow-2xl border border-simples-silver"
-                />
-              </div>
+              <AudioPlayer 
+                tracks={audioTracks}
+                currentTrackIndex={currentTrackIndex}
+                onTrackChange={handleTrackChange}
+              />
             ) : (
               <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
-                    <Music className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
-                    <p className="text-simples-silver text-sm">No tracks available</p>
-                  </div>
-                </div>
                 <div className="text-center py-8">
-                  <p className="text-simples-cloud text-sm">
-                    Audio tracks will appear here once uploaded and approved.
+                  <p className="text-simples-silver text-sm">
+                    No audio tracks available
                   </p>
                 </div>
               </div>
