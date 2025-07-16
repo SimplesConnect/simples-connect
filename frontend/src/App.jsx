@@ -22,6 +22,7 @@ import Resources from './pages/Resources';
 import Policies from './pages/Policies';
 import SafetyTips from './pages/SafetyTips';
 import CommunityGuidelines from './pages/CommunityGuidelines';
+import Disclaimers from './pages/Disclaimers';
 import { useAuth } from './context/AuthContext';
 
 // Layout component for authenticated pages
@@ -108,6 +109,14 @@ const AppContent = () => {
             element={
               <PublicLayout>
                 <CommunityGuidelines />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/disclaimers"
+            element={
+              <PublicLayout>
+                <Disclaimers />
               </PublicLayout>
             }
           />

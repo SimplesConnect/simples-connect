@@ -1,6 +1,6 @@
 // src/components/Messages.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Image as ImageIcon, Send, Paperclip, X, Smile, Mic, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,7 @@ const Messages = () => {
   const { user } = useAuth();
   const { markMatchAsRead, fetchUnreadCount } = useMessages();
   const location = useLocation();
+  const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [selected, setSelected] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -353,14 +354,23 @@ const Messages = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <img src={selected.photo} alt={selected.name} className="w-10 h-10 rounded-full object-cover" />
-          <div className="flex-1">
-            <div className="font-semibold text-simples-midnight">{selected.name}</div>
-            <div className="text-xs text-simples-tropical flex items-center gap-1">
-              <div className="w-2 h-2 bg-simples-tropical rounded-full"></div>
-              online
+          <button 
+            onClick={() => navigate(`/profile/${selected.otherUserId}`)} 
+            className="flex items-center gap-3 hover:bg-simples-cloud rounded-lg p-2 transition-colors group"
+          >
+            <img 
+              src={selected.photo} 
+              alt={selected.name} 
+              className="w-10 h-10 rounded-full object-cover cursor-pointer" 
+            />
+            <div className="flex-1 text-left">
+              <div className="font-semibold text-simples-midnight group-hover:text-simples-ocean transition-colors">{selected.name}</div>
+              <div className="text-xs text-simples-tropical flex items-center gap-1">
+                <div className="w-2 h-2 bg-simples-tropical rounded-full"></div>
+                online
+              </div>
             </div>
-          </div>
+          </button>
           <div className="flex items-center gap-2">
             <button className="p-2 text-simples-storm hover:text-simples-sky rounded-full hover:bg-simples-cloud transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -670,14 +680,26 @@ const Messages = () => {
                   <img 
                     src={conversation.photo} 
                     alt={conversation.name}
-                    className="w-14 h-14 rounded-full object-cover"
+                    className="w-14 h-14 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/profile/${conversation.otherUserId}`);
+                    }}
                   />
                   <div className="absolute bottom-0 right-0 w-4 h-4 bg-simples-tropical border-2 border-white rounded-full"></div>
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold text-simples-midnight truncate">{conversation.name}</h3>
+                    <h3 
+                      className="font-semibold text-simples-midnight truncate cursor-pointer hover:text-simples-ocean transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/profile/${conversation.otherUserId}`);
+                      }}
+                    >
+                      {conversation.name}
+                    </h3>
                     <span className="text-xs text-simples-storm">
                       {new Date(conversation.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>

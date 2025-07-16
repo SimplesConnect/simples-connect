@@ -27,6 +27,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import YouTubePlayer from '../components/YouTubePlayer';
+import AudioPlayer from '../components/AudioPlayer';
 import { VideoThumbnail, MusicCard, PremiumButton } from '../components/premium';
 
 const Lounge = () => {
@@ -40,6 +41,11 @@ const Lounge = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  
+  // Audio player state
+  const [audioTracks, setAudioTracks] = useState([]);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [loadingTracks, setLoadingTracks] = useState(true);
 
   // Podcast episodes data
   const podcastEpisodes = [
@@ -292,6 +298,32 @@ const Lounge = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  // Fetch audio tracks from database
+  const fetchAudioTracks = async () => {
+    try {
+      setLoadingTracks(true);
+      const response = await fetch('/api/audio/tracks?featured=true&limit=10');
+      const data = await response.json();
+      
+      if (data.success && data.tracks) {
+        setAudioTracks(data.tracks);
+      }
+    } catch (error) {
+      console.error('Error fetching audio tracks:', error);
+    } finally {
+      setLoadingTracks(false);
+    }
+  };
+
+  // Load audio tracks on component mount
+  useEffect(() => {
+    fetchAudioTracks();
+  }, []);
+
+  const handleTrackChange = (newIndex) => {
+    setCurrentTrackIndex(newIndex);
+  };
+
   return (
     <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <main className="px-4 md:px-6 py-6 max-w-6xl mx-auto">
@@ -394,84 +426,47 @@ const Lounge = () => {
           {/* Right Column - Community Cards */}
           <div className="lg:col-span-1 space-y-6">
             {/* Vibe + Music Card */}
-            <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
-                  <Music className="w-5 h-5 text-white" />
+            {loadingTracks ? (
+              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
+                    <Music className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
+                    <p className="text-simples-silver text-sm">Loading tracks...</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
-                  <p className="text-simples-silver text-sm">Feel the rhythm</p>
-                </div>
-              </div>
-
-              {/* Featured Song */}
-              <div className="mb-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden">
-                    <img 
-                      src={featuredSong.album_cover_url}
-                      alt="Album cover"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-white font-medium text-sm">{featuredSong.song_title}</h4>
-                    <p className="text-simples-silver text-xs">{featuredSong.artist_name}</p>
-                  </div>
-                  <button
-                    onClick={togglePlay}
-                    className="w-8 h-8 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center hover:scale-105 transition-transform"
-                  >
-                    {isPlaying ? (
-                      <Pause className="w-4 h-4 text-white" />
-                    ) : (
-                      <Play className="w-4 h-4 text-white ml-0.5" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Music Player Bar */}
-                <div className="bg-simples-storm rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-simples-silver text-xs">{formatTime(currentTime)}</span>
-                    <div className="flex-1 bg-simples-midnight rounded-full h-1">
-                      <div 
-                        className="bg-gradient-to-r from-simples-ocean to-simples-sky h-1 rounded-full transition-all duration-300"
-                        style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                      />
-                    </div>
-                    <span className="text-simples-silver text-xs">{formatTime(duration)}</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <Volume2 className="w-4 h-4 text-simples-silver" />
-                    <div className="flex-1 bg-simples-midnight rounded-full h-1">
-                      <div className="bg-simples-ocean h-1 rounded-full w-3/4" />
-                    </div>
-                  </div>
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-8 h-8 border-2 border-simples-ocean border-t-transparent rounded-full animate-spin"></div>
                 </div>
               </div>
-
-              {/* Mini Playlist */}
-              <div className="space-y-2">
-                <h4 className="text-white font-medium text-sm mb-2">Up Next</h4>
-                {musicSubmissions.slice(0, 2).map((track) => (
-                  <div key={track.id} className="flex items-center gap-2 p-2 bg-simples-storm rounded-lg">
-                    <div className="w-8 h-8 rounded overflow-hidden">
-                      <img 
-                        src={track.album_cover_url}
-                        alt="Album cover"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-white text-xs font-medium">{track.song_title}</p>
-                      <p className="text-simples-silver text-xs">{track.artist_name}</p>
-                    </div>
+            ) : audioTracks.length > 0 ? (
+              <AudioPlayer 
+                tracks={audioTracks}
+                currentTrackIndex={currentTrackIndex}
+                onTrackChange={handleTrackChange}
+                showQueue={true}
+                className="shadow-2xl border border-simples-silver"
+              />
+            ) : (
+              <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
+                    <Music className="w-5 h-5 text-white" />
                   </div>
-                ))}
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Vibe + Music</h3>
+                    <p className="text-simples-silver text-sm">No tracks available</p>
+                  </div>
+                </div>
+                <div className="text-center py-8">
+                  <p className="text-simples-cloud text-sm">
+                    Audio tracks will appear here once uploaded and approved.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Ask a Question Card */}
             <div className="bg-gradient-to-br from-simples-midnight to-simples-storm rounded-3xl p-6 shadow-2xl border border-simples-silver">
