@@ -88,11 +88,11 @@ const Events = () => {
               <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Calendar className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-4">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-simples-ocean to-simples-sky bg-clip-text text-transparent mb-4">
                 Events
               </h1>
               
-              <p className="text-lg md:text-xl text-simples-storm mb-6 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-base md:text-lg text-simples-storm mb-6 max-w-3xl mx-auto leading-relaxed">
                 Connect with fellow Ugandans in the diaspora through cultural celebrations, romantic meetups, and community building events.
               </p>
               
@@ -112,7 +112,7 @@ const Events = () => {
         {/* Main Content */}
         <div className="mb-8">
         {/* Simple Message */}
-        <div className="text-center py-16">
+        <div className="text-center py-8">
           <div className="w-24 h-24 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
             <Calendar className="w-12 h-12 text-white" />
           </div>

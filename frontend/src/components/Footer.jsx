@@ -32,18 +32,18 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <a 
-                  href="/terms" 
+                  href="/policies" 
                   className="text-simples-cloud hover:text-simples-sky transition-colors text-sm"
                 >
-                  Terms & Conditions
+                  Policies
                 </a>
               </li>
               <li>
                 <a 
-                  href="/privacy" 
+                  href="/safety-tips" 
                   className="text-simples-cloud hover:text-simples-sky transition-colors text-sm"
                 >
-                  Privacy Policy
+                  Safety Tips
                 </a>
               </li>
               <li>
@@ -56,10 +56,10 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="/cookies" 
+                  href="/community-guidelines" 
                   className="text-simples-cloud hover:text-simples-sky transition-colors text-sm"
                 >
-                  Cookie Policy
+                  Community Guidelines
                 </a>
               </li>
             </ul>

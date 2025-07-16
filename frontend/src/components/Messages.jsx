@@ -4,9 +4,11 @@ import { useLocation } from 'react-router-dom';
 import { Image as ImageIcon, Send, Paperclip, X, Smile, Mic, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useMessages } from '../context/MessageContext';
 
 const Messages = () => {
   const { user } = useAuth();
+  const { markMatchAsRead, fetchUnreadCount } = useMessages();
   const location = useLocation();
   const [conversations, setConversations] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -119,14 +121,8 @@ const Messages = () => {
       const data = await response.json();
       setMessages(data.messages || []);
 
-      // Mark messages as read
-      await fetch(`/api/messages/read/${matchId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // Mark messages as read and update unread count
+      await markMatchAsRead(matchId);
     } catch (error) {
       console.error('Error loading messages:', error);
       setMessages([]);

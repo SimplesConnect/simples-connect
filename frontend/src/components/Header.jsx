@@ -1,13 +1,18 @@
 // src/components/common/Header.jsx
-import React, { useState } from 'react';
-import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, Calendar, Coffee, BookOpen, Bell } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, Calendar, Coffee, BookOpen, Bell, Camera, Search, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useMessages } from '../context/MessageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [imageLoadError, setImageLoadError] = useState(false);
   const { user, signOut } = useAuth();
+  const { unreadCount } = useMessages();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,7 +25,8 @@ const Header = () => {
     }
   };
 
-  const mainNavItems = [
+  // Navigation items for authenticated users
+  const authenticatedNavItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Heart },
     { name: 'Discover', path: '/discover', icon: Heart },
     { name: 'Events', path: '/events', icon: Calendar },
@@ -28,7 +34,70 @@ const Header = () => {
     { name: 'Resources', path: '/resources', icon: BookOpen },
   ];
 
+  // Navigation items for non-authenticated users
+  const publicNavItems = [
+    { name: 'Events', path: '/events', icon: Calendar },
+    { name: 'Lounge', path: '/lounge', icon: Coffee },
+    { name: 'Resources', path: '/resources', icon: BookOpen },
+  ];
+
+  // Use appropriate nav items based on authentication status
+  const mainNavItems = user ? authenticatedNavItems : publicNavItems;
+
   const isActivePath = (path) => location.pathname === path;
+
+  // Fetch user profile data for profile picture
+  const fetchUserProfile = async () => {
+    if (user) {
+      try {
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select('full_name, profile_picture_url, email')
+          .eq('id', user.id)
+          .single();
+
+        if (!error && profileData) {
+          setUserProfile(profileData);
+          setImageLoadError(false); // Reset image error when profile updates
+        }
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+      }
+    } else {
+      setUserProfile(null);
+      setImageLoadError(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, [user]);
+
+  // Listen for profile updates
+  useEffect(() => {
+    if (user) {
+      const channel = supabase
+        .channel('profile_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${user.id}`
+          },
+          () => {
+            // Refresh profile data when it's updated
+            fetchUserProfile();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user]);
 
   return (
     <header className="bg-white/80 backdrop-blur-sm border-b border-simples-silver/50 sticky top-0 z-40 shadow-lg">
@@ -67,87 +136,132 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-6">
-            {/* Messages Icon */}
-            <button
-              onClick={() => navigate('/messages')}
-              className={`relative p-3 rounded-xl transition-all duration-300 ${
-                isActivePath('/messages') 
-                  ? 'bg-simples-ocean/20 text-simples-ocean' 
-                  : 'text-simples-storm hover:text-simples-ocean hover:bg-simples-cloud/50'
-              }`}
-            >
-              <MessageCircle className="w-6 h-6" />
-              {/* Message notification badge */}
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-simples-rose rounded-full flex items-center justify-center">
-                <span className="text-xs text-white font-bold">3</span>
-              </div>
-            </button>
-
-            {/* User Profile */}
-            <div className="relative">
+            {/* Messages Icon - Only show for authenticated users */}
+            {user && (
               <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-4 bg-white/80 hover:bg-white/90 px-4 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-simples-silver/50"
+                onClick={() => navigate('/messages')}
+                className={`relative p-3 rounded-xl transition-all duration-300 ${
+                  isActivePath('/messages') 
+                    ? 'bg-simples-ocean/20 text-simples-ocean' 
+                    : 'text-simples-storm hover:text-simples-ocean hover:bg-simples-cloud/50'
+                }`}
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
-                </div>
-                <span className="hidden md:inline font-medium text-simples-midnight">
-                  {user?.user_metadata?.full_name || 'User'}
-                </span>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              </button>
-
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-3 w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-simples-silver/50 py-3 z-50">
-                  <div className="px-4 py-3 border-b border-simples-silver/50">
-                    <p className="font-semibold text-simples-midnight">
-                      {user?.user_metadata?.full_name || 'User'}
-                    </p>
-                    <p className="text-sm text-simples-storm">{user?.email}</p>
+                <MessageCircle className="w-6 h-6" />
+                {/* Message notification badge */}
+                {unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 bg-simples-rose rounded-full flex items-center justify-center px-1">
+                    <span className="text-xs text-white font-bold">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
                   </div>
-                  
-                  <button
-                    onClick={() => {
-                      navigate(`/profile/${user.id}`);
-                      setUserMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
-                  >
-                    <User className="w-5 h-5" />
-                    View Profile
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate('/edit-profile');
-                      setUserMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
-                  >
-                    <User className="w-5 h-5" />
-                    Edit Profile
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate('/settings');
-                      setUserMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
-                  >
-                    <Settings className="w-5 h-5" />
-                    Settings
-                  </button>
-                  <hr className="my-2 border-simples-silver/50" />
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full text-left px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 flex items-center gap-3"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </button>
+            )}
+
+            {/* User Profile - Only show for authenticated users */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-4 bg-white/80 hover:bg-white/90 px-4 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-simples-silver/50"
+                >
+                  {userProfile?.profile_picture_url && !imageLoadError ? (
+                    <img
+                      src={userProfile.profile_picture_url}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover"
+                      onError={() => setImageLoadError(true)}
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  <span className="hidden md:inline font-medium text-simples-midnight">
+                    {userProfile?.full_name || user?.user_metadata?.full_name || 'User'}
+                  </span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-simples-silver/50 py-3 z-50">
+                    <div className="px-4 py-3 border-b border-simples-silver/50">
+                      <p className="font-semibold text-simples-midnight">
+                        {userProfile?.full_name || user?.user_metadata?.full_name || 'User'}
+                      </p>
+                      <p className="text-sm text-simples-storm">{userProfile?.email || user?.email}</p>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        navigate('/edit-profile');
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
+                    >
+                      <Camera className="w-5 h-5" />
+                      Change Photo
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate(`/profile/${user.id}`);
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
+                    >
+                      <User className="w-5 h-5" />
+                      Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate('/settings');
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
+                    >
+                      <Settings className="w-5 h-5" />
+                      Settings
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate('/discover');
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
+                    >
+                      <Search className="w-5 h-5" />
+                      Browse
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate('/matches');
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-simples-storm hover:text-simples-midnight hover:bg-simples-cloud/50 transition-all duration-200 flex items-center gap-3"
+                    >
+                      <Users className="w-5 h-5" />
+                      Matches
+                    </button>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 transition-all duration-200 flex items-center gap-3"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Log out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Login button for non-authenticated users
+              <button
+                onClick={() => navigate('/')}
+                className="flex items-center gap-3 bg-gradient-to-r from-simples-ocean to-simples-sky text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                <LogIn className="w-5 h-5" />
+                <span className="hidden md:inline">Sign In</span>
+              </button>
+            )}
 
             {/* Mobile Menu Toggle */}
             <button
@@ -177,46 +291,66 @@ const Header = () => {
                 {item.name}
               </button>
             ))}
-            <hr className="my-4 border-simples-silver/50" />
-            <button
-              onClick={() => {
-                navigate('/messages');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full flex items-center gap-4 py-4 font-medium transition-all duration-200 ${
-                isActivePath('/messages') ? 'text-simples-ocean' : 'text-simples-storm hover:text-simples-midnight'
-              }`}
-            >
-              <MessageCircle className="w-5 h-5" />
-              Messages
-            </button>
-            <button
-              onClick={() => {
-                navigate('/edit-profile');
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-4 py-4 text-simples-storm hover:text-simples-midnight transition-all duration-200 font-medium"
-            >
-              <User className="w-5 h-5" />
-              Edit Profile
-            </button>
-            <button
-              onClick={() => {
-                navigate('/settings');
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-4 py-4 text-simples-storm hover:text-simples-midnight transition-all duration-200 font-medium"
-            >
-              <Settings className="w-5 h-5" />
-              Settings
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-4 py-4 text-red-500 hover:text-red-600 transition-all duration-200 font-medium"
-            >
-              <LogOut className="w-5 h-5" />
-              Sign Out
-            </button>
+            
+            {/* Show different mobile menu items based on authentication */}
+            {user ? (
+              <>
+                <hr className="my-4 border-simples-silver/50" />
+                <button
+                  onClick={() => {
+                    navigate('/messages');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-4 py-4 font-medium transition-all duration-200 ${
+                    isActivePath('/messages') ? 'text-simples-ocean' : 'text-simples-storm hover:text-simples-midnight'
+                  }`}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Messages
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/edit-profile');
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-4 py-4 text-simples-storm hover:text-simples-midnight transition-all duration-200 font-medium"
+                >
+                  <User className="w-5 h-5" />
+                  Edit Profile
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/settings');
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-4 py-4 text-simples-storm hover:text-simples-midnight transition-all duration-200 font-medium"
+                >
+                  <Settings className="w-5 h-5" />
+                  Settings
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-4 py-4 text-red-500 hover:text-red-600 transition-all duration-200 font-medium"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <hr className="my-4 border-simples-silver/50" />
+                <button
+                  onClick={() => {
+                    navigate('/');
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-4 py-4 text-simples-ocean hover:text-simples-sky transition-all duration-200 font-medium"
+                >
+                  <LogIn className="w-5 h-5" />
+                  Sign In
+                </button>
+              </>
+            )}
           </nav>
         )}
       </div>

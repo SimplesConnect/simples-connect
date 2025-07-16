@@ -18,6 +18,9 @@ import AuthCallback from './components/AuthCallback';
 import Events from './pages/Events';
 import Lounge from './pages/Lounge';
 import Resources from './pages/Resources';
+import Policies from './pages/Policies';
+import SafetyTips from './pages/SafetyTips';
+import CommunityGuidelines from './pages/CommunityGuidelines';
 import { useAuth } from './context/AuthContext';
 
 // Layout component for authenticated pages
@@ -166,6 +169,36 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/policies"
+            element={
+              <PrivateRoute>
+                <AuthenticatedLayout>
+                  <Policies />
+                </AuthenticatedLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/safety-tips"
+            element={
+              <PrivateRoute>
+                <AuthenticatedLayout>
+                  <SafetyTips />
+                </AuthenticatedLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/community-guidelines"
+            element={
+              <PrivateRoute>
+                <AuthenticatedLayout>
+                  <CommunityGuidelines />
+                </AuthenticatedLayout>
+              </PrivateRoute>
+            }
+          />
           
           {/* Redirect any unknown routes to dashboard if authenticated, otherwise to landing */}
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -178,8 +211,14 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <MessageProvider>
+        <AppContent />
+      </MessageProvider>
     </AuthProvider>
+  );
+}
+
+export default App;
   );
 }
 
