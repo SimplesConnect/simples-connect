@@ -558,6 +558,7 @@ const Lounge = () => {
             </div>
           </div>
         </div>
+        </div>
       </main>
 
       {/* Enhanced Modals */}
