@@ -1,9 +1,10 @@
 // src/components/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Users, Sparkles, Video, BookOpen, User, Edit, X } from 'lucide-react';
+import { Heart, MessageCircle, Users, Sparkles, Video, BookOpen, User, Edit, X, RefreshCw, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import MatchingPreferences from './MatchingPreferences';
 
 
 const Dashboard = () => {
@@ -23,9 +24,11 @@ const Dashboard = () => {
   const [recentActivity, setRecentActivity] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingActivity, setLoadingActivity] = useState(true);
+  const [refreshingActivity, setRefreshingActivity] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [showAdModal, setShowAdModal] = useState(false);
+  const [showMatchingPreferences, setShowMatchingPreferences] = useState(false);
   const [adFormData, setAdFormData] = useState({
     businessName: '',
     email: '',
@@ -122,12 +125,15 @@ const Dashboard = () => {
     fetchDashboardStats();
   }, [user]);
 
-  // Fetch recent interaction history
+  // Fetch and subscribe to recent interaction history
   useEffect(() => {
     const fetchRecentInteractions = async () => {
       if (!user) return;
       
       try {
+        setLoadingActivity(true);
+        console.log('Fetching recent interactions for user:', user.id);
+        
         // Fetch user's recent interactions with profiles
         const { data: interactions, error: interactionError } = await supabase
           .from('user_interactions')
@@ -142,7 +148,7 @@ const Dashboard = () => {
               age,
               bio,
               interests,
-              profile_pictures
+              profile_picture_url
             )
           `)
           .eq('user_id', user.id)
@@ -153,6 +159,8 @@ const Dashboard = () => {
           console.error('Error fetching interactions:', interactionError);
           setRecentActivity([]);
         } else {
+          console.log('Fetched interactions:', interactions);
+          
           // Transform interactions into activity format
           const interactionActivities = (interactions || []).map((interaction) => {
             const profile = interaction.profiles;
@@ -160,6 +168,11 @@ const Dashboard = () => {
                              interaction.interaction_type === 'super_like' ? 'super liked' : 'passed on';
             const iconType = interaction.interaction_type === 'like' ? 'heart' : 
                            interaction.interaction_type === 'super_like' ? 'sparkles' : 'x';
+            
+            // Debug log for profile data
+            if (!profile) {
+              console.warn('Missing profile data for interaction:', interaction);
+            }
             
             return {
               id: interaction.id,
@@ -184,10 +197,104 @@ const Dashboard = () => {
       }
     };
 
-    fetchRecentInteractions();
+    if (user) {
+      fetchRecentInteractions();
+
+      // Set up real-time subscription for instant updates
+      console.log('Setting up real-time subscription for user interactions');
+      
+      const interactionSubscription = supabase
+        .channel('user_interactions_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+            schema: 'public',
+            table: 'user_interactions',
+            filter: `user_id=eq.${user.id}` // Only listen to current user's interactions
+          },
+          (payload) => {
+            console.log('Real-time interaction update:', payload);
+            // Refetch interactions when changes occur
+            fetchRecentInteractions();
+          }
+        )
+        .subscribe();
+
+      // Cleanup subscription on unmount
+      return () => {
+        console.log('Cleaning up interaction subscription');
+        supabase.removeChannel(interactionSubscription);
+      };
+    }
   }, [user]);
 
+  // Manual refresh function for user-triggered updates
+  const refreshInteractionHistory = async () => {
+    if (!user) return;
+    
+    setRefreshingActivity(true);
+    try {
+      console.log('Manual refresh of interaction history');
+      
+      const { data: interactions, error: interactionError } = await supabase
+        .from('user_interactions')
+        .select(`
+          id,
+          interaction_type,
+          created_at,
+          target_user_id,
+          profiles:target_user_id (
+            id,
+            full_name,
+            age,
+            bio,
+            interests,
+            profile_picture_url
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
 
+      if (interactionError) {
+        console.error('Error refreshing interactions:', interactionError);
+      } else {
+        console.log('Refreshed interactions:', interactions);
+        
+        const interactionActivities = (interactions || []).map((interaction) => {
+          const profile = interaction.profiles;
+          const actionText = interaction.interaction_type === 'like' ? 'liked' : 
+                           interaction.interaction_type === 'super_like' ? 'super liked' : 'passed on';
+          const iconType = interaction.interaction_type === 'like' ? 'heart' : 
+                         interaction.interaction_type === 'super_like' ? 'sparkles' : 'x';
+          
+          // Debug log for profile data
+          if (!profile) {
+            console.warn('Missing profile data for interaction:', interaction);
+          }
+          
+          return {
+            id: interaction.id,
+            type: 'interaction_history',
+            icon: iconType,
+            message: `You ${actionText} ${profile?.full_name || 'someone'}`,
+            preview: profile?.bio ? profile.bio.substring(0, 50) + '...' : 'No bio available',
+            time: interaction.created_at,
+            profile: profile,
+            interaction_type: interaction.interaction_type,
+            count: null
+          };
+        });
+        
+        setRecentActivity(interactionActivities);
+      }
+    } catch (error) {
+      console.error('Error in manual refresh:', error);
+    } finally {
+      setRefreshingActivity(false);
+    }
+  };
 
   const handleAdFormChange = (e) => {
     setAdFormData({
@@ -381,9 +488,21 @@ const Dashboard = () => {
                 <p className="text-simples-storm mb-4">
                   Discover amazing people who share your interests and values.
                 </p>
-                <button className="btn-primary w-full">
-                  Discover
-                </button>
+                <div className="space-y-2">
+                  <button className="btn-primary w-full">
+                    Discover
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMatchingPreferences(true);
+                    }}
+                    className="flex items-center justify-center gap-2 w-full py-2 text-sm text-simples-storm hover:text-simples-midnight transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Matching Preferences
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -495,9 +614,24 @@ const Dashboard = () => {
         {/* Recent Interaction History */}
         <div className="mt-8">
           <div className="card">
-            <h2 className="text-xl font-bold text-simples-midnight mb-6">
-              Recent Interaction History
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-simples-midnight">
+                Recent Interaction History
+              </h2>
+              <button
+                onClick={refreshInteractionHistory}
+                disabled={refreshingActivity}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+                  refreshingActivity 
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    : 'bg-simples-cloud/50 text-simples-storm hover:bg-simples-cloud hover:text-simples-midnight'
+                }`}
+                title="Refresh interaction history"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshingActivity ? 'animate-spin' : ''}`} />
+                {refreshingActivity ? 'Updating...' : 'Refresh'}
+              </button>
+            </div>
             
             {loadingActivity ? (
               <div className="space-y-4">
@@ -737,6 +871,17 @@ const Dashboard = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Matching Preferences Modal */}
+      {showMatchingPreferences && (
+        <MatchingPreferences
+          onSave={(preferences) => {
+            console.log('Preferences saved:', preferences);
+            setShowMatchingPreferences(false);
+          }}
+          onClose={() => setShowMatchingPreferences(false)}
+        />
       )}
     </div>
   );

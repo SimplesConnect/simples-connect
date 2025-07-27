@@ -16,6 +16,8 @@ import EditProfile from './components/EditProfile';
 import Settings from './components/Settings';
 import FlowTest from './components/FlowTest';
 import AuthCallback from './components/AuthCallback';
+import EnhancedMatching from './components/EnhancedMatching';
+import MatchingPreferences from './components/MatchingPreferences';
 
 import Resources from './pages/Resources';
 import AboutUs from './pages/AboutUs';
@@ -335,6 +337,8 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
+          {/* Enhanced Matching Routes */}
+          <Route path="/enhanced-discover" element={<PrivateRoute><EnhancedMatching /></PrivateRoute>} />
           
           {/* Redirect any unknown routes to dashboard if authenticated, otherwise to landing */}
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -39,8 +39,8 @@ const AboutUs = () => {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            "Connection is simple—when you find someone who sees the world the way you do."
+          <h1 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
+            "Connection is simple, when you find someone who sees the world the way you do."
           </h1>
           <p className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed opacity-90">
             Simples Connect is where Ugandans in the diaspora find meaningful relationships that honor culture, values, and real connection.
