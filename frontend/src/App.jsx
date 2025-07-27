@@ -47,6 +47,7 @@ import { useAuth } from './context/AuthContext';
 // Admin components
 import AdminDashboard from './components/admin/AdminDashboard';
 import UserManagement from './components/admin/UserManagement';
+import ContentModeration from './components/admin/ContentModeration';
 
 // Layout component for authenticated pages
 const AuthenticatedLayout = ({ children }) => {
@@ -358,6 +359,14 @@ const AppContent = () => {
             element={
               <PrivateRoute>
                 <UserManagement />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/admin/moderation" 
+            element={
+              <PrivateRoute>
+                <ContentModeration />
               </PrivateRoute>
             } 
           />

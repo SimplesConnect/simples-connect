@@ -327,20 +327,50 @@ const Dashboard = () => {
     });
   };
 
-  const handleAdFormSubmit = (e) => {
+  const handleAdFormSubmit = async (e) => {
     e.preventDefault();
-    // For now, just show success message - later integrate with backend
-    alert('Thank you for your interest! We\'ll contact you within 24 hours to discuss your advertising package.');
-    setShowAdModal(false);
-    setAdFormData({
-      businessName: '',
-      email: '',
-      phone: '',
-      videoUrl: '',
-      adType: 'featured',
-      description: '',
-      budget: ''
-    });
+    
+    try {
+      console.log('🔄 Submitting advertiser request:', adFormData);
+      
+      // Save to advertiser_requests table
+      const { error } = await supabase
+        .from('advertiser_requests')
+        .insert({
+          business_name: adFormData.businessName,
+          contact_person: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Unknown',
+          email: adFormData.email,
+          phone: adFormData.phone || null,
+          business_description: adFormData.description,
+          target_audience: 'Ugandans in the diaspora', // Default for this platform
+          budget_range: adFormData.budget,
+          content_type: 'video', // Since this is for featured videos
+          content_description: `Featured video promotion: ${adFormData.description}`,
+          website_url: adFormData.videoUrl || null,
+          additional_notes: `Submitted via ${adFormData.adType} ad type`,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      console.log('✅ Advertiser request submitted successfully');
+      alert('Thank you for your interest! Your request has been submitted and we\'ll contact you within 24 hours to discuss your advertising package.');
+      
+      setShowAdModal(false);
+      setAdFormData({
+        businessName: '',
+        email: '',
+        phone: '',
+        videoUrl: '',
+        adType: 'featured',
+        description: '',
+        budget: ''
+      });
+      
+    } catch (error) {
+      console.error('❌ Error submitting advertiser request:', error);
+      alert('Sorry, there was an error submitting your request. Please try again.');
+    }
   };
 
   // Helper function to format time
