@@ -269,39 +269,7 @@ const EnhancedMatching = () => {
               </p>
             )}
 
-            {/* Connection Intentions */}
-            {currentMatch.intentions && currentMatch.intentions.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-simples-midnight mb-2">Looking for:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {currentMatch.intentions.map((intention) => (
-                    <span key={intention} className="px-3 py-1 bg-simples-lavender/20 text-simples-lavender rounded-full text-xs font-medium capitalize">
-                      {intention.replace('_', ' ')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Vibe & Life Phase */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              {currentMatch.vibe && (
-                <div>
-                  <h4 className="text-sm font-semibold text-simples-midnight mb-1">Vibe</h4>
-                  <span className="px-3 py-1 bg-simples-tropical/20 text-simples-tropical rounded-full text-xs font-medium capitalize">
-                    {currentMatch.vibe}
-                  </span>
-                </div>
-              )}
-              {currentMatch.life_phase && (
-                <div>
-                  <h4 className="text-sm font-semibold text-simples-midnight mb-1">Life Phase</h4>
-                  <span className="px-3 py-1 bg-simples-rose/20 text-simples-rose rounded-full text-xs font-medium capitalize">
-                    {currentMatch.life_phase.replace('_', ' ')}
-                  </span>
-                </div>
-              )}
-            </div>
+            {/* Removed enhanced profile fields - database columns don't exist yet */}
 
             {/* Shared Interests */}
             {currentMatch.shared_interests && currentMatch.shared_interests.length > 0 && (
@@ -317,19 +285,7 @@ const EnhancedMatching = () => {
               </div>
             )}
 
-            {/* Communication Style */}
-            {currentMatch.communication_style && currentMatch.communication_style.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-simples-midnight mb-2">Communication:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {currentMatch.communication_style.map((style) => (
-                    <span key={style} className="px-3 py-1 bg-simples-sky/20 text-simples-sky rounded-full text-xs font-medium capitalize">
-                      {style.replace('_', ' ')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Removed Communication Style - database column doesn't exist */}
           </div>
         </div>
 

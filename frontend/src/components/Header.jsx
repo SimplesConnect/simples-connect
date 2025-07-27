@@ -48,7 +48,7 @@ const Header = () => {
 
   // Removed complex admin checking - using simple hardcoded check above
 
-  // Fetch user profile data for profile picture
+  // Fetch user profile data for profile picture - WITH EMERGENCY FALLBACK
   const fetchUserProfile = async () => {
     if (user) {
       try {
@@ -60,10 +60,26 @@ const Header = () => {
 
         if (!error && profileData) {
           setUserProfile(profileData);
-          setImageLoadError(false); // Reset image error when profile updates
+          setImageLoadError(false);
+        } else {
+          // FALLBACK: Use auth metadata if profile fetch fails
+          console.warn('Profile fetch failed, using auth fallback:', error);
+          setUserProfile({
+            full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
+            email: user?.email || '',
+            profile_picture_url: null
+          });
+          setImageLoadError(false);
         }
       } catch (err) {
-        console.error('Error fetching user profile:', err);
+        console.warn('EMERGENCY FALLBACK for profile fetch:', err);
+        // EMERGENCY FALLBACK: Use auth data so admin menu still works
+        setUserProfile({
+          full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
+          email: user?.email || '',
+          profile_picture_url: null
+        });
+        setImageLoadError(false);
       }
     } else {
       setUserProfile(null);
