@@ -29,6 +29,8 @@ const Dashboard = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showAdModal, setShowAdModal] = useState(false);
   const [showMatchingPreferences, setShowMatchingPreferences] = useState(false);
+  const [showProfileUpdateNotification, setShowProfileUpdateNotification] = useState(false);
+  const [profileNeedsUpdate, setProfileNeedsUpdate] = useState(false);
   const [adFormData, setAdFormData] = useState({
     businessName: '',
     email: '',
@@ -45,7 +47,7 @@ const Dashboard = () => {
         try {
           const { data: profile, error } = await supabase
             .from('profiles')
-            .select('is_profile_complete, full_name, birthdate, bio, interests, gender, looking_for')
+            .select('is_profile_complete, full_name, birthdate, bio, interests, gender, looking_for, intentions, vibe, life_phase, communication_style, emotional_availability, region_preference')
             .eq('id', user.id)
             .single();
 
@@ -65,6 +67,22 @@ const Dashboard = () => {
             
             const isComplete = hasRequiredFields && hasInterests;
             setProfileComplete(isComplete);
+            
+            // Check if user needs to update their matching preferences
+            const hasNewMatchingFields = profile.intentions && profile.intentions.length > 0 && 
+                                       profile.vibe && profile.life_phase && 
+                                       profile.communication_style && profile.emotional_availability && 
+                                       profile.region_preference;
+            
+            setProfileNeedsUpdate(!hasNewMatchingFields && isComplete);
+            
+            // Show notification if profile needs matching criteria update
+            // Only show if user hasn't permanently dismissed it
+            const dismissedKey = `profile_update_dismissed_${user.id}`;
+            const isDismissed = localStorage.getItem(dismissedKey);
+            if (!hasNewMatchingFields && isComplete && !isDismissed) {
+              setShowProfileUpdateNotification(true);
+            }
           } else {
             setProfileComplete(false);
           }
@@ -330,6 +348,15 @@ const Dashboard = () => {
     return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
   };
 
+  // Helper function to permanently dismiss profile update notification
+  const dismissProfileUpdateNotification = (permanent = false) => {
+    setShowProfileUpdateNotification(false);
+    if (permanent) {
+      const dismissedKey = `profile_update_dismissed_${user.id}`;
+      localStorage.setItem(dismissedKey, 'true');
+    }
+  };
+
   // Helper function to get icon component
   const getActivityIcon = (iconType) => {
     switch (iconType) {
@@ -369,6 +396,69 @@ const Dashboard = () => {
             >
               <X className="w-5 h-5" />
             </button>
+          </div>
+        )}
+
+        {/* Profile Update Notification */}
+        {showProfileUpdateNotification && profileNeedsUpdate && (
+          <div className="mb-6 bg-gradient-to-r from-simples-rose/10 to-simples-lavender/10 border-2 border-simples-rose/30 rounded-xl p-6 relative">
+            <button
+              onClick={() => dismissProfileUpdateNotification(false)}
+              className="absolute top-4 right-4 text-simples-storm hover:text-simples-midnight transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-full flex items-center justify-center flex-shrink-0">
+                <Settings className="w-6 h-6 text-white" />
+              </div>
+              
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-simples-midnight mb-2">
+                  🎯 Improve Your Matches with New Preferences!
+                </h3>
+                <p className="text-simples-storm mb-4 leading-relaxed">
+                  We've enhanced our matching system with new criteria to help you find better connections! 
+                  Update your profile with your communication style, vibe, life phase, and more to get 
+                  higher quality matches that truly align with what you're looking for.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                  <button
+                    onClick={() => {
+                      dismissProfileUpdateNotification();
+                      navigate('/edit-profile');
+                    }}
+                    className="bg-gradient-to-r from-simples-rose to-simples-lavender text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                  >
+                    <Edit className="w-5 h-5" />
+                    Update My Preferences
+                  </button>
+                  
+                  <button
+                    onClick={() => dismissProfileUpdateNotification(false)}
+                    className="bg-simples-cloud hover:bg-simples-silver text-simples-midnight px-6 py-3 rounded-xl font-medium transition-colors"
+                  >
+                    Maybe Later
+                  </button>
+                  
+                  <button
+                    onClick={() => dismissProfileUpdateNotification(true)}
+                    className="text-sm text-simples-storm hover:text-simples-midnight transition-colors"
+                  >
+                    Don't show this again
+                  </button>
+                </div>
+                
+                <div className="p-3 bg-white/50 rounded-lg">
+                  <p className="text-sm text-simples-storm">
+                    <span className="font-medium">New matching criteria include:</span> Connection intentions, Communication style, 
+                    Emotional availability, Geographic preferences, Life phase, and Conversation boundaries.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         {/* Welcome Section */}
