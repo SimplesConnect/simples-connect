@@ -373,43 +373,104 @@ const Messages = () => {
     // Show "not matched" state if user tried to message someone they're not matched with
     if (selected.notMatched) {
       return (
-        <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-b from-simples-cloud to-white p-8">
-          <div className="max-w-md text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
+        <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center relative overflow-hidden">
+          {/* Animated Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e879f9" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse"></div>
+          </div>
+          
+          {/* Floating Hearts Animation */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-20 left-10 text-pink-300 animate-bounce text-2xl">💕</div>
+            <div className="absolute top-32 right-16 text-purple-300 animate-ping text-xl">💜</div>
+            <div className="absolute bottom-32 left-20 text-blue-300 animate-pulse text-lg">💙</div>
+            <div className="absolute bottom-20 right-12 text-red-300 animate-bounce text-xl">❤️</div>
+          </div>
+          
+          {/* Main Content */}
+          <div className="relative z-10 max-w-sm mx-auto p-8">
+            {/* Glass Card */}
+            <div className="backdrop-blur-xl bg-white/20 border border-white/30 rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-500">
+              
+              {/* Animated Icon */}
+              <div className="relative mx-auto mb-6 w-24 h-24">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full animate-spin"></div>
+                <div className="absolute inset-1 bg-white rounded-full flex items-center justify-center">
+                  <div className="text-3xl animate-pulse">🔒</div>
+                </div>
+              </div>
+              
+              {/* Modern Heading */}
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                  Oops! Not Connected Yet! 
+                </h2>
+                <div className="text-lg mb-3">
+                  <span className="animate-bounce inline-block">🚀</span>
+                  <span className="ml-1 font-semibold text-gray-700">Let's fix that!</span>
+                </div>
+              </div>
+              
+              {/* Fun Description */}
+              <div className="text-center mb-8 space-y-2">
+                <p className="text-gray-600 leading-relaxed">
+                  <span className="font-medium text-purple-600">{selected.name}</span> looks amazing, but you'll need to 
+                  <span className="font-bold text-pink-600"> match first</span> to slide into those DMs! 
+                </p>
+                <p className="text-sm text-gray-500 italic">
+                  It's like getting VIP access to the coolest party 🎉
+                </p>
+              </div>
+              
+              {/* Action Buttons with Modern Design */}
+              <div className="space-y-4">
+                <button
+                  onClick={() => navigate('/discover')}
+                  className="group w-full relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative flex items-center justify-center gap-2">
+                    <span className="text-xl">🎯</span>
+                    <span>Start Swiping!</span>
+                    <span className="text-xl animate-bounce">✨</span>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => navigate(`/profile/${selected.userId}`)}
+                  className="group w-full bg-white/50 backdrop-blur-sm border-2 border-purple-200 text-purple-700 py-3 px-6 rounded-2xl font-semibold hover:bg-white/70 hover:border-purple-300 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-lg">👀</span>
+                    <span>Peek at {selected.name}'s Profile</span>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setSelected(null)}
+                  className="w-full text-gray-500 hover:text-gray-700 py-2 font-medium transition-colors duration-300 text-sm"
+                >
+                  ← Back to Messages
+                </button>
+              </div>
+              
+              {/* Fun Footer */}
+              <div className="mt-6 pt-4 border-t border-white/20 text-center">
+                <p className="text-xs text-gray-500">
+                  Pro tip: Be yourself and let the magic happen! 
+                  <span className="animate-bounce inline-block ml-1">🌟</span>
+                </p>
+              </div>
             </div>
             
-            <h2 className="text-2xl font-bold text-simples-midnight mb-4">
-              Connect with {selected.name} First!
-            </h2>
-            
-            <p className="text-simples-storm mb-6 leading-relaxed">
-              To send messages, you need to match with {selected.name} first. Head to the discover page to like their profile and see if it's a match!
-            </p>
-            
-            <div className="space-y-3">
-              <button
-                onClick={() => navigate('/discover')}
-                className="w-full bg-gradient-to-r from-simples-rose to-simples-lavender text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
-              >
-                Go to Discover
-              </button>
-              
-              <button
-                onClick={() => navigate(`/profile/${selected.userId}`)}
-                className="w-full bg-simples-cloud text-simples-midnight py-3 px-6 rounded-xl font-semibold hover:bg-simples-silver transition-colors"
-              >
-                View {selected.name}'s Profile
-              </button>
-              
-              <button
-                onClick={() => setSelected(null)}
-                className="w-full text-simples-storm hover:text-simples-midnight py-2 font-medium transition-colors"
-              >
-                Back to Messages
-              </button>
+            {/* Floating Action Hint */}
+            <div className="mt-6 text-center">
+              <div className="inline-flex items-center gap-2 bg-white/30 backdrop-blur-sm px-4 py-2 rounded-full border border-white/40">
+                <span className="text-sm text-gray-600 font-medium">Swipe right on</span>
+                <span className="text-sm font-bold text-purple-600">{selected.name}</span>
+                <span className="text-sm text-gray-600">to unlock chat</span>
+                <span className="animate-pulse">🔓</span>
+              </div>
             </div>
           </div>
         </div>
