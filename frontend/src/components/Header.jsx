@@ -247,12 +247,27 @@ const Header = () => {
                       <>
                         <div className="bg-gradient-to-r from-purple-50 to-purple-100 border-l-4 border-purple-500 m-2 p-3 rounded-lg">
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
                               console.log('🚀 Admin Dashboard clicked!');
-                              navigate('/admin');
+                              console.log('User object:', user);
+                              console.log('User authenticated:', !!user);
+                              console.log('Current location:', window.location.href);
+                              
+                              // Force navigation and close menu
                               setUserMenuOpen(false);
+                              
+                              // Try multiple navigation methods
+                              try {
+                                console.log('Attempting React Router navigation...');
+                                navigate('/admin');
+                              } catch (error) {
+                                console.error('React Router navigation failed:', error);
+                                console.log('Falling back to window.location...');
+                                window.location.href = '/admin';
+                              }
                             }}
-                            className="w-full text-left text-purple-700 hover:text-purple-900 transition-all duration-200 flex items-center gap-3 font-bold text-lg"
+                            className="w-full text-left text-purple-700 hover:text-purple-900 transition-all duration-200 flex items-center gap-3 font-bold text-lg cursor-pointer"
                           >
                             <Shield className="w-6 h-6 text-purple-600" />
                             🔧 Admin Dashboard
