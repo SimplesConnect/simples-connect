@@ -1,6 +1,6 @@
 // src/components/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { Heart, Play, ThumbsUp, Share2, MessageCircle, Users, Sparkles, Video, BookOpen, User, Edit, X } from 'lucide-react';
+import { Heart, MessageCircle, Users, Sparkles, Video, BookOpen, User, Edit, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -10,14 +10,8 @@ const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [likedVideo, setLikedVideo] = useState(false);
   const [profileComplete, setProfileComplete] = useState(true); // Start as true to avoid flickering
   const [profileLoading, setProfileLoading] = useState(true);
-  const [videoStats, setVideoStats] = useState({
-    likes: 1247,
-    views: 15420,
-    comments: 89
-  });
   
   // New states for live data
   const [dashboardStats, setDashboardStats] = useState({
@@ -128,57 +122,72 @@ const Dashboard = () => {
     fetchDashboardStats();
   }, [user]);
 
-  // Fetch recent potential matches
+  // Fetch recent interaction history
   useEffect(() => {
-    const fetchRecentPotentialMatches = async () => {
+    const fetchRecentInteractions = async () => {
       if (!user) return;
       
       try {
-        // Fetch recent profiles that the user might be interested in
-        const { data: potentialMatches, error: matchError } = await supabase
-          .from('profiles')
-          .select('id, full_name, age, bio, interests, profile_pictures, created_at')
-          .neq('id', user.id)
-          .eq('is_profile_complete', true)
+        // Fetch user's recent interactions with profiles
+        const { data: interactions, error: interactionError } = await supabase
+          .from('user_interactions')
+          .select(`
+            id,
+            interaction_type,
+            created_at,
+            target_user_id,
+            profiles:target_user_id (
+              id,
+              full_name,
+              age,
+              bio,
+              interests,
+              profile_pictures
+            )
+          `)
+          .eq('user_id', user.id)
           .order('created_at', { ascending: false })
-          .limit(5);
+          .limit(10);
 
-        if (matchError) {
-          console.error('Error fetching potential matches:', matchError);
+        if (interactionError) {
+          console.error('Error fetching interactions:', interactionError);
           setRecentActivity([]);
         } else {
-          // Transform potential matches into activity format
-          const matchActivities = (potentialMatches || []).map((match) => ({
-            id: match.id,
-            type: 'potential_match',
-            icon: 'heart',
-            message: `${match.full_name || 'Someone'} joined the community`,
-            preview: match.bio ? match.bio.substring(0, 50) + '...' : 'New member looking to connect',
-            time: match.created_at,
-            profile: match,
-            count: null
-          }));
+          // Transform interactions into activity format
+          const interactionActivities = (interactions || []).map((interaction) => {
+            const profile = interaction.profiles;
+            const actionText = interaction.interaction_type === 'like' ? 'liked' : 
+                             interaction.interaction_type === 'super_like' ? 'super liked' : 'passed on';
+            const iconType = interaction.interaction_type === 'like' ? 'heart' : 
+                           interaction.interaction_type === 'super_like' ? 'sparkles' : 'x';
+            
+            return {
+              id: interaction.id,
+              type: 'interaction_history',
+              icon: iconType,
+              message: `You ${actionText} ${profile?.full_name || 'someone'}`,
+              preview: profile?.bio ? profile.bio.substring(0, 50) + '...' : 'No bio available',
+              time: interaction.created_at,
+              profile: profile,
+              interaction_type: interaction.interaction_type,
+              count: null
+            };
+          });
           
-          setRecentActivity(matchActivities);
+          setRecentActivity(interactionActivities);
         }
       } catch (error) {
-        console.error('Error in fetchRecentPotentialMatches:', error);
+        console.error('Error in fetchRecentInteractions:', error);
         setRecentActivity([]);
       } finally {
         setLoadingActivity(false);
       }
     };
 
-    fetchRecentPotentialMatches();
+    fetchRecentInteractions();
   }, [user]);
 
-  const handleLikeVideo = () => {
-    setLikedVideo(!likedVideo);
-    setVideoStats(prev => ({
-      ...prev,
-      likes: likedVideo ? prev.likes - 1 : prev.likes + 1
-    }));
-  };
+
 
   const handleAdFormChange = (e) => {
     setAdFormData({
@@ -221,6 +230,10 @@ const Dashboard = () => {
     switch (iconType) {
       case 'heart':
         return <Heart className="w-5 h-5 text-simples-rose" />;
+      case 'sparkles':
+        return <Sparkles className="w-5 h-5 text-simples-lavender" />;
+      case 'x':
+        return <X className="w-5 h-5 text-simples-storm" />;
       case 'users':
         return <Users className="w-5 h-5 text-simples-lavender" />;
       case 'message-circle':
@@ -452,52 +465,8 @@ const Dashboard = () => {
                 </p>
                 
                 {/* Video Actions */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <button
-                      onClick={handleLikeVideo}
-                      className={`flex items-center gap-2 transition-colors ${
-                        likedVideo 
-                          ? 'text-simples-rose' 
-                          : 'text-simples-storm hover:text-simples-rose'
-                      }`}
-                    >
-                      <ThumbsUp className={`w-5 h-5 ${likedVideo ? 'fill-current' : ''}`} />
-                      <span className="text-sm font-medium">{videoStats.likes}</span>
-                    </button>
-                    
-                    <div className="flex items-center gap-2 text-simples-storm">
-                      <MessageCircle className="w-5 h-5" />
-                      <span className="text-sm">{videoStats.comments}</span>
-                    </div>
-                    
-                    <button className="flex items-center gap-2 text-simples-storm hover:text-simples-ocean transition-colors">
-                      <Share2 className="w-5 h-5" />
-                      <span className="text-sm">Share</span>
-                    </button>
-                  </div>
-                  
-                  <div className="text-sm text-simples-storm">
-                    {videoStats.views.toLocaleString()} views
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Subscribe Section */}
-            <div className="bg-gradient-to-r from-simples-ocean/10 to-simples-sky/10 rounded-2xl p-6 text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-full flex items-center justify-center mx-auto mb-4">
-                <Play className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-simples-midnight mb-2">
-                Love the Content?
-              </h3>
-              <p className="text-simples-storm mb-4">
-                Subscribe to our channel for more networking tips, success stories, and relationship advice.
-              </p>
-              <button className="btn-primary">
-                Subscribe Now
-              </button>
             </div>
 
             {/* Business Ad CTA Section */}
@@ -523,11 +492,11 @@ const Dashboard = () => {
 
 
 
-        {/* Recent Potential Matches */}
+        {/* Recent Interaction History */}
         <div className="mt-8">
           <div className="card">
             <h2 className="text-xl font-bold text-simples-midnight mb-6">
-              Recent Potential Matches
+              Recent Interaction History
             </h2>
             
             {loadingActivity ? (
@@ -550,7 +519,7 @@ const Dashboard = () => {
                     className="flex items-center gap-4 p-4 bg-simples-cloud/30 rounded-xl hover:bg-simples-cloud/50 transition-colors cursor-pointer"
                     onClick={() => {
                       // Handle click based on activity type
-                      if (activity.type === 'potential_match' && activity.profile) {
+                      if (activity.type === 'interaction_history' && activity.profile) {
                         navigate(`/profile/${activity.profile.id}`);
                       } else if (activity.type === 'message') {
                         navigate('/messages');
@@ -563,6 +532,8 @@ const Dashboard = () => {
                   >
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                       activity.icon === 'heart' ? 'bg-simples-rose/20' :
+                      activity.icon === 'sparkles' ? 'bg-simples-lavender/20' :
+                      activity.icon === 'x' ? 'bg-simples-storm/20' :
                       activity.icon === 'users' ? 'bg-simples-lavender/20' :
                       'bg-simples-tropical/20'
                     }`}>
@@ -594,9 +565,9 @@ const Dashboard = () => {
                 <div className="w-16 h-16 bg-simples-cloud/50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Heart className="w-8 h-8 text-simples-storm" />
                 </div>
-                <p className="text-simples-storm mb-2">No potential matches yet</p>
+                <p className="text-simples-storm mb-2">No interaction history yet</p>
                 <p className="text-sm text-simples-storm">
-                  Complete your profile and start discovering people to see potential matches here!
+                  Start discovering and interacting with people to see your activity history here!
                 </p>
                 <button 
                   onClick={() => navigate('/discover')}
