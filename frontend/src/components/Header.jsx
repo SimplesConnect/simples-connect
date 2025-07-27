@@ -50,6 +50,13 @@ const Header = () => {
       try {
         console.log('Checking admin status for user:', user.id, user.email);
         
+        // Temporary: Auto-grant admin for presheja@gmail.com while database is being set up
+        if (user.email === 'presheja@gmail.com') {
+          console.log('Temporary admin access granted for presheja@gmail.com');
+          setIsAdmin(true);
+          return;
+        }
+        
         const { data: adminUser, error } = await supabase
           .from('admin_users')
           .select('admin_level, is_active')
@@ -68,7 +75,13 @@ const Header = () => {
         }
       } catch (err) {
         console.error('Error checking admin status:', err);
-        setIsAdmin(false);
+        // Fallback for presheja@gmail.com if database isn't ready
+        if (user.email === 'presheja@gmail.com') {
+          console.log('Fallback admin access for presheja@gmail.com');
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
       }
     } else {
       setIsAdmin(false);
