@@ -78,139 +78,241 @@ const AdminDashboard = () => {
 
       console.log('📊 Loading REAL admin dashboard data from database...');
       
-      // REAL DATA FROM SUPABASE
+      // REAL DATA FROM SUPABASE WITH INDIVIDUAL ERROR HANDLING
       const today = new Date();
       const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const startOfWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-      // Fetch real user statistics
-      const [
-        totalUsersResult,
-        newSignupsTodayResult,
-        newSignupsWeekResult,
-        totalMatchesResult,
-        newMatchesTodayResult,
-        newMatchesWeekResult,
-        totalMessagesResult,
-        newMessagesTodayResult,
-        newMessagesWeekResult,
-        adminActionsResult
-      ] = await Promise.all([
-        // Total users
-        supabase
+      console.log('🕐 Date ranges:', {
+        today: today.toISOString(),
+        startOfToday: startOfToday.toISOString(),
+        startOfWeek: startOfWeek.toISOString()
+      });
+
+      // Initialize stats with fallback values
+      let realStats = {
+        totalUsers: 0,
+        newSignupsToday: 0,
+        newSignupsWeek: 0,
+        activeUsersToday: 0,
+        activeUsersWeek: 0,
+        engagementPercentage: 0,
+        totalMatches: 0,
+        newMatchesToday: 0,
+        newMatchesWeek: 0,
+        totalMessages: 0,
+        newMessagesToday: 0,
+        newMessagesWeek: 0,
+        pendingReports: 0,
+        highPriorityReports: 0,
+        userStatusBreakdown: { active: 0, suspended: 0, banned: 0 },
+        recentAdminActions: [],
+        platformHealth: { status: 'healthy', uptime: '99.8%', avgResponseTime: '245ms' }
+      };
+
+      // CARD 1: TOTAL USERS - Count all profiles
+      try {
+        console.log('🔍 Fetching total users...');
+        const { count: totalUsers, error: totalUsersError } = await supabase
           .from('profiles')
-          .select('*', { count: 'exact', head: true }),
-        
+          .select('*', { count: 'exact', head: true });
+
+        if (totalUsersError) {
+          console.error('❌ Error fetching total users:', totalUsersError);
+        } else {
+          realStats.totalUsers = totalUsers || 0;
+          console.log('✅ Total users:', realStats.totalUsers);
+        }
+
         // New signups today
-        supabase
+        const { count: newSignupsToday, error: signupsTodayError } = await supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true })
-          .gte('created_at', startOfToday.toISOString()),
-        
+          .gte('created_at', startOfToday.toISOString());
+
+        if (signupsTodayError) {
+          console.error('❌ Error fetching signups today:', signupsTodayError);
+        } else {
+          realStats.newSignupsToday = newSignupsToday || 0;
+          console.log('✅ New signups today:', realStats.newSignupsToday);
+        }
+
         // New signups this week
-        supabase
+        const { count: newSignupsWeek, error: signupsWeekError } = await supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true })
-          .gte('created_at', startOfWeek.toISOString()),
+          .gte('created_at', startOfWeek.toISOString());
+
+        if (signupsWeekError) {
+          console.error('❌ Error fetching signups this week:', signupsWeekError);
+        } else {
+          realStats.newSignupsWeek = newSignupsWeek || 0;
+          console.log('✅ New signups this week:', realStats.newSignupsWeek);
+        }
+
+      } catch (error) {
+        console.error('❌ Error in user statistics:', error);
+      }
+
+      // CARD 2: ACTIVE TODAY - Users active today with engagement percentage
+      try {
+        console.log('🔍 Fetching active users...');
+        
+        // Count users active today (updated_at or created_at is today)
+        const { count: activeToday, error: activeTodayError } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .or(`updated_at.gte.${startOfToday.toISOString()},created_at.gte.${startOfToday.toISOString()}`);
+
+        if (activeTodayError) {
+          console.error('❌ Error fetching active users today:', activeTodayError);
+        } else {
+          realStats.activeUsersToday = activeToday || 0;
+          console.log('✅ Active users today:', realStats.activeUsersToday);
+        }
+
+        // Calculate engagement percentage
+        if (realStats.totalUsers > 0) {
+          realStats.engagementPercentage = Math.round((realStats.activeUsersToday / realStats.totalUsers) * 100);
+        }
+        console.log('✅ Engagement percentage:', realStats.engagementPercentage + '%');
+
+      } catch (error) {
+        console.error('❌ Error in active users statistics:', error);
+      }
+
+      // CARD 3: TOTAL MATCHES - Count all matches
+      try {
+        console.log('🔍 Fetching matches data...');
         
         // Total matches
-        supabase
+        const { count: totalMatches, error: totalMatchesError } = await supabase
           .from('matches')
-          .select('*', { count: 'exact', head: true }),
-        
+          .select('*', { count: 'exact', head: true });
+
+        if (totalMatchesError) {
+          console.error('❌ Error fetching total matches:', totalMatchesError);
+        } else {
+          realStats.totalMatches = totalMatches || 0;
+          console.log('✅ Total matches:', realStats.totalMatches);
+        }
+
         // New matches today
-        supabase
+        const { count: newMatchesToday, error: matchesTodayError } = await supabase
           .from('matches')
           .select('*', { count: 'exact', head: true })
-          .gte('created_at', startOfToday.toISOString()),
+          .gte('created_at', startOfToday.toISOString());
+
+        if (matchesTodayError) {
+          console.error('❌ Error fetching matches today:', matchesTodayError);
+        } else {
+          realStats.newMatchesToday = newMatchesToday || 0;
+          console.log('✅ New matches today:', realStats.newMatchesToday);
+        }
+
+      } catch (error) {
+        console.error('❌ Error in matches statistics:', error);
+      }
+
+      // CARD 4: PENDING REPORTS - Count pending reports
+      try {
+        console.log('🔍 Fetching reports data...');
         
-        // New matches this week
-        supabase
-          .from('matches')
+        // Try to get pending reports from content_reports table
+        const { count: pendingReports, error: reportsError } = await supabase
+          .from('content_reports')
           .select('*', { count: 'exact', head: true })
-          .gte('created_at', startOfWeek.toISOString()),
-        
+          .eq('status', 'pending');
+
+        if (reportsError) {
+          console.warn('⚠️ content_reports table not found or error:', reportsError);
+          // This is expected if the table doesn't exist yet
+          realStats.pendingReports = 0;
+        } else {
+          realStats.pendingReports = pendingReports || 0;
+          console.log('✅ Pending reports:', realStats.pendingReports);
+        }
+
+        // High priority reports
+        const { count: highPriorityReports, error: highPriorityError } = await supabase
+          .from('content_reports')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'pending')
+          .eq('priority', 'high');
+
+        if (highPriorityError) {
+          console.warn('⚠️ High priority reports query failed:', highPriorityError);
+          realStats.highPriorityReports = 0;
+        } else {
+          realStats.highPriorityReports = highPriorityReports || 0;
+          console.log('✅ High priority reports:', realStats.highPriorityReports);
+        }
+
+      } catch (error) {
+        console.error('❌ Error in reports statistics:', error);
+      }
+
+      // Additional statistics
+      try {
         // Total messages
-        supabase
+        const { count: totalMessages, error: messagesError } = await supabase
           .from('messages')
-          .select('*', { count: 'exact', head: true }),
-        
-        // New messages today
-        supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .gte('created_at', startOfToday.toISOString()),
-        
-        // New messages this week
-        supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .gte('created_at', startOfWeek.toISOString()),
-        
+          .select('*', { count: 'exact', head: true });
+
+        if (!messagesError) {
+          realStats.totalMessages = totalMessages || 0;
+          console.log('✅ Total messages:', realStats.totalMessages);
+        }
+
         // Recent admin actions
-        supabase
+        const { data: adminActions, error: adminActionsError } = await supabase
           .from('admin_audit_logs')
           .select('action, timestamp')
           .order('timestamp', { ascending: false })
-          .limit(5)
-      ]);
+          .limit(5);
 
-      // Get user status breakdown
-      const { data: suspendedUsers } = await supabase
-        .from('user_status_history')
-        .select('user_id')
-        .eq('status', 'suspended')
-        .order('changed_at', { ascending: false });
+        if (!adminActionsError && adminActions) {
+          realStats.recentAdminActions = adminActions.map(action => ({
+            action: action.action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            timestamp: new Date(action.timestamp)
+          }));
+          console.log('✅ Recent admin actions:', realStats.recentAdminActions.length);
+        }
 
-      const { data: bannedUsers } = await supabase
-        .from('user_status_history')
-        .select('user_id')
-        .eq('status', 'banned')
-        .order('changed_at', { ascending: false });
+        // User status breakdown
+        const { data: suspendedUsers } = await supabase
+          .from('user_status_history')
+          .select('user_id')
+          .eq('status', 'suspended')
+          .order('changed_at', { ascending: false });
 
-      // Get unique suspended and banned users
-      const suspendedCount = new Set(suspendedUsers?.map(u => u.user_id) || []).size;
-      const bannedCount = new Set(bannedUsers?.map(u => u.user_id) || []).size;
-      const totalUsers = totalUsersResult.count || 0;
-      const activeCount = totalUsers - suspendedCount - bannedCount;
+        const { data: bannedUsers } = await supabase
+          .from('user_status_history')
+          .select('user_id')
+          .eq('status', 'banned')
+          .order('changed_at', { ascending: false });
 
-      const realStats = {
-        totalUsers: totalUsers,
-        newSignupsToday: newSignupsTodayResult.count || 0,
-        newSignupsWeek: newSignupsWeekResult.count || 0,
-        activeUsersToday: activeCount, // Simplified - users who are not suspended/banned
-        activeUsersWeek: activeCount,
-        totalMatches: totalMatchesResult.count || 0,
-        newMatchesToday: newMatchesTodayResult.count || 0,
-        newMatchesWeek: newMatchesWeekResult.count || 0,
-        totalMessages: totalMessagesResult.count || 0,
-        newMessagesToday: newMessagesTodayResult.count || 0,
-        newMessagesWeek: newMessagesWeekResult.count || 0,
-        userStatusBreakdown: {
-          active: activeCount,
+        const suspendedCount = new Set(suspendedUsers?.map(u => u.user_id) || []).size;
+        const bannedCount = new Set(bannedUsers?.map(u => u.user_id) || []).size;
+        const activeCount = realStats.totalUsers - suspendedCount - bannedCount;
+
+        realStats.userStatusBreakdown = {
+          active: Math.max(0, activeCount),
           suspended: suspendedCount,
           banned: bannedCount
-        },
-        pendingReports: 0, // Will be updated when content_reports table is used
-        highPriorityReports: 0,
-        recentAdminActions: adminActionsResult.data?.map(action => ({
-          action: action.action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          timestamp: new Date(action.timestamp)
-        })) || [],
-        platformHealth: {
-          status: 'healthy',
-          uptime: '99.8%',
-          avgResponseTime: '245ms'
-        }
-      };
+        };
+
+      } catch (error) {
+        console.error('❌ Error in additional statistics:', error);
+      }
       
       setStats(realStats);
       setLastUpdated(new Date());
       console.log('✅ REAL admin dashboard data loaded successfully:', realStats);
 
     } catch (error) {
-      console.error('❌ Error fetching real admin stats:', error);
-      setError(error.message);
+      console.error('❌ Critical error fetching admin stats:', error);
+      setError(`Database error: ${error.message}`);
       
       // Fallback to minimal stats if database fails
       setStats({
@@ -219,6 +321,7 @@ const AdminDashboard = () => {
         newSignupsWeek: 0,
         activeUsersToday: 0,
         activeUsersWeek: 0,
+        engagementPercentage: 0,
         totalMatches: 0,
         newMatchesToday: 0,
         newMatchesWeek: 0,
@@ -320,35 +423,35 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* Key Metrics */}
+        {/* Key Metrics - REAL DATA */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatsCard
             title="Total Users"
-            value={stats?.overview?.totalUsers || 0}
-            change={`+${stats?.overview?.newSignupsToday || 0} today`}
+            value={stats?.totalUsers || 0}
+            change={`+${stats?.newSignupsToday || 0} today`}
             icon={Users}
             color="blue"
           />
           <StatsCard
             title="Active Today"
-            value={stats?.overview?.activeUsersToday || 0}
-            change={`${stats?.engagement?.engagementRate || 0}% engagement`}
+            value={stats?.activeUsersToday || 0}
+            change={`${stats?.engagementPercentage || 0}% engagement`}
             icon={Activity}
             color="green"
           />
           <StatsCard
             title="Total Matches"
-            value={stats?.engagement?.totalMatches || 0}
-            change={`+${stats?.engagement?.newMatchesToday || 0} today`}
+            value={stats?.totalMatches || 0}
+            change={`+${stats?.newMatchesToday || 0} today`}
             icon={Heart}
             color="pink"
           />
           <StatsCard
             title="Pending Reports"
-            value={stats?.moderation?.pendingReports || 0}
-            change={`${stats?.moderation?.highPriorityReports || 0} high priority`}
+            value={stats?.pendingReports || 0}
+            change={`${stats?.highPriorityReports || 0} high priority`}
             icon={Flag}
-            color={stats?.moderation?.highPriorityReports > 0 ? "red" : "gray"}
+            color={stats?.highPriorityReports > 0 ? "red" : "gray"}
           />
         </div>
 
@@ -367,7 +470,7 @@ const AdminDashboard = () => {
             icon={Shield}
             action={() => navigate('/admin/moderation')}
             bgColor="bg-orange-500"
-            badge={stats?.moderation?.pendingReports > 0 ? stats.moderation.pendingReports : null}
+            badge={stats?.pendingReports > 0 ? stats.pendingReports : null}
           />
           <QuickActionCard
             title="Platform Analytics"
@@ -389,26 +492,26 @@ const AdminDashboard = () => {
             <div className="space-y-4">
               <StatusBar
                 label="Active Users"
-                value={stats?.userStatus?.active || 0}
-                total={stats?.overview?.totalUsers || 1}
+                value={stats?.userStatusBreakdown?.active || 0}
+                total={stats?.totalUsers || 1}
                 color="green"
               />
               <StatusBar
                 label="Suspended Users"
-                value={stats?.userStatus?.suspended || 0}
-                total={stats?.overview?.totalUsers || 1}
+                value={stats?.userStatusBreakdown?.suspended || 0}
+                total={stats?.totalUsers || 1}
                 color="yellow"
               />
               <StatusBar
                 label="Banned Users"
-                value={stats?.userStatus?.banned || 0}
-                total={stats?.overview?.totalUsers || 1}
+                value={stats?.userStatusBreakdown?.banned || 0}
+                total={stats?.totalUsers || 1}
                 color="red"
               />
               <StatusBar
                 label="Pending Review"
-                value={stats?.userStatus?.pendingReview || 0}
-                total={stats?.overview?.totalUsers || 1}
+                value={0}
+                total={stats?.totalUsers || 1}
                 color="gray"
               />
             </div>
@@ -423,21 +526,21 @@ const AdminDashboard = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">New Signups This Week</span>
-                <span className="font-semibold">{stats?.overview?.newSignupsThisWeek || 0}</span>
+                <span className="font-semibold">{stats?.newSignupsWeek || 0}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Weekly Growth Rate</span>
                 <span className="font-semibold text-green-600">
-                  +{stats?.trends?.growthRate || 0}%
+                  +{stats?.totalUsers > 0 ? Math.round(((stats?.newSignupsWeek || 0) / stats.totalUsers) * 100) : 0}%
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Messages Today</span>
-                <span className="font-semibold">{stats?.engagement?.newMessagesToday || 0}</span>
+                <span className="font-semibold">{stats?.newMessagesToday || 0}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Admin Actions (24h)</span>
-                <span className="font-semibold">{stats?.moderation?.recentAdminActions || 0}</span>
+                <span className="font-semibold">{stats?.recentAdminActions?.length || 0}</span>
               </div>
             </div>
           </div>
