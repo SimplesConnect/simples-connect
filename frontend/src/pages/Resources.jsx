@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { BookOpen, Calendar, ArrowRight, User, Globe, Shield, Briefcase, Send, Plus, Eye, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Resources = () => {
+  const navigate = useNavigate();
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -9,6 +11,26 @@ const Resources = () => {
     description: '',
     authorName: ''
   });
+
+  // Mapping of post titles to their routes
+  const postRoutes = {
+    'How to Set Up a Profile That Gets Attention': '/resources/profile-setup',
+    'Your First Week on Simples Connect: What to Do': '/resources/first-week-guide',
+    'Understanding Privacy Settings and Safety Features': '/resources/privacy-settings',
+    '5 Things Only Ugandans Abroad Understand': '/resources/five-things-ugandans-understand',
+    'How to Feel Grounded When You Miss Home': '/resources/feeling-grounded-homesick',
+    'Balancing Two Cultures: The Diaspora Experience': '/resources/balancing-two-cultures',
+    'How to Stay Safe While Making New Connections': '/resources/stay-safe-connecting',
+    'Blocking, Reporting & Controlling Your Experience': '/resources/blocking-reporting-control',
+    'Mental Health Resources for the Diaspora': '/resources/mental-health-diaspora',
+    'How to Promote Your Small Business (Without Being Spammy)': '/resources/promote-business-without-spamming',
+    'Simple Ways to Build Your Brand on Social Media': '/resources/build-brand-social-media',
+    'Networking in the Diaspora: Quality Over Quantity': '/resources/networking-diaspora-quality'
+  };
+
+  const getPostRoute = (title) => {
+    return postRoutes[title] || '/resources';
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -129,25 +151,29 @@ const Resources = () => {
       date: 'December 28, 2024',
       title: 'How to Set Up Your Profile',
       category: 'Getting Started',
-      categoryColor: 'bg-green-100 text-green-800'
+      categoryColor: 'bg-green-100 text-green-800',
+      route: '/resources/profile-setup'
     },
     {
       date: 'December 27, 2024',
       title: 'Feeling Homesick? Try This',
       category: 'Life in the Diaspora',
-      categoryColor: 'bg-blue-100 text-blue-800'
+      categoryColor: 'bg-blue-100 text-blue-800',
+      route: '/resources/feeling-grounded-homesick'
     },
     {
       date: 'December 26, 2024',
       title: 'Stay Safe While Socializing Online',
       category: 'Safety & Support',
-      categoryColor: 'bg-red-100 text-red-800'
+      categoryColor: 'bg-red-100 text-red-800',
+      route: '/resources/stay-safe-connecting'
     },
     {
       date: 'December 25, 2024',
       title: 'Promote Without Being Pushy',
       category: 'Hustle & Growth',
-      categoryColor: 'bg-purple-100 text-purple-800'
+      categoryColor: 'bg-purple-100 text-purple-800',
+      route: '/resources/promote-business-without-spamming'
     }
   ];
 
@@ -200,7 +226,10 @@ const Resources = () => {
                         <span className="text-xs text-simples-storm">
                           {post.readTime}
                         </span>
-                        <button className="text-simples-ocean hover:text-simples-sky text-sm font-semibold flex items-center gap-1">
+                        <button 
+                          onClick={() => navigate(getPostRoute(post.title))}
+                          className="text-simples-ocean hover:text-simples-sky text-sm font-semibold flex items-center gap-1"
+                        >
                           Read More <ArrowRight className="w-3 h-3" />
                         </button>
                       </div>
@@ -244,7 +273,10 @@ const Resources = () => {
                           </span>
                         </td>
                         <td className="p-4 text-center">
-                          <button className="inline-flex items-center gap-2 text-simples-ocean hover:text-simples-sky font-semibold text-sm">
+                          <button 
+                            onClick={() => navigate(post.route)}
+                            className="inline-flex items-center gap-2 text-simples-ocean hover:text-simples-sky font-semibold text-sm"
+                          >
                             <Eye className="w-4 h-4" />
                             View
                           </button>

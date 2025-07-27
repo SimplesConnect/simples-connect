@@ -25,6 +25,21 @@ import Policies from './pages/Policies';
 import SafetyTips from './pages/SafetyTips';
 import CommunityGuidelines from './pages/CommunityGuidelines';
 import Disclaimers from './pages/Disclaimers';
+
+// Blog post imports
+import HowToSetUpProfile from './pages/blog/HowToSetUpProfile';
+import FirstWeekGuide from './pages/blog/FirstWeekGuide';
+import PrivacySettingsGuide from './pages/blog/PrivacySettingsGuide';
+import FiveThingsUgandansUnderstand from './pages/blog/FiveThingsUgandansUnderstand';
+import FeelingGroundedWhenHomesick from './pages/blog/FeelingGroundedWhenHomesick';
+import BalancingTwoCultures from './pages/blog/BalancingTwoCultures';
+import StaySafeWhileConnecting from './pages/blog/StaySafeWhileConnecting';
+import BlockingReportingControl from './pages/blog/BlockingReportingControl';
+import MentalHealthDiaspora from './pages/blog/MentalHealthDiaspora';
+import PromoteBusinessWithoutSpamming from './pages/blog/PromoteBusinessWithoutSpamming';
+import NetworkingDiasporaQuality from './pages/blog/NetworkingDiasporaQuality';
+import BuildBrandSocialMedia from './pages/blog/BuildBrandSocialMedia';
+
 import { useAuth } from './context/AuthContext';
 
 // Layout component for authenticated pages
@@ -127,6 +142,104 @@ const AppContent = () => {
             element={
               <PublicLayout>
                 <Disclaimers />
+              </PublicLayout>
+            }
+          />
+
+          {/* Blog Post Routes */}
+          <Route
+            path="/resources/profile-setup"
+            element={
+              <PublicLayout>
+                <HowToSetUpProfile />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/first-week-guide"
+            element={
+              <PublicLayout>
+                <FirstWeekGuide />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/privacy-settings"
+            element={
+              <PublicLayout>
+                <PrivacySettingsGuide />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/five-things-ugandans-understand"
+            element={
+              <PublicLayout>
+                <FiveThingsUgandansUnderstand />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/feeling-grounded-homesick"
+            element={
+              <PublicLayout>
+                <FeelingGroundedWhenHomesick />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/balancing-two-cultures"
+            element={
+              <PublicLayout>
+                <BalancingTwoCultures />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/stay-safe-connecting"
+            element={
+              <PublicLayout>
+                <StaySafeWhileConnecting />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/blocking-reporting-control"
+            element={
+              <PublicLayout>
+                <BlockingReportingControl />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/mental-health-diaspora"
+            element={
+              <PublicLayout>
+                <MentalHealthDiaspora />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/promote-business-without-spamming"
+            element={
+              <PublicLayout>
+                <PromoteBusinessWithoutSpamming />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/networking-diaspora-quality"
+            element={
+              <PublicLayout>
+                <NetworkingDiasporaQuality />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/resources/build-brand-social-media"
+            element={
+              <PublicLayout>
+                <BuildBrandSocialMedia />
               </PublicLayout>
             }
           />

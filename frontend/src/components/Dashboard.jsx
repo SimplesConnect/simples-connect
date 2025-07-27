@@ -31,6 +31,16 @@ const Dashboard = () => {
   const [loadingActivity, setLoadingActivity] = useState(true);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showAdModal, setShowAdModal] = useState(false);
+  const [adFormData, setAdFormData] = useState({
+    businessName: '',
+    email: '',
+    phone: '',
+    videoUrl: '',
+    adType: 'featured',
+    description: '',
+    budget: ''
+  });
 
   useEffect(() => {
     const checkProfileCompletion = async () => {
@@ -118,32 +128,48 @@ const Dashboard = () => {
     fetchDashboardStats();
   }, [user]);
 
-  // Fetch recent activity
+  // Fetch recent potential matches
   useEffect(() => {
-    const fetchRecentActivity = async () => {
+    const fetchRecentPotentialMatches = async () => {
       if (!user) return;
       
       try {
-        const response = await fetch('/api/users/recent-activity', {
-          headers: {
-            'Authorization': `Bearer ${user.access_token}`
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setRecentActivity(data.activities);
-          }
+        // Fetch recent profiles that the user might be interested in
+        const { data: potentialMatches, error: matchError } = await supabase
+          .from('profiles')
+          .select('id, full_name, age, bio, interests, profile_pictures, created_at')
+          .neq('id', user.id)
+          .eq('is_profile_complete', true)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (matchError) {
+          console.error('Error fetching potential matches:', matchError);
+          setRecentActivity([]);
+        } else {
+          // Transform potential matches into activity format
+          const matchActivities = (potentialMatches || []).map((match) => ({
+            id: match.id,
+            type: 'potential_match',
+            icon: 'heart',
+            message: `${match.full_name || 'Someone'} joined the community`,
+            preview: match.bio ? match.bio.substring(0, 50) + '...' : 'New member looking to connect',
+            time: match.created_at,
+            profile: match,
+            count: null
+          }));
+          
+          setRecentActivity(matchActivities);
         }
       } catch (error) {
-        console.error('Error fetching recent activity:', error);
+        console.error('Error in fetchRecentPotentialMatches:', error);
+        setRecentActivity([]);
       } finally {
         setLoadingActivity(false);
       }
     };
 
-    fetchRecentActivity();
+    fetchRecentPotentialMatches();
   }, [user]);
 
   const handleLikeVideo = () => {
@@ -152,6 +178,29 @@ const Dashboard = () => {
       ...prev,
       likes: likedVideo ? prev.likes - 1 : prev.likes + 1
     }));
+  };
+
+  const handleAdFormChange = (e) => {
+    setAdFormData({
+      ...adFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleAdFormSubmit = (e) => {
+    e.preventDefault();
+    // For now, just show success message - later integrate with backend
+    alert('Thank you for your interest! We\'ll contact you within 24 hours to discuss your advertising package.');
+    setShowAdModal(false);
+    setAdFormData({
+      businessName: '',
+      email: '',
+      phone: '',
+      videoUrl: '',
+      adType: 'featured',
+      description: '',
+      budget: ''
+    });
   };
 
   // Helper function to format time
@@ -303,7 +352,49 @@ const Dashboard = () => {
 
         {/* Resources Section */}
         <div className="mb-8">
-          <div className="grid md:grid-cols-1 gap-6 max-w-md mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Start Matching Card */}
+            <div 
+              className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => navigate('/discover')}
+            >
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <Heart className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-simples-midnight mb-2">
+                  Start Matching
+                </h3>
+                <p className="text-simples-storm mb-4">
+                  Discover amazing people who share your interests and values.
+                </p>
+                <button className="btn-primary w-full">
+                  Discover
+                </button>
+              </div>
+            </div>
+
+            {/* Your Messages Card */}
+            <div 
+              className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => navigate('/messages')}
+            >
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-sky rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <MessageCircle className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-simples-midnight mb-2">
+                  Your Messages
+                </h3>
+                <p className="text-simples-storm mb-4">
+                  Continue conversations with your matches and build connections.
+                </p>
+                <button className="btn-secondary w-full">
+                  View Messages
+                </button>
+              </div>
+            </div>
+
             {/* Resources Card */}
             <div 
               className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
@@ -402,75 +493,41 @@ const Dashboard = () => {
                 Love the Content?
               </h3>
               <p className="text-simples-storm mb-4">
-                Subscribe to our channel for more dating tips, success stories, and relationship advice.
+                Subscribe to our channel for more networking tips, success stories, and relationship advice.
               </p>
               <button className="btn-primary">
                 Subscribe Now
               </button>
             </div>
-          </div>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Start Matching */}
-          <div className="card group hover:shadow-xl transition-all duration-300 cursor-pointer">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Heart className="w-8 h-8 text-white" />
+            {/* Business Ad CTA Section */}
+            <div className="bg-gradient-to-r from-simples-tropical/10 to-simples-lavender/10 rounded-2xl p-6 text-center mt-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-full flex items-center justify-center mx-auto mb-4">
+                <Video className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-simples-midnight mb-2">
-                Start Matching
+                Want to Feature Your Business?
               </h3>
               <p className="text-simples-storm mb-4">
-                Discover amazing people who share your interests and values.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => navigate('/discover')}
-                  className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white py-2 px-4 rounded-lg font-medium hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm"
-                >
-                  <Heart className="w-4 h-4" />
-                  Discover
-                </button>
-                <button 
-                  onClick={() => navigate('/matches')}
-                  className="bg-gradient-to-r from-simples-tropical to-simples-sky text-white py-2 px-4 rounded-lg font-medium hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm"
-                >
-                  <Users className="w-4 h-4" />
-                  My Matches
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* View Messages */}
-          <div className="card group hover:shadow-xl transition-all duration-300 cursor-pointer">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-sky rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <MessageCircle className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-simples-midnight mb-2">
-                Your Messages
-              </h3>
-              <p className="text-simples-storm mb-4">
-                Continue conversations with your matches and build connections.
+                Reach thousands of Ugandans in the diaspora with our Featured Video ads. Perfect for businesses, services, and community events.
               </p>
               <button 
-                onClick={() => navigate('/messages')}
-                className="btn-secondary w-full"
+                onClick={() => setShowAdModal(true)}
+                className="bg-gradient-to-r from-simples-tropical to-simples-lavender text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
               >
-                View Messages
+                Submit Your Ad
               </button>
             </div>
           </div>
         </div>
 
-        {/* Recent Activity */}
+
+
+        {/* Recent Potential Matches */}
         <div className="mt-8">
           <div className="card">
             <h2 className="text-xl font-bold text-simples-midnight mb-6">
-              Recent Activity
+              Recent Potential Matches
             </h2>
             
             {loadingActivity ? (
@@ -493,7 +550,9 @@ const Dashboard = () => {
                     className="flex items-center gap-4 p-4 bg-simples-cloud/30 rounded-xl hover:bg-simples-cloud/50 transition-colors cursor-pointer"
                     onClick={() => {
                       // Handle click based on activity type
-                      if (activity.type === 'message') {
+                      if (activity.type === 'potential_match' && activity.profile) {
+                        navigate(`/profile/${activity.profile.id}`);
+                      } else if (activity.type === 'message') {
                         navigate('/messages');
                       } else if (activity.type === 'matches') {
                         navigate('/matches');
@@ -535,21 +594,179 @@ const Dashboard = () => {
                 <div className="w-16 h-16 bg-simples-cloud/50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Heart className="w-8 h-8 text-simples-storm" />
                 </div>
-                <p className="text-simples-storm mb-2">No recent activity</p>
+                <p className="text-simples-storm mb-2">No potential matches yet</p>
                 <p className="text-sm text-simples-storm">
-                  Start matching with people to see your activity here!
+                  Complete your profile and start discovering people to see potential matches here!
                 </p>
                 <button 
                   onClick={() => navigate('/discover')}
                   className="mt-4 btn-primary"
                 >
-                  Start Matching
+                  Start Discovering
                 </button>
               </div>
             )}
           </div>
         </div>
       </main>
+
+      {/* Business Ad Modal */}
+      {showAdModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-simples-midnight">Submit Your Business Ad</h3>
+              <button
+                onClick={() => setShowAdModal(false)}
+                className="text-simples-storm hover:text-simples-midnight"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="mb-6 p-4 bg-simples-tropical/10 rounded-xl">
+              <h4 className="font-semibold text-simples-midnight mb-2">Business Account Benefits:</h4>
+              <ul className="text-sm text-simples-storm space-y-1">
+                <li>• Featured video placement on dashboard</li>
+                <li>• Reach thousands of diaspora community members</li>
+                <li>• Dedicated business analytics and insights</li>
+                <li>• Priority customer support</li>
+                <li>• Custom advertising packages available</li>
+              </ul>
+            </div>
+
+            <form onSubmit={handleAdFormSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                    Business Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="businessName"
+                    value={adFormData.businessName}
+                    onChange={handleAdFormChange}
+                    required
+                    className="w-full p-3 border border-simples-cloud rounded-xl focus:outline-none focus:ring-2 focus:ring-simples-ocean"
+                    placeholder="Your business name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={adFormData.email}
+                    onChange={handleAdFormChange}
+                    required
+                    className="w-full p-3 border border-simples-cloud rounded-xl focus:outline-none focus:ring-2 focus:ring-simples-ocean"
+                    placeholder="business@example.com"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={adFormData.phone}
+                    onChange={handleAdFormChange}
+                    required
+                    className="w-full p-3 border border-simples-cloud rounded-xl focus:outline-none focus:ring-2 focus:ring-simples-ocean"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                    YouTube Video URL
+                  </label>
+                  <input
+                    type="url"
+                    name="videoUrl"
+                    value={adFormData.videoUrl}
+                    onChange={handleAdFormChange}
+                    className="w-full p-3 border border-simples-cloud rounded-xl focus:outline-none focus:ring-2 focus:ring-simples-ocean"
+                    placeholder="https://youtube.com/watch?v=..."
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                  Ad Type
+                </label>
+                <select
+                  name="adType"
+                  value={adFormData.adType}
+                  onChange={handleAdFormChange}
+                  className="w-full p-3 border border-simples-cloud rounded-xl focus:outline-none focus:ring-2 focus:ring-simples-ocean"
+                >
+                  <option value="featured">Featured Video (Dashboard placement)</option>
+                  <option value="banner">Banner Ad</option>
+                  <option value="sponsored">Sponsored Content</option>
+                  <option value="community">Community Event</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                  Business Description *
+                </label>
+                <textarea
+                  name="description"
+                  value={adFormData.description}
+                  onChange={handleAdFormChange}
+                  required
+                  rows="4"
+                  className="w-full p-3 border border-simples-cloud rounded-xl focus:outline-none focus:ring-2 focus:ring-simples-ocean resize-none"
+                  placeholder="Tell us about your business and what you'd like to advertise..."
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                  Monthly Budget Range
+                </label>
+                <select
+                  name="budget"
+                  value={adFormData.budget}
+                  onChange={handleAdFormChange}
+                  className="w-full p-3 border border-simples-cloud rounded-xl focus:outline-none focus:ring-2 focus:ring-simples-ocean"
+                >
+                  <option value="">Select budget range</option>
+                  <option value="500-1000">$500 - $1,000</option>
+                  <option value="1000-2500">$1,000 - $2,500</option>
+                  <option value="2500-5000">$2,500 - $5,000</option>
+                  <option value="5000+">$5,000+</option>
+                  <option value="custom">Custom (we'll discuss)</option>
+                </select>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAdModal(false)}
+                  className="flex-1 bg-simples-cloud text-simples-storm px-6 py-3 rounded-xl font-semibold hover:bg-simples-silver transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-gradient-to-r from-simples-tropical to-simples-lavender text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                >
+                  Submit Application
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
