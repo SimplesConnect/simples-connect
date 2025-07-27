@@ -27,19 +27,21 @@ CREATE TABLE IF NOT EXISTS advertiser_requests (
 -- Featured Content Table (YouTube videos)
 CREATE TABLE IF NOT EXISTS featured_content (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    advertiser_request_id UUID REFERENCES advertiser_requests(id) ON DELETE CASCADE,
+    advertiser_request_id UUID REFERENCES advertiser_requests(id) ON DELETE SET NULL, -- Made optional
     title VARCHAR(255) NOT NULL,
     description TEXT,
     youtube_video_id VARCHAR(50) NOT NULL, -- YouTube video ID
     youtube_url VARCHAR(500) NOT NULL,
     thumbnail_url VARCHAR(500),
     duration_seconds INTEGER,
-    is_active BOOLEAN DEFAULT false, -- Only one can be active at a time
+    is_active BOOLEAN DEFAULT false, -- Multiple videos can be active
     priority_order INTEGER DEFAULT 0, -- For ordering multiple videos
     start_date DATE,
     end_date DATE,
     view_count INTEGER DEFAULT 0,
     click_count INTEGER DEFAULT 0,
+    advertiser_name VARCHAR(255) DEFAULT 'Simples Connect', -- For non-linked advertisers
+    content_category VARCHAR(100) DEFAULT 'featured', -- 'featured', 'internal', 'promotional'
     created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -125,27 +127,35 @@ CREATE TRIGGER update_featured_content_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Function to ensure only one featured content is active at a time
-CREATE OR REPLACE FUNCTION ensure_single_active_content()
+-- Function to handle campaign date automation (optional - can be enabled later)
+CREATE OR REPLACE FUNCTION check_campaign_dates()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- If setting this content as active, deactivate all others
-    IF NEW.is_active = true THEN
-        UPDATE featured_content 
-        SET is_active = false 
-        WHERE id != NEW.id AND is_active = true;
+    -- Auto-activate if start date is today or past and end date is future (if manual override not set)
+    IF NEW.start_date IS NOT NULL AND NEW.end_date IS NOT NULL THEN
+        IF CURRENT_DATE >= NEW.start_date AND CURRENT_DATE <= NEW.end_date THEN
+            -- Only auto-activate if not manually set to inactive
+            IF OLD.is_active IS NULL OR OLD.is_active = NEW.is_active THEN
+                NEW.is_active = true;
+            END IF;
+        ELSIF CURRENT_DATE > NEW.end_date THEN
+            -- Auto-deactivate expired campaigns (unless manually overridden)
+            IF OLD.is_active IS NULL OR OLD.is_active = NEW.is_active THEN
+                NEW.is_active = false;
+            END IF;
+        END IF;
     END IF;
     
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Create trigger for single active content
-DROP TRIGGER IF EXISTS ensure_single_active_featured_content ON featured_content;
-CREATE TRIGGER ensure_single_active_featured_content
-    BEFORE INSERT OR UPDATE ON featured_content
-    FOR EACH ROW
-    EXECUTE FUNCTION ensure_single_active_content();
+-- Create trigger for campaign date automation (commented out for MVP - enable if needed)
+-- DROP TRIGGER IF EXISTS check_featured_content_campaign_dates ON featured_content;
+-- CREATE TRIGGER check_featured_content_campaign_dates
+--     BEFORE INSERT OR UPDATE ON featured_content
+--     FOR EACH ROW
+--     EXECUTE FUNCTION check_campaign_dates();
 
 -- Function to get advertiser request statistics
 CREATE OR REPLACE FUNCTION get_advertiser_stats()
@@ -209,8 +219,11 @@ $$ LANGUAGE plpgsql;
 -- Grant execute permission
 GRANT EXECUTE ON FUNCTION extract_youtube_id(TEXT) TO authenticated;
 
--- Sample data for testing (optional - uncomment if needed)
+-- Sample data for testing and initial content population
+-- Uncomment these sections to populate initial data
+
 /*
+-- Sample advertiser requests
 INSERT INTO advertiser_requests (
     business_name, 
     contact_person, 
@@ -249,5 +262,51 @@ INSERT INTO advertiser_requests (
     'Event highlights and upcoming cultural festival announcements',
     'https://diasporaevents.com',
     'approved'
+);
+
+-- Sample featured content (replace YouTube URLs with actual platform videos)
+INSERT INTO featured_content (
+    title,
+    description,
+    youtube_video_id,
+    youtube_url,
+    thumbnail_url,
+    is_active,
+    priority_order,
+    advertiser_name,
+    content_category
+) VALUES 
+(
+    'Welcome to Simples Connect',
+    'An introduction to our social networking platform for Ugandans in the diaspora.',
+    'dQw4w9WgXcQ', -- Replace with actual video ID
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    true,
+    1,
+    'Simples Connect',
+    'internal'
+),
+(
+    'Community Success Stories',
+    'Real stories from our community members about finding connections and building relationships.',
+    'dQw4w9WgXcQ', -- Replace with actual video ID
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    true,
+    2,
+    'Simples Connect',
+    'featured'
+),
+(
+    'Cultural Events Highlights',
+    'Highlights from recent cultural events and community gatherings.',
+    'dQw4w9WgXcQ', -- Replace with actual video ID
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    false,
+    3,
+    'Simples Connect',
+    'featured'
 );
 */ 

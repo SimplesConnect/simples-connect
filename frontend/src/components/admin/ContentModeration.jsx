@@ -63,7 +63,10 @@ const ContentModeration = () => {
     description: '',
     youtube_url: '',
     start_date: '',
-    end_date: ''
+    end_date: '',
+    advertiser_name: 'Simples Connect',
+    content_category: 'featured',
+    priority_order: 0
   });
   
   // Stats
@@ -143,12 +146,13 @@ const ContentModeration = () => {
         .from('featured_content')
         .select(`
           *,
-          advertiser_requests!inner(
+          advertiser_requests(
             business_name,
             contact_person,
             email
           )
         `)
+        .order('priority_order', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -248,10 +252,19 @@ const ContentModeration = () => {
       const videoId = extractYouTubeId(formData.youtube_url);
       const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
+      // Determine advertiser name
+      let advertiserName = formData.advertiser_name || 'Simples Connect';
+      if (formData.advertiser_request_id) {
+        const selectedRequest = requests.find(r => r.id === formData.advertiser_request_id);
+        if (selectedRequest) {
+          advertiserName = selectedRequest.business_name;
+        }
+      }
+
       const { error } = await supabase
         .from('featured_content')
         .insert({
-          advertiser_request_id: formData.advertiser_request_id,
+          advertiser_request_id: formData.advertiser_request_id || null,
           title: formData.title,
           description: formData.description,
           youtube_video_id: videoId,
@@ -259,6 +272,9 @@ const ContentModeration = () => {
           thumbnail_url: thumbnailUrl,
           start_date: formData.start_date || null,
           end_date: formData.end_date || null,
+          advertiser_name: advertiserName,
+          content_category: formData.content_category || 'featured',
+          priority_order: parseInt(formData.priority_order) || 0,
           created_by: user.id
         });
 
@@ -271,7 +287,7 @@ const ContentModeration = () => {
           admin_id: user.id,
           action: 'add_featured_content',
           target_user_id: null,
-          details: { videoId, title: formData.title },
+          details: { videoId, title: formData.title, advertiserName, category: formData.content_category },
           timestamp: new Date().toISOString()
         });
 
@@ -284,7 +300,10 @@ const ContentModeration = () => {
         description: '',
         youtube_url: '',
         start_date: '',
-        end_date: ''
+        end_date: '',
+        advertiser_name: 'Simples Connect',
+        content_category: 'featured',
+        priority_order: 0
       });
       setShowAddContentModal(false);
       await fetchData();
@@ -671,8 +690,8 @@ const ContentModeration = () => {
           {/* SECTION 2: Featured Content */}
           {activeTab === 'content' && (
             <div className="p-6">
-              {/* Add Content Button */}
-              <div className="flex justify-between items-center mb-6">
+              {/* Header and Filters */}
+              <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900">Featured Content Management</h2>
                 <button
                   onClick={() => setShowAddContentModal(true)}
@@ -681,6 +700,50 @@ const ContentModeration = () => {
                   <Plus className="w-4 h-4" />
                   Add Featured Content
                 </button>
+              </div>
+
+              {/* Content Filters and Info */}
+              <div className="mb-6 space-y-4">
+                <div className="flex gap-4 items-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700">Filter:</span>
+                    <select className="px-3 py-1 border border-gray-300 rounded text-sm">
+                      <option value="all">All Content</option>
+                      <option value="active">Active Only</option>
+                      <option value="inactive">Inactive Only</option>
+                      <option value="internal">Internal Content</option>
+                      <option value="featured">Featured Content</option>
+                      <option value="promotional">Promotional</option>
+                    </select>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium">{featuredContent.filter(c => c.is_active).length}</span> active videos in rotation
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium">{featuredContent.length}</span> total videos
+                  </div>
+                </div>
+
+                {/* Rotation System Info */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1 bg-blue-500 rounded">
+                      <Play className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-blue-900 mb-1">Video Rotation System</h3>
+                      <p className="text-sm text-blue-700 mb-2">
+                        Multiple videos can be "Active" at once. The Featured Content section will rotate through all active videos automatically.
+                      </p>
+                      <div className="text-xs text-blue-600 space-y-1">
+                        <div>• <span className="font-medium">Active videos</span>: Show to users in rotation (priority order)</div>
+                        <div>• <span className="font-medium">Inactive videos</span>: Hidden from users but kept for later reactivation</div>
+                        <div>• <span className="font-medium">Priority numbers</span>: Lower numbers show first in rotation</div>
+                        <div>• <span className="font-medium">Campaign dates</span>: Optional automatic activation/deactivation</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Featured Content Grid */}
@@ -716,14 +779,24 @@ const ContentModeration = () => {
                             Preview
                           </button>
                         </div>
-                        {content.is_active && (
-                          <div className="absolute top-2 right-2">
+                        <div className="absolute top-2 right-2">
+                          {content.is_active ? (
                             <span className="bg-green-500 text-white px-2 py-1 text-xs font-medium rounded-full flex items-center gap-1">
-                              <Star className="w-3 h-3" />
-                              Active
+                              <Play className="w-3 h-3" />
+                              Live
                             </span>
-                          </div>
-                        )}
+                          ) : (
+                            <span className="bg-gray-500 text-white px-2 py-1 text-xs font-medium rounded-full flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              Inactive
+                            </span>
+                          )}
+                        </div>
+                        <div className="absolute top-2 left-2">
+                          <span className="bg-blue-500 text-white px-2 py-1 text-xs font-medium rounded-full">
+                            #{content.priority_order || 0}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Content Info */}
@@ -732,7 +805,9 @@ const ContentModeration = () => {
                         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{content.description}</p>
                         
                         <div className="text-xs text-gray-500 mb-3">
-                          <div>Advertiser: {content.advertiser_requests.business_name}</div>
+                          <div>Advertiser: {content.advertiser_name || content.advertiser_requests?.business_name || 'Simples Connect'}</div>
+                          <div>Category: {content.content_category || 'featured'}</div>
+                          <div>Priority: {content.priority_order || 0}</div>
                           <div>Added: {new Date(content.created_at).toLocaleDateString()}</div>
                           {content.start_date && (
                             <div>Runs: {new Date(content.start_date).toLocaleDateString()} - {content.end_date ? new Date(content.end_date).toLocaleDateString() : 'Ongoing'}</div>
@@ -743,14 +818,29 @@ const ContentModeration = () => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => toggleContentActive(content.id, content.is_active)}
-                              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors flex items-center gap-1 ${
                                 content.is_active
-                                  ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                                  ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                                  : 'bg-green-100 text-green-800 hover:bg-green-200'
                               }`}
                             >
-                              {content.is_active ? 'Deactivate' : 'Activate'}
+                              {content.is_active ? (
+                                <>
+                                  <Clock className="w-3 h-3" />
+                                  Pause
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="w-3 h-3" />
+                                  Go Live
+                                </>
+                              )}
                             </button>
+                            {content.start_date && content.end_date && (
+                              <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
+                                Scheduled
+                              </span>
+                            )}
                           </div>
                           
                           <div className="flex items-center gap-1">
@@ -763,6 +853,29 @@ const ContentModeration = () => {
                             >
                               <ExternalLink className="w-4 h-4" />
                             </a>
+                            <button
+                              onClick={() => {
+                                const newPriority = prompt('Enter new priority order (0 = highest priority):', content.priority_order || 0);
+                                if (newPriority !== null) {
+                                  supabase
+                                    .from('featured_content')
+                                    .update({ priority_order: parseInt(newPriority) || 0 })
+                                    .eq('id', content.id)
+                                    .then(() => {
+                                      alert('Priority updated successfully!');
+                                      fetchFeaturedContent();
+                                    })
+                                    .catch(error => {
+                                      console.error('Error updating priority:', error);
+                                      alert('Failed to update priority');
+                                    });
+                                }
+                              }}
+                              className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                              title="Edit Priority"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
                             <button
                               onClick={() => deleteContent(content.id)}
                               className="p-1 text-red-600 hover:text-red-800 transition-colors"
@@ -999,17 +1112,55 @@ const ContentModeration = () => {
                 handleAddContent(contentFormData);
               }}>
                 <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Content Category *
+                      </label>
+                      <select
+                        value={contentFormData.content_category}
+                        onChange={(e) => setContentFormData({...contentFormData, content_category: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required
+                      >
+                        <option value="featured">Featured Content</option>
+                        <option value="internal">Internal Content</option>
+                        <option value="promotional">Promotional</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Priority Order
+                      </label>
+                      <input
+                        type="number"
+                        value={contentFormData.priority_order}
+                        onChange={(e) => setContentFormData({...contentFormData, priority_order: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="0"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Approved Advertiser *
+                      Approved Advertiser (Optional)
                     </label>
                     <select
                       value={contentFormData.advertiser_request_id}
-                      onChange={(e) => setContentFormData({...contentFormData, advertiser_request_id: e.target.value})}
+                      onChange={(e) => {
+                        const selectedId = e.target.value;
+                        const selectedRequest = requests.find(r => r.id === selectedId);
+                        setContentFormData({
+                          ...contentFormData, 
+                          advertiser_request_id: selectedId,
+                          advertiser_name: selectedRequest ? selectedRequest.business_name : 'Simples Connect'
+                        });
+                      }}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
                     >
-                      <option value="">Select an approved advertiser...</option>
+                      <option value="">Simples Connect (Internal Content)</option>
                       {requests
                         .filter(r => r.status === 'approved')
                         .map(request => (
@@ -1019,6 +1170,22 @@ const ContentModeration = () => {
                         ))}
                     </select>
                   </div>
+
+                  {!contentFormData.advertiser_request_id && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Advertiser Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.advertiser_name}
+                        onChange={(e) => setContentFormData({...contentFormData, advertiser_name: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Simples Connect"
+                        required
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1133,8 +1300,14 @@ const ContentModeration = () => {
             </div>
             <div className="p-4 bg-gray-50">
               <p className="text-gray-700">{previewVideo.description}</p>
-              <div className="mt-2 text-sm text-gray-500">
-                Advertiser: {previewVideo.advertiser_requests?.business_name}
+              <div className="mt-2 text-sm text-gray-500 space-y-1">
+                <div>Advertiser: {previewVideo.advertiser_name || previewVideo.advertiser_requests?.business_name || 'Simples Connect'}</div>
+                <div>Category: {previewVideo.content_category || 'featured'}</div>
+                <div>Priority: {previewVideo.priority_order || 0}</div>
+                <div>Status: {previewVideo.is_active ? '✅ Active' : '⏸️ Inactive'}</div>
+                {previewVideo.start_date && (
+                  <div>Campaign: {new Date(previewVideo.start_date).toLocaleDateString()} - {previewVideo.end_date ? new Date(previewVideo.end_date).toLocaleDateString() : 'Ongoing'}</div>
+                )}
               </div>
             </div>
           </div>
