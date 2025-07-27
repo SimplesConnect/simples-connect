@@ -145,7 +145,6 @@ const Dashboard = () => {
             profiles:target_user_id (
               id,
               full_name,
-              age,
               bio,
               interests,
               profile_picture_url
@@ -247,7 +246,6 @@ const Dashboard = () => {
           profiles:target_user_id (
             id,
             full_name,
-            age,
             bio,
             interests,
             profile_picture_url

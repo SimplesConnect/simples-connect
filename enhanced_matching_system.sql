@@ -160,7 +160,6 @@ CREATE OR REPLACE FUNCTION find_potential_matches(current_user_id UUID, match_li
 RETURNS TABLE (
   user_id UUID,
   full_name TEXT,
-  age INTEGER,
   bio TEXT,
   profile_picture_url TEXT,
   interests TEXT[],
@@ -188,7 +187,6 @@ BEGIN
   SELECT 
     p.id as user_id,
     p.full_name,
-    p.age,
     p.bio,
     p.profile_picture_url,
     p.interests,

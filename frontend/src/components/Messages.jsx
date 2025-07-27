@@ -31,14 +31,32 @@ const Messages = () => {
 
   // Handle pre-selected match from navigation
   useEffect(() => {
+    let preSelectedMatch = null;
+    
+    // Handle selectedMatch format (from MatchesView, RealMatchingComponent)
     if (location.state?.selectedMatch) {
-      const preSelectedMatch = location.state.selectedMatch;
-      console.log('Pre-selected match from navigation:', preSelectedMatch);
-      
+      preSelectedMatch = location.state.selectedMatch;
+      console.log('Pre-selected match from navigation (selectedMatch format):', preSelectedMatch);
+    }
+    // Handle targetUserId/targetUser format (from ViewProfile)
+    else if (location.state?.targetUserId && location.state?.targetUser) {
+      const { targetUserId, targetUser } = location.state;
+      preSelectedMatch = {
+        id: targetUserId,
+        matchId: null, // Will be resolved when we find the conversation
+        name: targetUser.full_name,
+        photo: targetUser.profile_picture_url || 'https://images.unsplash.com/photo-1494790108755-2616b612b29c?w=150&h=150&fit=crop',
+        userId: targetUserId,
+        otherUserId: targetUserId
+      };
+      console.log('Pre-selected match from navigation (targetUser format):', preSelectedMatch);
+    }
+    
+    if (preSelectedMatch) {
       // Always set the selected match immediately for better UX
       setSelected(preSelectedMatch);
       
-      // Load messages for this match
+      // Load messages for this match if we have a matchId
       if (preSelectedMatch.matchId) {
         loadMessages(preSelectedMatch.matchId);
       }
@@ -48,12 +66,25 @@ const Messages = () => {
         const matchingConversation = conversations.find(conv => 
           conv.matchId === preSelectedMatch.matchId || 
           conv.id === preSelectedMatch.id ||
-          conv.userId === preSelectedMatch.userId
+          conv.userId === preSelectedMatch.userId ||
+          conv.otherUserId === preSelectedMatch.userId
         );
         
         if (matchingConversation) {
           console.log('Found matching conversation:', matchingConversation);
           setSelected(matchingConversation);
+          
+          // Load messages for this conversation
+          if (matchingConversation.matchId) {
+            loadMessages(matchingConversation.matchId);
+          }
+        } else if (preSelectedMatch.userId) {
+          // No existing conversation found - this means they're not matched yet
+          console.log('No existing conversation found for user:', preSelectedMatch.userId);
+          setSelected({
+            ...preSelectedMatch,
+            notMatched: true // Flag to show "not matched" state
+          });
         }
       }
     }
@@ -339,6 +370,52 @@ const Messages = () => {
   }
 
   if (selected) {
+    // Show "not matched" state if user tried to message someone they're not matched with
+    if (selected.notMatched) {
+      return (
+        <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-b from-simples-cloud to-white p-8">
+          <div className="max-w-md text-center">
+            <div className="w-20 h-20 bg-gradient-to-r from-simples-rose to-simples-lavender rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            
+            <h2 className="text-2xl font-bold text-simples-midnight mb-4">
+              Connect with {selected.name} First!
+            </h2>
+            
+            <p className="text-simples-storm mb-6 leading-relaxed">
+              To send messages, you need to match with {selected.name} first. Head to the discover page to like their profile and see if it's a match!
+            </p>
+            
+            <div className="space-y-3">
+              <button
+                onClick={() => navigate('/discover')}
+                className="w-full bg-gradient-to-r from-simples-rose to-simples-lavender text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+              >
+                Go to Discover
+              </button>
+              
+              <button
+                onClick={() => navigate(`/profile/${selected.userId}`)}
+                className="w-full bg-simples-cloud text-simples-midnight py-3 px-6 rounded-xl font-semibold hover:bg-simples-silver transition-colors"
+              >
+                View {selected.name}'s Profile
+              </button>
+              
+              <button
+                onClick={() => setSelected(null)}
+                className="w-full text-simples-storm hover:text-simples-midnight py-2 font-medium transition-colors"
+              >
+                Back to Messages
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="min-h-[calc(100vh-4rem)] flex flex-col" style={{ 
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,

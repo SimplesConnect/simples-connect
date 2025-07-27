@@ -252,7 +252,7 @@ const EnhancedMatching = () => {
           <div className="p-6">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-simples-midnight">
-                {currentMatch.full_name}, {currentMatch.age}
+                {currentMatch.full_name}
               </h2>
               {currentMatch.location && (
                 <div className="flex items-center gap-1 text-simples-storm mt-1">
@@ -372,7 +372,18 @@ const EnhancedMatching = () => {
                 You and {currentMatch.full_name} liked each other!
               </p>
               <button 
-                onClick={() => navigate('/messages')}
+                onClick={() => navigate('/messages', {
+                  state: {
+                    selectedMatch: {
+                      id: currentMatch.user_id,
+                      matchId: null, // Will be resolved from the match that was just created
+                      name: currentMatch.full_name,
+                      photo: currentMatch.profile_picture_url || 'https://images.unsplash.com/photo-1494790108755-2616b612b29c?w=150&h=150&fit=crop',
+                      userId: currentMatch.user_id,
+                      otherUserId: currentMatch.user_id
+                    }
+                  }
+                })}
                 className="btn-primary w-full"
               >
                 Send Message
