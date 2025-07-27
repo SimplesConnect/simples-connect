@@ -76,49 +76,161 @@ const AdminDashboard = () => {
       setLoading(true);
       setError(null);
 
-      console.log('📊 Loading admin dashboard with mock data...');
+      console.log('📊 Loading REAL admin dashboard data from database...');
       
-      // MOCK DATA - Replace with real API when backend is ready
-      const mockStats = {
-        totalUsers: 247,
-        newSignupsToday: 12,
-        newSignupsWeek: 89,
-        activeUsersToday: 156,
-        activeUsersWeek: 201,
-        totalMatches: 1,
-        newMatchesToday: 3,
-        newMatchesWeek: 28,
-        totalMessages: 892,
-        newMessagesToday: 67,
-        newMessagesWeek: 423,
+      // REAL DATA FROM SUPABASE
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const startOfWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      // Fetch real user statistics
+      const [
+        totalUsersResult,
+        newSignupsTodayResult,
+        newSignupsWeekResult,
+        totalMatchesResult,
+        newMatchesTodayResult,
+        newMatchesWeekResult,
+        totalMessagesResult,
+        newMessagesTodayResult,
+        newMessagesWeekResult,
+        adminActionsResult
+      ] = await Promise.all([
+        // Total users
+        supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true }),
+        
+        // New signups today
+        supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startOfToday.toISOString()),
+        
+        // New signups this week
+        supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startOfWeek.toISOString()),
+        
+        // Total matches
+        supabase
+          .from('matches')
+          .select('*', { count: 'exact', head: true }),
+        
+        // New matches today
+        supabase
+          .from('matches')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startOfToday.toISOString()),
+        
+        // New matches this week
+        supabase
+          .from('matches')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startOfWeek.toISOString()),
+        
+        // Total messages
+        supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true }),
+        
+        // New messages today
+        supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startOfToday.toISOString()),
+        
+        // New messages this week
+        supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startOfWeek.toISOString()),
+        
+        // Recent admin actions
+        supabase
+          .from('admin_audit_logs')
+          .select('action, timestamp')
+          .order('timestamp', { ascending: false })
+          .limit(5)
+      ]);
+
+      // Get user status breakdown
+      const { data: suspendedUsers } = await supabase
+        .from('user_status_history')
+        .select('user_id')
+        .eq('status', 'suspended')
+        .order('changed_at', { ascending: false });
+
+      const { data: bannedUsers } = await supabase
+        .from('user_status_history')
+        .select('user_id')
+        .eq('status', 'banned')
+        .order('changed_at', { ascending: false });
+
+      // Get unique suspended and banned users
+      const suspendedCount = new Set(suspendedUsers?.map(u => u.user_id) || []).size;
+      const bannedCount = new Set(bannedUsers?.map(u => u.user_id) || []).size;
+      const totalUsers = totalUsersResult.count || 0;
+      const activeCount = totalUsers - suspendedCount - bannedCount;
+
+      const realStats = {
+        totalUsers: totalUsers,
+        newSignupsToday: newSignupsTodayResult.count || 0,
+        newSignupsWeek: newSignupsWeekResult.count || 0,
+        activeUsersToday: activeCount, // Simplified - users who are not suspended/banned
+        activeUsersWeek: activeCount,
+        totalMatches: totalMatchesResult.count || 0,
+        newMatchesToday: newMatchesTodayResult.count || 0,
+        newMatchesWeek: newMatchesWeekResult.count || 0,
+        totalMessages: totalMessagesResult.count || 0,
+        newMessagesToday: newMessagesTodayResult.count || 0,
+        newMessagesWeek: newMessagesWeekResult.count || 0,
         userStatusBreakdown: {
-          active: 235,
-          suspended: 8,
-          banned: 4
+          active: activeCount,
+          suspended: suspendedCount,
+          banned: bannedCount
         },
-        pendingReports: 2,
+        pendingReports: 0, // Will be updated when content_reports table is used
         highPriorityReports: 0,
-        recentAdminActions: [
-          { action: 'User promoted to admin', timestamp: new Date(Date.now() - 3600000) },
-          { action: 'Reported content reviewed', timestamp: new Date(Date.now() - 7200000) }
-        ],
+        recentAdminActions: adminActionsResult.data?.map(action => ({
+          action: action.action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          timestamp: new Date(action.timestamp)
+        })) || [],
         platformHealth: {
           status: 'healthy',
           uptime: '99.8%',
           avgResponseTime: '245ms'
         }
       };
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
       
-      setStats(mockStats);
+      setStats(realStats);
       setLastUpdated(new Date());
-      console.log('✅ Mock admin data loaded successfully');
+      console.log('✅ REAL admin dashboard data loaded successfully:', realStats);
 
     } catch (error) {
-      console.error('Error fetching admin stats:', error);
+      console.error('❌ Error fetching real admin stats:', error);
       setError(error.message);
+      
+      // Fallback to minimal stats if database fails
+      setStats({
+        totalUsers: 0,
+        newSignupsToday: 0,
+        newSignupsWeek: 0,
+        activeUsersToday: 0,
+        activeUsersWeek: 0,
+        totalMatches: 0,
+        newMatchesToday: 0,
+        newMatchesWeek: 0,
+        totalMessages: 0,
+        newMessagesToday: 0,
+        newMessagesWeek: 0,
+        userStatusBreakdown: { active: 0, suspended: 0, banned: 0 },
+        pendingReports: 0,
+        highPriorityReports: 0,
+        recentAdminActions: [],
+        platformHealth: { status: 'error', uptime: '0%', avgResponseTime: 'N/A' }
+      });
     } finally {
       setLoading(false);
     }
