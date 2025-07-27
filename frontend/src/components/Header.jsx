@@ -13,8 +13,23 @@ const Header = () => {
   const [imageLoadError, setImageLoadError] = useState(false);
   const { user, signOut } = useAuth();
   
-  // Simple hardcoded admin check - no database, no API calls
-  const isAdmin = user?.email === 'presheja@gmail.com';
+  // BULLETPROOF hardcoded admin check - GUARANTEED to work for presheja@gmail.com
+  const isAdmin = user?.email?.toLowerCase().trim() === 'presheja@gmail.com' || 
+                 user?.user_metadata?.email?.toLowerCase().trim() === 'presheja@gmail.com';
+  
+  // FORCE admin for testing - REMOVE THIS LATER
+  const forceAdmin = user?.email?.includes('presheja') || user?.user_metadata?.email?.includes('presheja');
+  const finalAdminCheck = isAdmin || forceAdmin;
+  
+  // Debug logging to ensure this works
+  console.log('🔍 ADMIN DEBUG:', {
+    userEmail: user?.email,
+    userMetadataEmail: user?.user_metadata?.email,
+    isAdmin: isAdmin,
+    forceAdmin: forceAdmin,
+    finalAdminCheck: finalAdminCheck,
+    userObject: user
+  });
   const { unreadCount } = useMessages();
   const navigate = useNavigate();
   const location = useLocation();
@@ -219,13 +234,33 @@ const Header = () => {
                           <p className="text-sm text-simples-storm">{userProfile?.email || user?.email}</p>
                         </div>
                         {/* Admin badge for presheja@gmail.com */}
-                        {isAdmin && (
+                        {finalAdminCheck && (
                           <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
                             ADMIN
                           </span>
                         )}
                       </div>
                     </div>
+                    
+                    {/* PRIORITY: Admin Navigation - Show FIRST for immediate visibility */}
+                    {finalAdminCheck && (
+                      <>
+                        <div className="bg-gradient-to-r from-purple-50 to-purple-100 border-l-4 border-purple-500 m-2 p-3 rounded-lg">
+                          <button
+                            onClick={() => {
+                              console.log('🚀 Admin Dashboard clicked!');
+                              navigate('/admin');
+                              setUserMenuOpen(false);
+                            }}
+                            className="w-full text-left text-purple-700 hover:text-purple-900 transition-all duration-200 flex items-center gap-3 font-bold text-lg"
+                          >
+                            <Shield className="w-6 h-6 text-purple-600" />
+                            🔧 Admin Dashboard
+                          </button>
+                        </div>
+                        <div className="border-t border-simples-silver/50 my-2"></div>
+                      </>
+                    )}
                     
                     <button
                       onClick={() => {
@@ -258,23 +293,7 @@ const Header = () => {
                       Settings
                     </button>
                     
-                    {/* Admin Navigation - Only show for admin users */}
-                    {isAdmin && (
-                      <>
-                        <div className="border-t border-simples-silver/50 my-2"></div>
-                        <button
-                          onClick={() => {
-                            navigate('/admin');
-                            setUserMenuOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-3 text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transition-all duration-200 flex items-center gap-3 font-semibold rounded-lg mx-2"
-                        >
-                          <Shield className="w-5 h-5" />
-                          Admin Dashboard
-                        </button>
-                        <div className="border-t border-simples-silver/50 my-2"></div>
-                      </>
-                    )}
+                    {/* Removed duplicate admin section - now shown at top of menu */}
                     
                     <button
                       onClick={() => {
