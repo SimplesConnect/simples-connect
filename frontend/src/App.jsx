@@ -44,6 +44,10 @@ import BuildBrandSocialMedia from './pages/blog/BuildBrandSocialMedia';
 
 import { useAuth } from './context/AuthContext';
 
+// Admin components
+import AdminDashboard from './components/admin/AdminDashboard';
+import UserManagement from './components/admin/UserManagement';
+
 // Layout component for authenticated pages
 const AuthenticatedLayout = ({ children }) => {
   return (
@@ -340,6 +344,24 @@ const AppContent = () => {
           {/* Enhanced Matching Routes */}
           <Route path="/enhanced-discover" element={<PrivateRoute><EnhancedMatching /></PrivateRoute>} />
           
+          {/* Admin Routes - No header/footer for clean admin interface */}
+          <Route 
+            path="/admin" 
+            element={
+              <PrivateRoute>
+                <AdminDashboard />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/admin/users" 
+            element={
+              <PrivateRoute>
+                <UserManagement />
+              </PrivateRoute>
+            } 
+          />
+
           {/* Redirect any unknown routes to dashboard if authenticated, otherwise to landing */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

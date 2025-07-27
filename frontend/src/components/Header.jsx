@@ -11,6 +11,7 @@ const Header = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { user, signOut } = useAuth();
   const { unreadCount } = useMessages();
   const navigate = useNavigate();
@@ -43,6 +44,27 @@ const Header = () => {
 
   const isActivePath = (path) => location.pathname === path;
 
+  // Check if user is admin
+  const checkAdminStatus = async () => {
+    if (user) {
+      try {
+        const { data: adminUser, error } = await supabase
+          .from('admin_users')
+          .select('admin_level, is_active')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .single();
+
+        setIsAdmin(!error && adminUser);
+      } catch (err) {
+        console.error('Error checking admin status:', err);
+        setIsAdmin(false);
+      }
+    } else {
+      setIsAdmin(false);
+    }
+  };
+
   // Fetch user profile data for profile picture
   const fetchUserProfile = async () => {
     if (user) {
@@ -57,12 +79,16 @@ const Header = () => {
           setUserProfile(profileData);
           setImageLoadError(false); // Reset image error when profile updates
         }
+        
+        // Also check admin status
+        await checkAdminStatus();
       } catch (err) {
         console.error('Error fetching user profile:', err);
       }
     } else {
       setUserProfile(null);
       setImageLoadError(false);
+      setIsAdmin(false);
     }
   };
 
@@ -224,6 +250,27 @@ const Header = () => {
                       <Settings className="w-5 h-5" />
                       Settings
                     </button>
+                    
+                    {/* Admin Navigation - Only show for admin users */}
+                    {isAdmin && (
+                      <>
+                        <div className="border-t border-simples-silver/50 my-2"></div>
+                        <button
+                          onClick={() => {
+                            navigate('/admin');
+                            setUserMenuOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-3 text-purple-700 hover:text-purple-800 hover:bg-purple-50 transition-all duration-200 flex items-center gap-3 font-medium"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                          Admin Dashboard
+                        </button>
+                        <div className="border-t border-simples-silver/50 my-2"></div>
+                      </>
+                    )}
+                    
                     <button
                       onClick={() => {
                         navigate('/discover');
