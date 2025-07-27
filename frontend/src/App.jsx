@@ -16,9 +16,11 @@ import EditProfile from './components/EditProfile';
 import Settings from './components/Settings';
 import FlowTest from './components/FlowTest';
 import AuthCallback from './components/AuthCallback';
-import Events from './pages/Events';
-import Lounge from './pages/Lounge';
+
 import Resources from './pages/Resources';
+import AboutUs from './pages/AboutUs';
+import FAQs from './pages/FAQs';
+import ContactUs from './pages/ContactUs';
 import Policies from './pages/Policies';
 import SafetyTips from './pages/SafetyTips';
 import CommunityGuidelines from './pages/CommunityGuidelines';
@@ -65,26 +67,34 @@ const AppContent = () => {
           
           {/* Public Routes with Header (accessible without login) */}
           <Route
-            path="/events"
-            element={
-              <PublicLayout>
-                <Events />
-              </PublicLayout>
-            }
-          />
-          <Route
-            path="/lounge"
-            element={
-              <PublicLayout>
-                <Lounge />
-              </PublicLayout>
-            }
-          />
-          <Route
             path="/resources"
             element={
               <PublicLayout>
                 <Resources />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PublicLayout>
+                <AboutUs />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/faqs"
+            element={
+              <PublicLayout>
+                <FAQs />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <PublicLayout>
+                <ContactUs />
               </PublicLayout>
             }
           />

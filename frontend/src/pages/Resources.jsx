@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
-import { BookOpen, Plus, Send, X, FileText, User, Lightbulb, Heart, MessageCircle, Target } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { BookOpen, Calendar, ArrowRight, User, Globe, Shield, Briefcase, Send, Plus, Eye, X } from 'lucide-react';
 
 const Resources = () => {
-  const { user } = useAuth();
-  const [showRequestModal, setShowRequestModal] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [formData, setFormData] = useState({
-    topicSuggestion: '',
-    importanceReason: '',
-    userName: ''
+    title: '',
+    category: '',
+    description: '',
+    authorName: ''
   });
 
   const handleInputChange = (e) => {
@@ -21,326 +17,358 @@ const Resources = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
+    // For now, just show success message
+    alert('Thank you for your submission! We\'ll review it and get back to you.');
+    setShowSubmitModal(false);
+    setFormData({ title: '', category: '', description: '', authorName: '' });
+  };
 
-    try {
-      const { error } = await supabase
-        .from('resource_requests')
-        .insert([
-          {
-            user_id: user.id,
-            topic_suggestion: formData.topicSuggestion,
-            importance_reason: formData.importanceReason || null,
-            user_name: formData.userName || null
-          }
-        ]);
-
-      if (error) throw error;
-
-      setSuccess(true);
-      setFormData({
-        topicSuggestion: '',
-        importanceReason: '',
-        userName: ''
-      });
-
-      // Close modal after 2 seconds
-      setTimeout(() => {
-        setShowRequestModal(false);
-        setSuccess(false);
-      }, 2000);
-
-    } catch (error) {
-      console.error('Error submitting resource request:', error);
-      alert('Error submitting request. Please try again.');
-    } finally {
-      setLoading(false);
+  const categories = [
+    {
+      id: 'getting-started',
+      emoji: '🟢',
+      title: 'Getting Started',
+      description: 'For new users learning the platform',
+      color: 'from-green-500 to-green-600',
+      posts: [
+        {
+          title: 'How to Set Up a Profile That Gets Attention',
+          excerpt: 'Essential tips for creating an authentic profile that represents the real you while attracting meaningful connections.',
+          readTime: '5 min read'
+        },
+        {
+          title: 'Your First Week on Simples Connect: What to Do',
+          excerpt: 'A step-by-step guide to navigating your first week and making the most of your experience.',
+          readTime: '8 min read'
+        },
+        {
+          title: 'Understanding Privacy Settings and Safety Features',
+          excerpt: 'Learn how to control who sees your profile and how to use our safety tools effectively.',
+          readTime: '6 min read'
+        }
+      ]
+    },
+    {
+      id: 'diaspora-life',
+      emoji: '🌍',
+      title: 'Life in the Diaspora',
+      description: 'Identity, belonging, and emotional wellbeing',
+      color: 'from-blue-500 to-blue-600',
+      posts: [
+        {
+          title: '5 Things Only Ugandans Abroad Understand',
+          excerpt: 'From explaining your accent to navigating cultural differences - the unique experiences we all share.',
+          readTime: '7 min read'
+        },
+        {
+          title: 'How to Feel Grounded When You Miss Home',
+          excerpt: 'Practical strategies for maintaining your cultural identity and connection to Uganda while building a new life.',
+          readTime: '9 min read'
+        },
+        {
+          title: 'Balancing Two Cultures: The Diaspora Experience',
+          excerpt: 'Finding harmony between your Ugandan roots and your new country\'s customs.',
+          readTime: '6 min read'
+        }
+      ]
+    },
+    {
+      id: 'safety-support',
+      emoji: '🔒',
+      title: 'Safety & Support',
+      description: 'Digital safety and mental health reminders',
+      color: 'from-red-500 to-red-600',
+      posts: [
+        {
+          title: 'How to Stay Safe While Making New Connections',
+          excerpt: 'Essential safety tips for meeting new people online and taking relationships offline safely.',
+          readTime: '10 min read'
+        },
+        {
+          title: 'Blocking, Reporting & Controlling Your Experience',
+          excerpt: 'Complete guide to our safety features and how to create boundaries that work for you.',
+          readTime: '5 min read'
+        },
+        {
+          title: 'Mental Health Resources for the Diaspora',
+          excerpt: 'Finding support and maintaining mental wellness while navigating life abroad.',
+          readTime: '8 min read'
+        }
+      ]
+    },
+    {
+      id: 'hustle-growth',
+      emoji: '💼',
+      title: 'Hustle & Growth',
+      description: 'Diaspora hustle, business, and self-improvement',
+      color: 'from-purple-500 to-purple-600',
+      posts: [
+        {
+          title: 'How to Promote Your Small Business (Without Being Spammy)',
+          excerpt: 'Ethical networking strategies that build genuine relationships while growing your business.',
+          readTime: '12 min read'
+        },
+        {
+          title: 'Simple Ways to Build Your Brand on Social Media',
+          excerpt: 'Authentic personal branding tips that honor your culture while building professional credibility.',
+          readTime: '7 min read'
+        },
+        {
+          title: 'Networking in the Diaspora: Quality Over Quantity',
+          excerpt: 'How to build meaningful professional relationships that advance your career and community.',
+          readTime: '9 min read'
+        }
+      ]
     }
-  };
+  ];
 
-  const closeModal = () => {
-    setShowRequestModal(false);
-    setSuccess(false);
-    setFormData({
-      topicSuggestion: '',
-      importanceReason: '',
-      userName: ''
-    });
-  };
-
-  const upcomingTopics = [
+  const latestPosts = [
     {
-      icon: Heart,
-      title: "First Date Success",
-      description: "Tips for making great first impressions",
-      color: "from-simples-rose to-simples-lavender"
+      date: 'December 28, 2024',
+      title: 'How to Set Up Your Profile',
+      category: 'Getting Started',
+      categoryColor: 'bg-green-100 text-green-800'
     },
     {
-      icon: MessageCircle,
-      title: "Conversation Starters",
-      description: "Break the ice with meaningful questions",
-      color: "from-simples-ocean to-simples-tropical"
+      date: 'December 27, 2024',
+      title: 'Feeling Homesick? Try This',
+      category: 'Life in the Diaspora',
+      categoryColor: 'bg-blue-100 text-blue-800'
     },
     {
-      icon: Target,
-      title: "Building Confidence",
-      description: "Develop self-assurance in dating",
-      color: "from-simples-lavender to-simples-sky"
+      date: 'December 26, 2024',
+      title: 'Stay Safe While Socializing Online',
+      category: 'Safety & Support',
+      categoryColor: 'bg-red-100 text-red-800'
     },
     {
-      icon: Lightbulb,
-      title: "Red Flags to Watch",
-      description: "Identify warning signs early",
-      color: "from-simples-tropical to-simples-ocean"
+      date: 'December 25, 2024',
+      title: 'Promote Without Being Pushy',
+      category: 'Hustle & Growth',
+      categoryColor: 'bg-purple-100 text-purple-800'
     }
   ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-simples-cloud via-simples-silver to-simples-light">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-white/50 px-4 py-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center shadow-lg">
-                <BookOpen className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-gradient-to-b from-simples-cloud to-white">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-simples-ocean to-simples-sky text-white py-20">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <BookOpen className="w-12 h-12" />
+            <h1 className="text-4xl md:text-6xl font-bold">
+              Resources
+            </h1>
+          </div>
+          <p className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed opacity-90">
+            Stories, tips, and guides from the Ugandan diaspora community. 
+            Real experiences, practical advice, and cultural wisdom to help you thrive.
+          </p>
+        </div>
+      </div>
+
+      {/* Categories Section */}
+      <div className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-simples-midnight text-center mb-16">
+            Browse by Category
+          </h2>
+          <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+            {categories.map((category) => (
+              <div key={category.id} className="bg-simples-cloud rounded-2xl overflow-hidden shadow-lg">
+                <div className={`bg-gradient-to-r ${category.color} text-white p-6`}>
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-3xl">{category.emoji}</span>
+                    <div>
+                      <h3 className="text-2xl font-bold">{category.title}</h3>
+                      <p className="opacity-90">{category.description}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 space-y-4">
+                  {category.posts.map((post, index) => (
+                    <div key={index} className="bg-white p-4 rounded-xl border border-simples-cloud hover:shadow-md transition-shadow">
+                      <h4 className="font-semibold text-simples-midnight mb-2">
+                        {post.title}
+                      </h4>
+                      <p className="text-simples-storm text-sm mb-3 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-simples-storm">
+                          {post.readTime}
+                        </span>
+                        <button className="text-simples-ocean hover:text-simples-sky text-sm font-semibold flex items-center gap-1">
+                          Read More <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Latest Posts Section */}
+      <div className="py-16 bg-simples-cloud">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-simples-midnight text-center mb-16">
+            📰 Latest Posts
+          </h2>
+          <div className="max-w-5xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-simples-midnight text-white">
+                    <tr>
+                      <th className="text-left p-4 font-semibold">🗓️ Date</th>
+                      <th className="text-left p-4 font-semibold">📝 Title</th>
+                      <th className="text-left p-4 font-semibold">📁 Category</th>
+                      <th className="text-center p-4 font-semibold">🔗 Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {latestPosts.map((post, index) => (
+                      <tr key={index} className="border-b border-simples-cloud hover:bg-simples-cloud transition-colors">
+                        <td className="p-4 text-simples-storm">{post.date}</td>
+                        <td className="p-4">
+                          <span className="font-semibold text-simples-midnight">{post.title}</span>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${post.categoryColor}`}>
+                            {post.category}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <button className="inline-flex items-center gap-2 text-simples-ocean hover:text-simples-sky font-semibold text-sm">
+                            <Eye className="w-4 h-4" />
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Submit Post Section */}
+      <div className="py-16 bg-gradient-to-r from-simples-tropical to-simples-lavender text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Got a Story to Share?
+          </h2>
+          <p className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
+            Have a lesson, tip, or experience that could help the community? 
+            We'd love to feature your story on our resources page.
+          </p>
+          <button
+            onClick={() => setShowSubmitModal(true)}
+            className="inline-flex items-center gap-3 bg-white text-simples-midnight px-8 py-4 rounded-xl font-semibold hover:bg-simples-cloud transition-all duration-300 text-lg"
+          >
+            <Plus className="w-5 h-5" />
+            Submit Your Post Idea
+          </button>
+        </div>
+      </div>
+
+      {/* Submit Post Modal */}
+      {showSubmitModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-simples-midnight">Submit Post Idea</h3>
+              <button
+                onClick={() => setShowSubmitModal(false)}
+                className="text-simples-storm hover:text-simples-midnight"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                  Post Title *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-simples-cloud rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent outline-none"
+                  placeholder="e.g., How to Navigate Family Expectations While Living Abroad"
+                />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-simples-midnight">Resources</h1>
-                <p className="text-simples-storm">Dating tips and relationship guidance</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowRequestModal(true)}
-              className="bg-gradient-to-r from-simples-lavender to-simples-rose text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Request a Topic
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="card max-w-3xl mx-auto">
-          {/* Main Empty State */}
-          <div className="text-center mb-12">
-            <div className="w-24 h-24 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <BookOpen className="w-12 h-12 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-simples-midnight mb-4">
-              We're building an amazing collection of dating tips and guides
-            </h2>
-            <p className="text-simples-storm text-lg leading-relaxed mb-6">
-              Coming soon! Our resource library will be filled with expert advice, 
-              practical tips, and guides to help you navigate the dating world with confidence.
-            </p>
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-simples-cloud to-simples-silver rounded-full px-4 py-2 text-simples-storm">
-              <div className="w-2 h-2 bg-simples-lavender rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">Content in development</span>
-            </div>
-          </div>
-
-          {/* What's Coming Section */}
-          <div className="mb-12">
-            <h3 className="text-xl font-bold text-simples-midnight mb-6 text-center">
-              What's Coming Soon
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {upcomingTopics.map((topic, index) => (
-                <div key={index} className="bg-white/60 rounded-xl p-6 hover:bg-white/80 transition-all duration-300 hover:shadow-lg">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${topic.color} rounded-xl flex items-center justify-center mb-4`}>
-                    <topic.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h4 className="font-semibold text-simples-midnight mb-2">{topic.title}</h4>
-                  <p className="text-simples-storm text-sm">{topic.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Request Section */}
-          <div className="bg-gradient-to-r from-simples-cloud to-simples-silver rounded-xl p-8 text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-full flex items-center justify-center mx-auto mb-6">
-              <Lightbulb className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-simples-midnight mb-4">
-              Have a topic in mind?
-            </h3>
-            <p className="text-simples-storm mb-6 leading-relaxed">
-              Help us prioritize content by suggesting topics you'd like to see covered. 
-              Your input shapes our resource library!
-            </p>
-            <button
-              onClick={() => setShowRequestModal(true)}
-              className="bg-gradient-to-r from-simples-lavender to-simples-rose text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-2 mx-auto"
-            >
-              <Plus className="w-5 h-5" />
-              Request a Topic
-            </button>
-          </div>
-
-          {/* Feature Preview */}
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-xl flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-8 h-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-simples-midnight mb-2">Expert Guides</h4>
-              <p className="text-simples-storm text-sm">Comprehensive guides from dating experts</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Lightbulb className="w-8 h-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-simples-midnight mb-2">Quick Tips</h4>
-              <p className="text-simples-storm text-sm">Bite-sized advice for every situation</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-white" />
-              </div>
-              <h4 className="font-semibold text-simples-midnight mb-2">Success Stories</h4>
-              <p className="text-simples-storm text-sm">Real experiences from our community</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Request Modal */}
-      {showRequestModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="p-6">
-              {/* Modal Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-simples-lavender to-simples-rose rounded-xl flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-white" />
-                  </div>
-                  <h2 className="text-xl font-bold text-simples-midnight">
-                    Request a Topic
-                  </h2>
-                </div>
-                <button
-                  onClick={closeModal}
-                  className="text-simples-storm hover:text-simples-midnight transition-colors"
+                <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                  Category *
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-simples-cloud rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent outline-none"
                 >
-                  <X className="w-6 h-6" />
+                  <option value="">Select a category</option>
+                  <option value="getting-started">🟢 Getting Started</option>
+                  <option value="diaspora-life">🌍 Life in the Diaspora</option>
+                  <option value="safety-support">🔒 Safety & Support</option>
+                  <option value="hustle-growth">💼 Hustle & Growth</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                  Brief Description *
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  required
+                  rows={4}
+                  className="w-full px-4 py-3 border border-simples-cloud rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent outline-none resize-vertical"
+                  placeholder="Tell us what your post would cover and why it would be valuable to the community..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-simples-midnight mb-2">
+                  Your Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="authorName"
+                  value={formData.authorName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-simples-cloud rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent outline-none"
+                  placeholder="How would you like to be credited?"
+                />
+              </div>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowSubmitModal(false)}
+                  className="flex-1 px-6 py-3 border border-simples-cloud text-simples-storm rounded-xl hover:bg-simples-cloud transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-simples-ocean hover:bg-simples-sky text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  <Send className="w-4 h-4" />
+                  Submit Idea
                 </button>
               </div>
-
-              {/* Success Message */}
-              {success && (
-                <div className="bg-simples-tropical/10 border border-simples-tropical/20 rounded-xl p-4 mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 bg-simples-tropical rounded-full flex items-center justify-center">
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <p className="text-simples-tropical font-semibold">
-                      Topic request submitted successfully!
-                    </p>
-                  </div>
-                  <p className="text-simples-tropical text-sm mt-1">
-                    We'll consider your suggestion for future content.
-                  </p>
-                </div>
-              )}
-
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
-                    Topic Suggestion *
-                  </label>
-                  <div className="relative">
-                    <Lightbulb className="absolute left-3 top-3 w-5 h-5 text-simples-storm" />
-                    <textarea
-                      name="topicSuggestion"
-                      value={formData.topicSuggestion}
-                      onChange={handleInputChange}
-                      rows={3}
-                      className="input-field pl-10 resize-none"
-                      placeholder="What topic would you like us to cover? (e.g., 'How to handle rejection gracefully', 'Long-distance relationship tips')"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
-                    Why is this important to you?
-                  </label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-3 w-5 h-5 text-simples-storm" />
-                    <textarea
-                      name="importanceReason"
-                      value={formData.importanceReason}
-                      onChange={handleInputChange}
-                      rows={4}
-                      className="input-field pl-10 resize-none"
-                      placeholder="Help us understand why this topic matters to you and others in our community..."
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-simples-midnight font-medium mb-2">
-                    Your Name (optional)
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-simples-storm" />
-                    <input
-                      type="text"
-                      name="userName"
-                      value={formData.userName}
-                      onChange={handleInputChange}
-                      className="input-field pl-10"
-                      placeholder="Your name (optional)"
-                    />
-                  </div>
-                </div>
-
-                <div className="bg-simples-cloud/50 rounded-lg p-4">
-                  <p className="text-simples-storm text-sm">
-                    <strong>Note:</strong> All topic requests are reviewed by our content team. 
-                    Popular requests will be prioritized for future guides and resources.
-                  </p>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="flex-1 bg-simples-silver text-simples-midnight px-6 py-3 rounded-xl font-semibold hover:bg-simples-storm/20 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 bg-gradient-to-r from-simples-lavender to-simples-rose text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5" />
-                        Submit Request
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
+            </form>
           </div>
         </div>
       )}

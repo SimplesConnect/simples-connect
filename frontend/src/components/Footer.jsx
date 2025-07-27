@@ -79,18 +79,18 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="/lounge" 
+                  href="/resources" 
                   className="text-simples-cloud hover:text-simples-sky transition-colors text-sm"
                 >
-                  Lounge
+                  Resources
                 </a>
               </li>
               <li>
                 <a 
-                  href="/events" 
+                  href="/contact" 
                   className="text-simples-cloud hover:text-simples-sky transition-colors text-sm"
                 >
-                  Events
+                  Contact Us
                 </a>
               </li>
               <li>

@@ -1,6 +1,6 @@
 // src/components/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { Heart, Play, ThumbsUp, Share2, MessageCircle, Users, Sparkles, Video, Calendar, Coffee, BookOpen, User, Edit, X } from 'lucide-react';
+import { Heart, Play, ThumbsUp, Share2, MessageCircle, Users, Sparkles, Video, BookOpen, User, Edit, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -301,51 +301,9 @@ const Dashboard = () => {
 
 
 
-        {/* Events, Lounge, Resources Section */}
+        {/* Resources Section */}
         <div className="mb-8">
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Events Card */}
-            <div 
-              className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
-              onClick={() => navigate('/events')}
-            >
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-simples-ocean to-simples-sky rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Calendar className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-simples-midnight mb-2">
-                  Events
-                </h3>
-                <p className="text-simples-storm mb-4">
-                  Join exclusive events and meetups to connect with other singles.
-                </p>
-                <button className="btn-primary w-full">
-                  View Events
-                </button>
-              </div>
-            </div>
-
-            {/* Lounge Card */}
-            <div 
-              className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
-              onClick={() => navigate('/lounge')}
-            >
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-simples-tropical to-simples-lavender rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Coffee className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-simples-midnight mb-2">
-                  Lounge
-                </h3>
-                <p className="text-simples-storm mb-4">
-                  Discover music, share stories, and connect with the community.
-                </p>
-                <button className="btn-secondary w-full">
-                  Enter Lounge
-                </button>
-              </div>
-            </div>
-
+          <div className="grid md:grid-cols-1 gap-6 max-w-md mx-auto">
             {/* Resources Card */}
             <div 
               className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
@@ -359,7 +317,7 @@ const Dashboard = () => {
                   Resources
                 </h3>
                 <p className="text-simples-storm mb-4">
-                  Access dating tips, relationship advice, and community guides.
+                  Access networking tips, relationship advice, and community guides.
                 </p>
                 <button className="btn-secondary w-full">
                   Browse Resources

@@ -1,6 +1,6 @@
 // src/components/common/Header.jsx
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, Calendar, Coffee, BookOpen, Bell, Camera, Search, LogIn } from 'lucide-react';
+import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, BookOpen, Bell, Camera, Search, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMessages } from '../context/MessageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -29,15 +29,12 @@ const Header = () => {
   const authenticatedNavItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Heart },
     { name: 'Discover', path: '/discover', icon: Heart },
-    { name: 'Events', path: '/events', icon: Calendar },
-    { name: 'Lounge', path: '/lounge', icon: Coffee },
+    { name: 'Matches', path: '/matches', icon: Users },
     { name: 'Resources', path: '/resources', icon: BookOpen },
   ];
 
   // Navigation items for non-authenticated users
   const publicNavItems = [
-    { name: 'Events', path: '/events', icon: Calendar },
-    { name: 'Lounge', path: '/lounge', icon: Coffee },
     { name: 'Resources', path: '/resources', icon: BookOpen },
   ];
 
