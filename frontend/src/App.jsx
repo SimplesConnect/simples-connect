@@ -17,7 +17,7 @@ import Settings from './components/Settings';
 import FlowTest from './components/FlowTest';
 import AuthCallback from './components/AuthCallback';
 import EnhancedMatching from './components/EnhancedMatching';
-import MatchingPreferences from './components/MatchingPreferences';
+// import MatchingPreferences from './components/MatchingPreferences'; // Removed - uses non-existent DB columns
 
 import Resources from './pages/Resources';
 import AboutUs from './pages/AboutUs';

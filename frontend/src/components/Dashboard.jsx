@@ -4,7 +4,7 @@ import { Heart, MessageCircle, Users, Sparkles, Video, BookOpen, User, Edit, X, 
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import MatchingPreferences from './MatchingPreferences';
+// import MatchingPreferences from './MatchingPreferences'; // Removed - uses non-existent DB columns
 
 
 const Dashboard = () => {
@@ -28,7 +28,7 @@ const Dashboard = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [showAdModal, setShowAdModal] = useState(false);
-  const [showMatchingPreferences, setShowMatchingPreferences] = useState(false);
+  // const [showMatchingPreferences, setShowMatchingPreferences] = useState(false); // Removed
   const [showProfileUpdateNotification, setShowProfileUpdateNotification] = useState(false);
   const [profileNeedsUpdate, setProfileNeedsUpdate] = useState(false);
   const [adFormData, setAdFormData] = useState({
@@ -47,7 +47,7 @@ const Dashboard = () => {
         try {
           const { data: profile, error } = await supabase
             .from('profiles')
-            .select('is_profile_complete, full_name, birthdate, bio, interests, gender, looking_for, intentions, vibe, life_phase, communication_style, emotional_availability, region_preference')
+            .select('is_profile_complete, full_name, birthdate, bio, interests, gender, looking_for')
             .eq('id', user.id)
             .single();
 
@@ -68,21 +68,9 @@ const Dashboard = () => {
             const isComplete = hasRequiredFields && hasInterests;
             setProfileComplete(isComplete);
             
-            // Check if user needs to update their matching preferences
-            const hasNewMatchingFields = profile.intentions && profile.intentions.length > 0 && 
-                                       profile.vibe && profile.life_phase && 
-                                       profile.communication_style && profile.emotional_availability && 
-                                       profile.region_preference;
-            
-            setProfileNeedsUpdate(!hasNewMatchingFields && isComplete);
-            
-            // Show notification if profile needs matching criteria update
-            // Only show if user hasn't permanently dismissed it
-            const dismissedKey = `profile_update_dismissed_${user.id}`;
-            const isDismissed = localStorage.getItem(dismissedKey);
-            if (!hasNewMatchingFields && isComplete && !isDismissed) {
-              setShowProfileUpdateNotification(true);
-            }
+            // Removed matching preferences check - database columns don't exist yet
+            setProfileNeedsUpdate(false);
+            setShowProfileUpdateNotification(false);
           } else {
             setProfileComplete(false);
           }
@@ -599,7 +587,7 @@ const Dashboard = () => {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowMatchingPreferences(true);
+                                              // setShowMatchingPreferences(true); // Removed - preferences don't exist
                     }}
                     className="flex items-center justify-center gap-2 w-full py-2 text-sm text-simples-storm hover:text-simples-midnight transition-colors"
                   >
@@ -1090,16 +1078,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Matching Preferences Modal */}
-      {showMatchingPreferences && (
-        <MatchingPreferences
-          onSave={(preferences) => {
-            console.log('Preferences saved:', preferences);
-            setShowMatchingPreferences(false);
-          }}
-          onClose={() => setShowMatchingPreferences(false)}
-        />
-      )}
+      {/* Removed Matching Preferences Modal - uses non-existent DB columns */}
     </div>
   );
 };
