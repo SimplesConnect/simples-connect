@@ -1,6 +1,6 @@
 // src/components/common/Header.jsx
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, BookOpen, Bell, Camera, Search, LogIn } from 'lucide-react';
+import { Heart, MessageCircle, Settings, LogOut, Menu, X, User, Users, BookOpen, Bell, Camera, Search, LogIn, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMessages } from '../context/MessageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -48,6 +48,8 @@ const Header = () => {
   const checkAdminStatus = async () => {
     if (user) {
       try {
+        console.log('Checking admin status for user:', user.id, user.email);
+        
         const { data: adminUser, error } = await supabase
           .from('admin_users')
           .select('admin_level, is_active')
@@ -55,7 +57,15 @@ const Header = () => {
           .eq('is_active', true)
           .single();
 
-        setIsAdmin(!error && adminUser);
+        console.log('Admin check result:', { adminUser, error });
+        
+        if (adminUser && !error) {
+          setIsAdmin(true);
+          console.log('User is admin with level:', adminUser.admin_level);
+        } else {
+          setIsAdmin(false);
+          console.log('User is not admin or error occurred:', error?.message);
+        }
       } catch (err) {
         console.error('Error checking admin status:', err);
         setIsAdmin(false);
@@ -95,6 +105,12 @@ const Header = () => {
   useEffect(() => {
     fetchUserProfile();
   }, [user]);
+
+  // Force refresh admin status - for debugging
+  const forceRefreshAdminStatus = async () => {
+    console.log('Force refreshing admin status...');
+    await checkAdminStatus();
+  };
 
   // Listen for profile updates
   useEffect(() => {
@@ -214,10 +230,29 @@ const Header = () => {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-3 w-64 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-simples-silver/50 py-3 z-50">
                     <div className="px-4 py-3 border-b border-simples-silver/50">
-                      <p className="font-semibold text-simples-midnight">
-                        {userProfile?.full_name || user?.user_metadata?.full_name || 'User'}
-                      </p>
-                      <p className="text-sm text-simples-storm">{userProfile?.email || user?.email}</p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-simples-midnight">
+                            {userProfile?.full_name || user?.user_metadata?.full_name || 'User'}
+                          </p>
+                          <p className="text-sm text-simples-storm">{userProfile?.email || user?.email}</p>
+                        </div>
+                        {/* Debug controls - remove after testing */}
+                        <div className="flex items-center gap-2">
+                          {isAdmin && (
+                            <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
+                              ADMIN
+                            </span>
+                          )}
+                          <button
+                            onClick={forceRefreshAdminStatus}
+                            className="text-xs text-gray-400 hover:text-gray-600 p-1"
+                            title="Refresh admin status"
+                          >
+                            🔄
+                          </button>
+                        </div>
+                      </div>
                     </div>
                     
                     <button
@@ -260,11 +295,9 @@ const Header = () => {
                             navigate('/admin');
                             setUserMenuOpen(false);
                           }}
-                          className="w-full text-left px-4 py-3 text-purple-700 hover:text-purple-800 hover:bg-purple-50 transition-all duration-200 flex items-center gap-3 font-medium"
+                          className="w-full text-left px-4 py-3 text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transition-all duration-200 flex items-center gap-3 font-semibold rounded-lg mx-2"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                          </svg>
+                          <Shield className="w-5 h-5" />
                           Admin Dashboard
                         </button>
                         <div className="border-t border-simples-silver/50 my-2"></div>
