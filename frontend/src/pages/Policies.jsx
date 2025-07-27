@@ -23,7 +23,7 @@ const Policies = () => {
                 <strong>Effective Date:</strong> July 12, 2025
               </p>
               <p className="text-lg text-simples-storm leading-relaxed">
-                Welcome to Simples Dating – where Ugandans in the diaspora meet, connect, and build meaningful relationships. By using our website, you agree to the terms below. Please read carefully.
+                Welcome to Simples Connect – where Ugandans in the diaspora meet, connect, and build meaningful relationships. By using our social networking platform, you agree to the terms below. Please read carefully.
               </p>
             </div>
 
@@ -33,7 +33,7 @@ const Policies = () => {
                   💌 <span>Who We Are</span>
                 </h2>
                 <p className="text-simples-storm leading-relaxed">
-                  Simples Dating is a relationship platform created for Ugandans living abroad. We offer free and paid membership options, events, and premium matchmaking services.
+                  Simples Connect is a social networking platform created for Ugandans living abroad. We offer free and paid membership options, events, and premium networking services.
                 </p>
               </section>
 
@@ -138,7 +138,7 @@ const Policies = () => {
                 <h2 className="text-2xl font-semibold text-simples-midnight mb-4 flex items-center gap-2">
                   ⚖️ <span>Legal Stuff</span>
                 </h2>
-                <p className="text-simples-storm leading-relaxed mb-4">By using Simples Dating, you agree that:</p>
+                <p className="text-simples-storm leading-relaxed mb-4">By using Simples Connect, you agree that:</p>
                 <ul className="list-disc list-inside text-simples-storm space-y-2 ml-4">
                   <li>Ugandan law applies where relevant</li>
                   <li>Disputes may be handled by a mediator first before legal action</li>
@@ -180,7 +180,7 @@ const Policies = () => {
                 <strong>Effective Date:</strong> July 12, 2025
               </p>
               <p className="text-lg text-simples-storm leading-relaxed">
-                At Simples Dating, your privacy is sacred. We built this platform to create meaningful, safe connections for Ugandans in the diaspora—and protecting your personal information is part of that commitment.
+                At Simples Connect, your privacy is sacred. We built this social networking platform to create meaningful, safe connections for Ugandans in the diaspora—and protecting your personal information is part of that commitment.
               </p>
             </div>
 
@@ -228,7 +228,7 @@ const Policies = () => {
                   <li>Regular system checks and updates</li>
                 </ul>
                 <p className="text-simples-storm leading-relaxed mt-4">
-                  Only authorized team members (like your dating coach or admin support) can view your information—and only to help you.
+                  Only authorized team members (like your networking coach or admin support) can view your information—and only to help you.
                 </p>
               </section>
 
@@ -284,7 +284,7 @@ const Policies = () => {
                   🤝 <span>Your Consent</span>
                 </h2>
                 <p className="text-simples-storm leading-relaxed">
-                  By using Simples Dating, you agree to this privacy policy.
+                  By using Simples Connect, you agree to this privacy policy.
                 </p>
               </section>
 
@@ -315,7 +315,7 @@ const Policies = () => {
                     <ul className="list-disc list-inside text-simples-storm space-y-1 ml-4">
                       <li>A personal intake and goal-setting call</li>
                       <li>Curated matches monthly or weekly</li>
-                      <li>Support from your personal dating coach</li>
+                      <li>Support from your personal networking coach</li>
                       <li>Optional family involvement (if culturally important)</li>
                       <li>Background verification on potential matches</li>
                     </ul>
@@ -360,7 +360,7 @@ const Policies = () => {
                 <strong>Effective Date:</strong> July 12, 2025
               </p>
               <p className="text-lg text-simples-storm leading-relaxed">
-                At Simples Dating, we use cookies to make your experience smoother, more personal, and more secure. This policy explains what cookies are, how we use them, and how you can control them.
+                At Simples Connect, we use cookies to make your experience smoother, more personal, and more secure. This policy explains what cookies are, how we use them, and how you can control them.
               </p>
             </div>
 

@@ -12,7 +12,7 @@ const CommunityGuidelines = () => {
         "Speak kindly—even when you're not feeling the vibe.",
         "Disagree respectfully—no insults or sarcasm.",
         "Avoid gossip or judgment about other users.",
-        "This is a dating space, not a battleground."
+        "This is a social networking space, not a battleground."
       ]
     },
     {
@@ -109,7 +109,7 @@ const CommunityGuidelines = () => {
               </p>
               
               <p className="text-base md:text-lg text-simples-storm mb-6 max-w-3xl mx-auto leading-relaxed">
-                At Simples Dating, we're not just building an app—we're building a community grounded in respect, culture, and genuine connection. These guidelines help us protect the space we're creating and ensure everyone feels seen, safe, and valued.
+                At Simples Connect, we're not just building an app—we're building a community grounded in respect, culture, and genuine connection. These guidelines help us protect the space we're creating and ensure everyone feels seen, safe, and valued.
               </p>
             </div>
           </div>

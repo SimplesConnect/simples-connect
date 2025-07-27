@@ -164,7 +164,7 @@ const SignupModal = ({ isOpen, onClose }) => {
                   {isLogin ? 'Signing In...' : 'Creating Account...'}
                 </div>
               ) : (
-                isLogin ? 'Sign In' : 'Start Dating'
+                                    isLogin ? 'Sign In' : 'Start Connecting'
               )}
             </button>
           </form>
