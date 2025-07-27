@@ -121,9 +121,18 @@ const Dashboard = () => {
       if (!user) return;
       
       try {
+        // Get the current session to access the access token
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          console.error('No valid session for dashboard stats');
+          setLoadingStats(false);
+          return;
+        }
+
         const response = await fetch('/api/users/dashboard-stats', {
           headers: {
-            'Authorization': `Bearer ${user.access_token}`
+            'Authorization': `Bearer ${session.access_token}`
           }
         });
         
@@ -132,6 +141,8 @@ const Dashboard = () => {
           if (data.success) {
             setDashboardStats(data.stats);
           }
+        } else {
+          console.error('Dashboard stats API error:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
