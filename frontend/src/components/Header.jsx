@@ -11,8 +11,10 @@ const Header = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [imageLoadError, setImageLoadError] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const { user, signOut } = useAuth();
+  
+  // Simple hardcoded admin check - no database, no API calls
+  const isAdmin = user?.email === 'presheja@gmail.com';
   const { unreadCount } = useMessages();
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,49 +46,7 @@ const Header = () => {
 
   const isActivePath = (path) => location.pathname === path;
 
-  // Check if user is admin
-  const checkAdminStatus = async () => {
-    if (user) {
-      try {
-        console.log('Checking admin status for user:', user.id, user.email);
-        
-        // Temporary: Auto-grant admin for presheja@gmail.com while database is being set up
-        if (user.email === 'presheja@gmail.com') {
-          console.log('Temporary admin access granted for presheja@gmail.com');
-          setIsAdmin(true);
-          return;
-        }
-        
-        const { data: adminUser, error } = await supabase
-          .from('admin_users')
-          .select('admin_level, is_active')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .single();
-
-        console.log('Admin check result:', { adminUser, error });
-        
-        if (adminUser && !error) {
-          setIsAdmin(true);
-          console.log('User is admin with level:', adminUser.admin_level);
-        } else {
-          setIsAdmin(false);
-          console.log('User is not admin or error occurred:', error?.message);
-        }
-      } catch (err) {
-        console.error('Error checking admin status:', err);
-        // Fallback for presheja@gmail.com if database isn't ready
-        if (user.email === 'presheja@gmail.com') {
-          console.log('Fallback admin access for presheja@gmail.com');
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-        }
-      }
-    } else {
-      setIsAdmin(false);
-    }
-  };
+  // Removed complex admin checking - using simple hardcoded check above
 
   // Fetch user profile data for profile picture
   const fetchUserProfile = async () => {
@@ -102,16 +62,12 @@ const Header = () => {
           setUserProfile(profileData);
           setImageLoadError(false); // Reset image error when profile updates
         }
-        
-        // Also check admin status
-        await checkAdminStatus();
       } catch (err) {
         console.error('Error fetching user profile:', err);
       }
     } else {
       setUserProfile(null);
       setImageLoadError(false);
-      setIsAdmin(false);
     }
   };
 
@@ -119,11 +75,7 @@ const Header = () => {
     fetchUserProfile();
   }, [user]);
 
-  // Force refresh admin status - for debugging
-  const forceRefreshAdminStatus = async () => {
-    console.log('Force refreshing admin status...');
-    await checkAdminStatus();
-  };
+  // Admin status is now hardcoded - no refresh needed
 
   // Listen for profile updates
   useEffect(() => {
@@ -250,21 +202,12 @@ const Header = () => {
                           </p>
                           <p className="text-sm text-simples-storm">{userProfile?.email || user?.email}</p>
                         </div>
-                        {/* Debug controls - remove after testing */}
-                        <div className="flex items-center gap-2">
-                          {isAdmin && (
-                            <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
-                              ADMIN
-                            </span>
-                          )}
-                          <button
-                            onClick={forceRefreshAdminStatus}
-                            className="text-xs text-gray-400 hover:text-gray-600 p-1"
-                            title="Refresh admin status"
-                          >
-                            🔄
-                          </button>
-                        </div>
+                        {/* Admin badge for presheja@gmail.com */}
+                        {isAdmin && (
+                          <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
+                            ADMIN
+                          </span>
+                        )}
                       </div>
                     </div>
                     
