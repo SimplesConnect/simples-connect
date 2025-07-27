@@ -31,92 +31,96 @@ const Messages = () => {
 
   // Handle pre-selected match from navigation
   useEffect(() => {
-    let preSelectedMatch = null;
-    
-    // Handle selectedMatch format (from MatchesView, RealMatchingComponent)
-    if (location.state?.selectedMatch) {
-      preSelectedMatch = location.state.selectedMatch;
-      console.log('Pre-selected match from navigation (selectedMatch format):', preSelectedMatch);
-    }
-    // Handle targetUserId/targetUser format (from ViewProfile)
-    else if (location.state?.targetUserId && location.state?.targetUser) {
-      const { targetUserId, targetUser } = location.state;
-      preSelectedMatch = {
-        id: targetUserId,
-        matchId: null, // Will be resolved when we find the conversation
-        name: targetUser.full_name,
-        photo: targetUser.profile_picture_url || 'https://images.unsplash.com/photo-1494790108755-2616b612b29c?w=150&h=150&fit=crop',
-        userId: targetUserId,
-        otherUserId: targetUserId
-      };
-      console.log('Pre-selected match from navigation (targetUser format):', preSelectedMatch);
-    }
-    
-    if (preSelectedMatch) {
-      // Always set the selected match immediately for better UX
-      setSelected(preSelectedMatch);
+    const handlePreSelectedMatch = async () => {
+      let preSelectedMatch = null;
       
-      // Load messages for this match if we have a matchId
-      if (preSelectedMatch.matchId) {
-        loadMessages(preSelectedMatch.matchId);
+      // Handle selectedMatch format (from MatchesView, RealMatchingComponent)
+      if (location.state?.selectedMatch) {
+        preSelectedMatch = location.state.selectedMatch;
+        console.log('Pre-selected match from navigation (selectedMatch format):', preSelectedMatch);
+      }
+      // Handle targetUserId/targetUser format (from ViewProfile)
+      else if (location.state?.targetUserId && location.state?.targetUser) {
+        const { targetUserId, targetUser } = location.state;
+        preSelectedMatch = {
+          id: targetUserId,
+          matchId: null, // Will be resolved when we find the conversation
+          name: targetUser.full_name,
+          photo: targetUser.profile_picture_url || 'https://images.unsplash.com/photo-1494790108755-2616b612b29c?w=150&h=150&fit=crop',
+          userId: targetUserId,
+          otherUserId: targetUserId
+        };
+        console.log('Pre-selected match from navigation (targetUser format):', preSelectedMatch);
       }
       
-      // If conversations are loaded, try to find matching conversation
-      if (conversations.length > 0) {
-        const matchingConversation = conversations.find(conv => 
-          conv.matchId === preSelectedMatch.matchId || 
-          conv.id === preSelectedMatch.id ||
-          conv.userId === preSelectedMatch.userId ||
-          conv.otherUserId === preSelectedMatch.userId
-        );
+      if (preSelectedMatch) {
+        // Always set the selected match immediately for better UX
+        setSelected(preSelectedMatch);
         
-        if (matchingConversation) {
-          console.log('Found matching conversation:', matchingConversation);
-          setSelected(matchingConversation);
+        // Load messages for this match if we have a matchId
+        if (preSelectedMatch.matchId) {
+          loadMessages(preSelectedMatch.matchId);
+        }
+        
+        // If conversations are loaded, try to find matching conversation
+        if (conversations.length > 0) {
+          const matchingConversation = conversations.find(conv => 
+            conv.matchId === preSelectedMatch.matchId || 
+            conv.id === preSelectedMatch.id ||
+            conv.userId === preSelectedMatch.userId ||
+            conv.otherUserId === preSelectedMatch.userId
+          );
           
-          // Load messages for this conversation
-          if (matchingConversation.matchId) {
-            loadMessages(matchingConversation.matchId);
-          }
-        } else if (preSelectedMatch.userId) {
-          // No existing conversation found - check if there's a match without messages
-          console.log('No existing conversation found for user:', preSelectedMatch.userId);
-          
-          // Try to find a match without messages
-          try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-              const { data: potentialMatch, error: matchError } = await supabase
-                .from('matches')
-                .select('id, user1_id, user2_id')
-                .or(`and(user1_id.eq.${user.id},user2_id.eq.${preSelectedMatch.userId}),and(user1_id.eq.${preSelectedMatch.userId},user2_id.eq.${user.id})`)
-                .eq('is_active', true)
-                .single();
-
-              if (potentialMatch && !matchError) {
-                // Found a match! Set it up properly
-                console.log('Found existing match without messages:', potentialMatch.id);
-                setSelected({
-                  ...preSelectedMatch,
-                  matchId: potentialMatch.id,
-                  id: potentialMatch.id
-                });
-                loadMessages(potentialMatch.id);
-                return;
-              }
+          if (matchingConversation) {
+            console.log('Found matching conversation:', matchingConversation);
+            setSelected(matchingConversation);
+            
+            // Load messages for this conversation
+            if (matchingConversation.matchId) {
+              loadMessages(matchingConversation.matchId);
             }
-          } catch (error) {
-            console.log('No existing match found, showing connect first screen');
+          } else if (preSelectedMatch.userId) {
+            // No existing conversation found - check if there's a match without messages
+            console.log('No existing conversation found for user:', preSelectedMatch.userId);
+            
+            // Try to find a match without messages
+            try {
+              const { data: { session } } = await supabase.auth.getSession();
+              if (session) {
+                const { data: potentialMatch, error: matchError } = await supabase
+                  .from('matches')
+                  .select('id, user1_id, user2_id')
+                  .or(`and(user1_id.eq.${user.id},user2_id.eq.${preSelectedMatch.userId}),and(user1_id.eq.${preSelectedMatch.userId},user2_id.eq.${user.id})`)
+                  .eq('is_active', true)
+                  .single();
+
+                if (potentialMatch && !matchError) {
+                  // Found a match! Set it up properly
+                  console.log('Found existing match without messages:', potentialMatch.id);
+                  setSelected({
+                    ...preSelectedMatch,
+                    matchId: potentialMatch.id,
+                    id: potentialMatch.id
+                  });
+                  loadMessages(potentialMatch.id);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.log('No existing match found, showing connect first screen');
+            }
+            
+            // No match found - show "not matched" state
+            setSelected({
+              ...preSelectedMatch,
+              notMatched: true // Flag to show "not matched" state
+            });
           }
-          
-          // No match found - show "not matched" state
-          setSelected({
-            ...preSelectedMatch,
-            notMatched: true // Flag to show "not matched" state
-          });
         }
       }
-    }
+    };
+
+    handlePreSelectedMatch();
   }, [location.state, conversations]);
 
   // Auto-scroll to bottom when messages change
