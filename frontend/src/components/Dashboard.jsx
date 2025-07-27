@@ -247,7 +247,12 @@ const Dashboard = () => {
             fetchRecentInteractions();
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log('Interaction subscription status:', status);
+          if (status === 'CHANNEL_ERROR') {
+            console.warn('Realtime subscription error - interaction updates may be delayed');
+          }
+        });
 
       // Cleanup subscription on unmount
       return () => {

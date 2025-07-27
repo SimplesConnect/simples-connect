@@ -79,8 +79,37 @@ const Messages = () => {
             loadMessages(matchingConversation.matchId);
           }
         } else if (preSelectedMatch.userId) {
-          // No existing conversation found - this means they're not matched yet
+          // No existing conversation found - check if there's a match without messages
           console.log('No existing conversation found for user:', preSelectedMatch.userId);
+          
+          // Try to find a match without messages
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+              const { data: potentialMatch, error: matchError } = await supabase
+                .from('matches')
+                .select('id, user1_id, user2_id')
+                .or(`and(user1_id.eq.${user.id},user2_id.eq.${preSelectedMatch.userId}),and(user1_id.eq.${preSelectedMatch.userId},user2_id.eq.${user.id})`)
+                .eq('is_active', true)
+                .single();
+
+              if (potentialMatch && !matchError) {
+                // Found a match! Set it up properly
+                console.log('Found existing match without messages:', potentialMatch.id);
+                setSelected({
+                  ...preSelectedMatch,
+                  matchId: potentialMatch.id,
+                  id: potentialMatch.id
+                });
+                loadMessages(potentialMatch.id);
+                return;
+              }
+            }
+          } catch (error) {
+            console.log('No existing match found, showing connect first screen');
+          }
+          
+          // No match found - show "not matched" state
           setSelected({
             ...preSelectedMatch,
             notMatched: true // Flag to show "not matched" state
@@ -167,6 +196,22 @@ const Messages = () => {
     try {
       setSendingMessage(true);
       
+      // Debug logging
+      console.log('Sending message:', {
+        selectedMatchId: selected.matchId,
+        selectedId: selected.id,
+        content: content.trim(),
+        messageType
+      });
+
+      // Ensure we have a valid matchId
+      let matchId = selected.matchId || selected.id;
+      
+      if (!matchId) {
+        console.error('No matchId found for selected conversation:', selected);
+        throw new Error('Cannot send message: No match ID found. Please try selecting the conversation again.');
+      }
+      
       // Get the current session to get the access token
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -180,14 +225,16 @@ const Messages = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          match_id: selected.matchId,
+          match_id: matchId,
           content: content.trim(),
           message_type: messageType
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API Error:', response.status, errorData);
+        throw new Error(errorData.error || `Failed to send message (${response.status})`);
       }
 
       const data = await response.json();
@@ -208,7 +255,20 @@ const Messages = () => {
 
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Failed to send message. Please try again.');
+      
+      // Show more helpful error messages
+      let errorMessage = 'Failed to send message. Please try again.';
+      if (error.message.includes('No match ID found')) {
+        errorMessage = 'Please select a conversation from the list first, then try sending your message.';
+      } else if (error.message.includes('No active session')) {
+        errorMessage = 'Your session has expired. Please refresh the page and try again.';
+      } else if (error.message.includes('403')) {
+        errorMessage = 'You are not authorized to send messages in this conversation.';
+      } else if (error.message.includes('400')) {
+        errorMessage = 'Invalid message content. Please check your message and try again.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setSendingMessage(false);
     }

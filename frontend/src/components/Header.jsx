@@ -88,7 +88,12 @@ const Header = () => {
             fetchUserProfile();
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log('Profile subscription status:', status);
+          if (status === 'CHANNEL_ERROR') {
+            console.warn('Profile realtime subscription error - profile updates may be delayed');
+          }
+        });
 
       return () => {
         supabase.removeChannel(channel);
