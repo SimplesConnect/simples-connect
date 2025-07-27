@@ -25,7 +25,17 @@ const EditProfile = () => {
     interests: [],
     location: '',
     gender: '',
-    looking_for: ''
+    looking_for: '',
+    // New matching criteria fields
+    intentions: [],
+    vibe: 'balanced',
+    life_phase: 'exploring',
+    timezone_overlap_score: 50,
+    value_alignment_score: 50,
+    communication_style: 'balanced',
+    emotional_availability: 'open',
+    region_preference: 'flexible',
+    conversation_boundaries: []
   });
 
   useEffect(() => {
@@ -64,7 +74,17 @@ const EditProfile = () => {
           interests: interests,
           location: profileData.location || '',
           gender: profileData.gender || '',
-          looking_for: profileData.looking_for || ''
+          looking_for: profileData.looking_for || '',
+          // New matching criteria fields with defaults
+          intentions: Array.isArray(profileData.intentions) ? profileData.intentions : [],
+          vibe: profileData.vibe || 'balanced',
+          life_phase: profileData.life_phase || 'exploring',
+          timezone_overlap_score: profileData.timezone_overlap_score || 50,
+          value_alignment_score: profileData.value_alignment_score || 50,
+          communication_style: profileData.communication_style || 'balanced',
+          emotional_availability: profileData.emotional_availability || 'open',
+          region_preference: profileData.region_preference || 'flexible',
+          conversation_boundaries: Array.isArray(profileData.conversation_boundaries) ? profileData.conversation_boundaries : []
         });
 
         // Set gallery data
@@ -662,6 +682,237 @@ const EditProfile = () => {
               <p className="text-sm text-simples-storm mt-2">
                 {formData.bio.length}/500 characters
               </p>
+            </div>
+          </div>
+
+          {/* Matching Preferences Section */}
+          <div className="bg-white rounded-3xl shadow-xl p-8">
+            <h2 className="text-2xl font-bold text-simples-midnight mb-6">Matching Preferences</h2>
+            <p className="text-simples-storm mb-6">
+              Help us find better connections by sharing your preferences and what you're looking for.
+            </p>
+            
+            <div className="space-y-6">
+              {/* Connection Intentions */}
+              <div>
+                <label className="block text-sm font-medium text-simples-midnight mb-3">
+                  What are you looking for? (Select all that apply)
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {[
+                    'friendship', 'dating', 'serious_relationship', 'networking', 
+                    'cultural_connection', 'mentorship', 'activity_partner', 'travel_buddy'
+                  ].map((intention) => (
+                    <label key={intention} className="flex items-center gap-3 p-3 border border-simples-silver rounded-xl hover:bg-simples-cloud/30 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.intentions.includes(intention)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              intentions: [...prev.intentions, intention]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              intentions: prev.intentions.filter(i => i !== intention)
+                            }));
+                          }
+                        }}
+                        className="w-4 h-4 text-simples-ocean border-simples-silver rounded focus:ring-simples-ocean"
+                      />
+                      <span className="text-sm font-medium text-simples-midnight capitalize">
+                        {intention.replace('_', ' ')}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Vibe and Life Phase Row */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-simples-midnight mb-2">
+                    Your Vibe
+                  </label>
+                  <select
+                    value={formData.vibe}
+                    onChange={(e) => setFormData(prev => ({ ...prev, vibe: e.target.value }))}
+                    className="w-full p-4 border border-simples-silver rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent"
+                  >
+                    <option value="laid_back">Laid Back & Chill</option>
+                    <option value="energetic">Energetic & Outgoing</option>
+                    <option value="intellectual">Deep Thinker</option>
+                    <option value="adventurous">Adventurous Spirit</option>
+                    <option value="balanced">Balanced & Adaptable</option>
+                    <option value="creative">Creative & Artistic</option>
+                    <option value="focused">Goal-Oriented</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-simples-midnight mb-2">
+                    Life Phase
+                  </label>
+                  <select
+                    value={formData.life_phase}
+                    onChange={(e) => setFormData(prev => ({ ...prev, life_phase: e.target.value }))}
+                    className="w-full p-4 border border-simples-silver rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent"
+                  >
+                    <option value="student">Student Life</option>
+                    <option value="early_career">Starting Career</option>
+                    <option value="established_career">Established Professional</option>
+                    <option value="exploring">Exploring & Discovering</option>
+                    <option value="settled">Settled & Stable</option>
+                    <option value="transitioning">Life Transition</option>
+                    <option value="family_focused">Family-Focused</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Compatibility Scores */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-simples-midnight mb-2">
+                    Timezone Flexibility (0-100)
+                  </label>
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={formData.timezone_overlap_score}
+                      onChange={(e) => setFormData(prev => ({ ...prev, timezone_overlap_score: parseInt(e.target.value) }))}
+                      className="w-full h-2 bg-simples-silver rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-sm text-simples-storm">
+                      <span>Same timezone only (0)</span>
+                      <span className="font-medium text-simples-ocean">{formData.timezone_overlap_score}</span>
+                      <span>Any timezone (100)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-simples-midnight mb-2">
+                    Values Alignment Importance (0-100)
+                  </label>
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={formData.value_alignment_score}
+                      onChange={(e) => setFormData(prev => ({ ...prev, value_alignment_score: parseInt(e.target.value) }))}
+                      className="w-full h-2 bg-simples-silver rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-sm text-simples-storm">
+                      <span>Not important (0)</span>
+                      <span className="font-medium text-simples-ocean">{formData.value_alignment_score}</span>
+                      <span>Very important (100)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Communication and Emotional Availability Row */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-simples-midnight mb-2">
+                    Communication Style
+                  </label>
+                  <select
+                    value={formData.communication_style}
+                    onChange={(e) => setFormData(prev => ({ ...prev, communication_style: e.target.value }))}
+                    className="w-full p-4 border border-simples-silver rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent"
+                  >
+                    <option value="direct">Direct & Straightforward</option>
+                    <option value="diplomatic">Diplomatic & Tactful</option>
+                    <option value="expressive">Expressive & Emotional</option>
+                    <option value="analytical">Logical & Analytical</option>
+                    <option value="balanced">Balanced Approach</option>
+                    <option value="casual">Casual & Informal</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-simples-midnight mb-2">
+                    Emotional Availability
+                  </label>
+                  <select
+                    value={formData.emotional_availability}
+                    onChange={(e) => setFormData(prev => ({ ...prev, emotional_availability: e.target.value }))}
+                    className="w-full p-4 border border-simples-silver rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent"
+                  >
+                    <option value="very_open">Very Open & Ready</option>
+                    <option value="open">Open to Connection</option>
+                    <option value="cautious">Cautiously Open</option>
+                    <option value="guarded">Taking It Slow</option>
+                    <option value="healing">Focusing on Healing</option>
+                    <option value="exploring">Exploring My Feelings</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Region Preference */}
+              <div>
+                <label className="block text-sm font-medium text-simples-midnight mb-2">
+                  Geographic Preference
+                </label>
+                <select
+                  value={formData.region_preference}
+                  onChange={(e) => setFormData(prev => ({ ...prev, region_preference: e.target.value }))}
+                  className="w-full p-4 border border-simples-silver rounded-xl focus:ring-2 focus:ring-simples-ocean focus:border-transparent"
+                >
+                  <option value="same_city">Same City Only</option>
+                  <option value="same_country">Same Country</option>
+                  <option value="same_region">Same Region (e.g., North America, Europe)</option>
+                  <option value="english_speaking">English-Speaking Countries</option>
+                  <option value="flexible">Anywhere in the World</option>
+                  <option value="uganda_diaspora">Ugandan Diaspora Anywhere</option>
+                </select>
+              </div>
+
+              {/* Conversation Boundaries */}
+              <div>
+                <label className="block text-sm font-medium text-simples-midnight mb-3">
+                  Conversation Boundaries (Optional - Select topics you prefer to avoid initially)
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {[
+                    'politics', 'religion', 'finances', 'past_relationships', 
+                    'family_drama', 'work_stress', 'health_issues', 'controversial_topics'
+                  ].map((boundary) => (
+                    <label key={boundary} className="flex items-center gap-3 p-3 border border-simples-silver rounded-xl hover:bg-simples-cloud/30 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.conversation_boundaries.includes(boundary)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              conversation_boundaries: [...prev.conversation_boundaries, boundary]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              conversation_boundaries: prev.conversation_boundaries.filter(b => b !== boundary)
+                            }));
+                          }
+                        }}
+                        className="w-4 h-4 text-simples-ocean border-simples-silver rounded focus:ring-simples-ocean"
+                      />
+                      <span className="text-sm font-medium text-simples-midnight capitalize">
+                        {boundary.replace('_', ' ')}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-sm text-simples-storm mt-2">
+                  These are conversation topics you'd prefer to avoid in early conversations. This helps create more comfortable interactions.
+                </p>
+              </div>
             </div>
           </div>
 

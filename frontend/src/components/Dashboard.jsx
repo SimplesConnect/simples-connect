@@ -632,81 +632,194 @@ const Dashboard = () => {
             </div>
             
             {loadingActivity ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 bg-simples-cloud/30 rounded-xl animate-pulse">
-                    <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-20"></div>
-                    </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Loading Likes Column */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-3 border-b border-simples-cloud">
+                    <div className="w-5 h-5 bg-gray-300 rounded animate-pulse"></div>
+                    <div className="h-4 bg-gray-300 rounded w-24 animate-pulse"></div>
+                    <div className="w-6 h-4 bg-gray-300 rounded-full animate-pulse"></div>
                   </div>
-                ))}
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 bg-simples-rose/5 border border-simples-rose/20 rounded-xl animate-pulse">
+                        <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="h-3 bg-gray-300 rounded mb-2"></div>
+                          <div className="h-2 bg-gray-200 rounded w-16"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Loading Passes Column */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-3 border-b border-simples-cloud">
+                    <div className="w-5 h-5 bg-gray-300 rounded animate-pulse"></div>
+                    <div className="h-4 bg-gray-300 rounded w-24 animate-pulse"></div>
+                    <div className="w-6 h-4 bg-gray-300 rounded-full animate-pulse"></div>
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 bg-simples-storm/5 border border-simples-storm/20 rounded-xl animate-pulse">
+                        <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                        <div className="flex-1">
+                          <div className="h-3 bg-gray-300 rounded mb-2"></div>
+                          <div className="h-2 bg-gray-200 rounded w-16"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : recentActivity.length > 0 ? (
-              <div className="space-y-4">
-                {recentActivity.map((activity, index) => (
-                  <div 
-                    key={index} 
-                    className="flex items-center gap-4 p-4 bg-simples-cloud/30 rounded-xl hover:bg-simples-cloud/50 transition-colors cursor-pointer"
-                    onClick={() => {
-                      // Handle click based on activity type
-                      if (activity.type === 'interaction_history' && activity.profile) {
-                        navigate(`/profile/${activity.profile.id}`);
-                      } else if (activity.type === 'message') {
-                        navigate('/messages');
-                      } else if (activity.type === 'matches') {
-                        navigate('/matches');
-                      } else if (activity.type === 'likes') {
-                        navigate('/matches');
-                      }
-                    }}
-                  >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      activity.icon === 'heart' ? 'bg-simples-rose/20' :
-                      activity.icon === 'sparkles' ? 'bg-simples-lavender/20' :
-                      activity.icon === 'x' ? 'bg-simples-storm/20' :
-                      activity.icon === 'users' ? 'bg-simples-lavender/20' :
-                      'bg-simples-tropical/20'
-                    }`}>
-                      {getActivityIcon(activity.icon)}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-simples-midnight font-medium">
-                        {activity.message}
-                      </p>
-                      {activity.preview && (
-                        <p className="text-sm text-simples-storm italic mt-1">
-                          "{activity.preview}"
-                        </p>
-                      )}
-                      <p className="text-sm text-simples-storm">
-                        {formatTimeAgo(activity.time)}
-                      </p>
-                    </div>
-                    {activity.count && activity.count > 1 && (
-                      <div className="w-6 h-6 bg-simples-ocean text-white rounded-full flex items-center justify-center text-xs font-bold">
-                        {activity.count}
-                      </div>
-                    )}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Likes Column */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-3 border-b border-simples-cloud">
+                    <Heart className="w-5 h-5 text-simples-rose" />
+                    <h3 className="font-semibold text-simples-midnight">People You Liked</h3>
+                    <span className="px-2 py-1 bg-simples-rose/10 text-simples-rose text-xs rounded-full font-medium">
+                      {recentActivity.filter(activity => activity.interaction_type === 'like' || activity.interaction_type === 'super_like').length}
+                    </span>
                   </div>
-                ))}
+                  
+                  {recentActivity.filter(activity => activity.interaction_type === 'like' || activity.interaction_type === 'super_like').length > 0 ? (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {recentActivity
+                        .filter(activity => activity.interaction_type === 'like' || activity.interaction_type === 'super_like')
+                        .map((activity, index) => (
+                          <div 
+                            key={index} 
+                            className="flex items-center gap-3 p-3 bg-simples-rose/5 border border-simples-rose/20 rounded-xl hover:bg-simples-rose/10 transition-colors cursor-pointer"
+                            onClick={() => {
+                              if (activity.type === 'interaction_history' && activity.profile) {
+                                navigate(`/profile/${activity.profile.id}`);
+                              }
+                            }}
+                          >
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-simples-rose/20">
+                              {getActivityIcon(activity.icon)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-simples-midnight font-medium text-sm truncate">
+                                {activity.message}
+                              </p>
+                              {activity.preview && (
+                                <p className="text-xs text-simples-storm italic mt-1 line-clamp-2">
+                                  "{activity.preview}"
+                                </p>
+                              )}
+                              <p className="text-xs text-simples-storm">
+                                {formatTimeAgo(activity.time)}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 bg-simples-rose/5 rounded-xl border border-simples-rose/20">
+                      <Heart className="w-8 h-8 text-simples-rose/40 mx-auto mb-2" />
+                      <p className="text-sm text-simples-storm">No likes yet</p>
+                      <p className="text-xs text-simples-storm/70">Start discovering people you like!</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Passes Column */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-3 border-b border-simples-cloud">
+                    <X className="w-5 h-5 text-simples-storm" />
+                    <h3 className="font-semibold text-simples-midnight">People You Passed</h3>
+                    <span className="px-2 py-1 bg-simples-storm/10 text-simples-storm text-xs rounded-full font-medium">
+                      {recentActivity.filter(activity => activity.interaction_type === 'pass').length}
+                    </span>
+                  </div>
+                  
+                  {recentActivity.filter(activity => activity.interaction_type === 'pass').length > 0 ? (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {recentActivity
+                        .filter(activity => activity.interaction_type === 'pass')
+                        .map((activity, index) => (
+                          <div 
+                            key={index} 
+                            className="flex items-center gap-3 p-3 bg-simples-storm/5 border border-simples-storm/20 rounded-xl hover:bg-simples-storm/10 transition-colors cursor-pointer"
+                            onClick={() => {
+                              if (activity.type === 'interaction_history' && activity.profile) {
+                                navigate(`/profile/${activity.profile.id}`);
+                              }
+                            }}
+                          >
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-simples-storm/20">
+                              {getActivityIcon(activity.icon)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-simples-midnight font-medium text-sm truncate">
+                                {activity.message}
+                              </p>
+                              {activity.preview && (
+                                <p className="text-xs text-simples-storm italic mt-1 line-clamp-2">
+                                  "{activity.preview}"
+                                </p>
+                              )}
+                              <p className="text-xs text-simples-storm">
+                                {formatTimeAgo(activity.time)}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 bg-simples-storm/5 rounded-xl border border-simples-storm/20">
+                      <X className="w-8 h-8 text-simples-storm/40 mx-auto mb-2" />
+                      <p className="text-sm text-simples-storm">No passes yet</p>
+                      <p className="text-xs text-simples-storm/70">Keep discovering to find your matches!</p>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-simples-cloud/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-8 h-8 text-simples-storm" />
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Empty Likes Column */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-3 border-b border-simples-cloud">
+                    <Heart className="w-5 h-5 text-simples-rose" />
+                    <h3 className="font-semibold text-simples-midnight">People You Liked</h3>
+                    <span className="px-2 py-1 bg-simples-rose/10 text-simples-rose text-xs rounded-full font-medium">0</span>
+                  </div>
+                  <div className="text-center py-8 bg-simples-rose/5 rounded-xl border border-simples-rose/20">
+                    <Heart className="w-12 h-12 text-simples-rose/40 mx-auto mb-3" />
+                    <p className="text-simples-storm mb-2 font-medium">No likes yet</p>
+                    <p className="text-sm text-simples-storm/70 mb-4">
+                      Start discovering people you're interested in!
+                    </p>
+                    <button 
+                      onClick={() => navigate('/discover')}
+                      className="btn-primary text-sm px-4 py-2"
+                    >
+                      Start Discovering
+                    </button>
+                  </div>
                 </div>
-                <p className="text-simples-storm mb-2">No interaction history yet</p>
-                <p className="text-sm text-simples-storm">
-                  Start discovering and interacting with people to see your activity history here!
-                </p>
-                <button 
-                  onClick={() => navigate('/discover')}
-                  className="mt-4 btn-primary"
-                >
-                  Start Discovering
-                </button>
+
+                {/* Empty Passes Column */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-3 border-b border-simples-cloud">
+                    <X className="w-5 h-5 text-simples-storm" />
+                    <h3 className="font-semibold text-simples-midnight">People You Passed</h3>
+                    <span className="px-2 py-1 bg-simples-storm/10 text-simples-storm text-xs rounded-full font-medium">0</span>
+                  </div>
+                  <div className="text-center py-8 bg-simples-storm/5 rounded-xl border border-simples-storm/20">
+                    <X className="w-12 h-12 text-simples-storm/40 mx-auto mb-3" />
+                    <p className="text-simples-storm mb-2 font-medium">No passes yet</p>
+                    <p className="text-sm text-simples-storm/70">
+                      Your passed profiles will appear here as you discover people.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
