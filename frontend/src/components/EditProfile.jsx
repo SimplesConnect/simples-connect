@@ -4,6 +4,32 @@ import { Save, ArrowLeft, Upload, X, Plus, User, Camera, Trash2, Image as ImageI
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
+// Custom CSS for sliders
+const sliderStyles = `
+  .slider {
+    background: linear-gradient(to right, #E5F3FF 0%, #3B82F6 0%, #E5F3FF 0%);
+  }
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #3B82F6, #06B6D4);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #3B82F6, #06B6D4);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+`;
+
 const EditProfile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -25,8 +51,16 @@ const EditProfile = () => {
     interests: [],
     location: '',
     gender: '',
-    looking_for: ''
-    // Removed non-existent database columns
+    looking_for: '',
+    // Enhanced matching fields
+    intentions: [],
+    region_preference: [],
+    vibe: '',
+    life_phase: '',
+    communication_style: [],
+    emotional_availability: '',
+    value_alignment_score: 5,
+    timezone_overlap_score: 5
   });
 
   useEffect(() => {
@@ -65,8 +99,16 @@ const EditProfile = () => {
           interests: interests,
           location: profileData.location || '',
           gender: profileData.gender || '',
-          looking_for: profileData.looking_for || ''
-          // Removed non-existent database columns
+          looking_for: profileData.looking_for || '',
+          // Enhanced matching fields
+          intentions: profileData.intentions || [],
+          region_preference: profileData.region_preference || [],
+          vibe: profileData.vibe || '',
+          life_phase: profileData.life_phase || '',
+          communication_style: profileData.communication_style || [],
+          emotional_availability: profileData.emotional_availability || '',
+          value_alignment_score: profileData.value_alignment_score || 5,
+          timezone_overlap_score: profileData.timezone_overlap_score || 5
         });
 
         // Set gallery data
@@ -118,7 +160,12 @@ const EditProfile = () => {
       const requiredFields = ['full_name', 'birthdate', 'bio', 'gender', 'looking_for'];
       const hasRequiredFields = requiredFields.every(field => formData[field] && formData[field].toString().trim());
       const hasInterests = formData.interests && formData.interests.length > 0;
+      
+      // Enhanced matching validation (optional but recommended)
+      const hasEnhancedFields = formData.intentions.length > 0 || formData.vibe || formData.life_phase || formData.emotional_availability;
+      
       const isComplete = hasRequiredFields && hasInterests;
+      const isEnhanced = isComplete && hasEnhancedFields;
       
       const updateData = {
         ...formData,
@@ -424,6 +471,86 @@ const EditProfile = () => {
     }
   };
 
+  // Helper functions for enhanced matching fields
+  const toggleArrayItem = (field, item) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(item) 
+        ? prev[field].filter(i => i !== item)
+        : [...prev[field], item]
+    }));
+  };
+
+  const handleSliderChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: parseInt(value)
+    }));
+  };
+
+  // Enhanced matching options
+  const intentionOptions = [
+    { value: 'friendship', label: 'Friendship', description: 'Looking for genuine friendships and platonic connections' },
+    { value: 'dating', label: 'Dating', description: 'Interested in romantic relationships and dating' },
+    { value: 'networking', label: 'Networking', description: 'Professional connections and career opportunities' },
+    { value: 'cultural_exchange', label: 'Cultural Exchange', description: 'Learning about different cultures and sharing yours' },
+    { value: 'mentorship', label: 'Mentorship', description: 'Seeking guidance or offering mentorship to others' },
+    { value: 'business_partnership', label: 'Business Partnership', description: 'Collaborative business opportunities and partnerships' },
+    { value: 'travel_buddy', label: 'Travel Buddy', description: 'Finding companions for travel and adventures' },
+    { value: 'activity_partner', label: 'Activity Partner', description: 'Partners for hobbies, sports, and activities' }
+  ];
+
+  const regionOptions = [
+    { value: 'north_america', label: 'North America', description: 'USA, Canada, Mexico' },
+    { value: 'europe', label: 'Europe', description: 'European countries and regions' },
+    { value: 'middle_east', label: 'Middle East', description: 'Middle Eastern countries' },
+    { value: 'australia', label: 'Australia & Oceania', description: 'Australia, New Zealand, Pacific Islands' },
+    { value: 'asia', label: 'Asia', description: 'Asian countries and regions' },
+    { value: 'africa', label: 'Africa', description: 'African countries and regions' },
+    { value: 'south_america', label: 'South America', description: 'South American countries' }
+  ];
+
+  const vibeOptions = [
+    { value: 'deep', label: 'Deep', description: 'Meaningful conversations and profound connections' },
+    { value: 'light', label: 'Light', description: 'Fun, easygoing, and positive vibes' },
+    { value: 'funny', label: 'Funny', description: 'Love to laugh and make others smile' },
+    { value: 'intellectual', label: 'Intellectual', description: 'Enjoy stimulating discussions and learning' },
+    { value: 'adventurous', label: 'Adventurous', description: 'Always up for new experiences' },
+    { value: 'chill', label: 'Chill', description: 'Relaxed and go-with-the-flow attitude' },
+    { value: 'quiet', label: 'Quiet', description: 'Thoughtful and introspective nature' },
+    { value: 'creative', label: 'Creative', description: 'Artistic and imaginative approach to life' }
+  ];
+
+  const lifePhaseOptions = [
+    { value: 'student', label: 'Student', description: 'Focusing on education and personal growth' },
+    { value: 'new_parent', label: 'New Parent', description: 'Navigating the journey of parenthood' },
+    { value: 'relocating', label: 'Relocating', description: 'Moving to a new place or settling in' },
+    { value: 'hustle_season', label: 'Hustle Season', description: 'Building career and chasing goals' },
+    { value: 'career_transition', label: 'Career Transition', description: 'Changing paths or advancing professionally' },
+    { value: 'settling_down', label: 'Settling Down', description: 'Looking for stability and long-term plans' },
+    { value: 'exploring', label: 'Exploring', description: 'Discovering new interests and possibilities' },
+    { value: 'established', label: 'Established', description: 'Comfortable and looking to share experiences' }
+  ];
+
+  const communicationStyleOptions = [
+    { value: 'text', label: 'Text Messages', description: 'Prefer written communication' },
+    { value: 'voice', label: 'Voice Calls', description: 'Like talking over the phone' },
+    { value: 'memes', label: 'Memes & Humor', description: 'Communicate through funny content' },
+    { value: 'long_chats', label: 'Long Conversations', description: 'Enjoy deep, extended discussions' },
+    { value: 'video_calls', label: 'Video Calls', description: 'Face-to-face virtual conversations' },
+    { value: 'voice_notes', label: 'Voice Notes', description: 'Audio messages and voice recordings' },
+    { value: 'emojis', label: 'Emojis & Visual', description: 'Express through emojis and images' },
+    { value: 'formal', label: 'Formal Communication', description: 'Professional and structured conversation' }
+  ];
+
+  const emotionalAvailabilityOptions = [
+    { value: 'guarded', label: 'Guarded', description: 'Taking time to open up and trust' },
+    { value: 'open', label: 'Open', description: 'Ready for meaningful connections' },
+    { value: 'healing', label: 'Healing', description: 'Working through personal growth' },
+    { value: 'selective', label: 'Selective', description: 'Careful about who I connect with' },
+    { value: 'ready', label: 'Ready', description: 'Fully available for new relationships' }
+  ];
+
   if (loading && !formData.full_name) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-simples-cloud via-simples-silver to-simples-light">
@@ -439,6 +566,7 @@ const EditProfile = () => {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-simples-cloud via-simples-silver to-simples-light">
+      <style dangerouslySetInnerHTML={{ __html: sliderStyles }} />
       <div className="bg-white/80 backdrop-blur-sm border-b border-simples-silver/50 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <button
@@ -667,7 +795,265 @@ const EditProfile = () => {
             </div>
           </div>
 
-          {/* Removed Matching Preferences Section - Database columns don't exist yet */}
+          {/* SECTION 1: WHAT YOU'RE LOOKING FOR */}
+          <div className="bg-white rounded-3xl shadow-xl p-8">
+            <h2 className="text-2xl font-bold text-simples-midnight mb-6">What You're Looking For</h2>
+            
+            {/* Intentions */}
+            <div className="mb-8">
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Intentions <span className="text-simples-storm text-sm font-normal">(Select all that apply)</span>
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                What type of connections are you seeking? This helps us match you with like-minded people.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-3">
+                {intentionOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => toggleArrayItem('intentions', option.value)}
+                    className={`p-4 rounded-xl border-2 transition-all text-left ${
+                      formData.intentions.includes(option.value)
+                        ? 'border-simples-ocean bg-simples-ocean/10 text-simples-ocean'
+                        : 'border-simples-silver hover:border-simples-ocean/50 text-simples-storm'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 ${
+                        formData.intentions.includes(option.value)
+                          ? 'border-simples-ocean bg-simples-ocean'
+                          : 'border-simples-silver'
+                      }`}>
+                        {formData.intentions.includes(option.value) && (
+                          <X className="w-3 h-3 text-white transform rotate-45" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-xs text-simples-storm mt-1">{option.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              
+              {formData.intentions.length > 0 && (
+                <div className="mt-4 p-3 bg-simples-ocean/5 rounded-xl">
+                  <p className="text-sm text-simples-ocean">
+                    <strong>Selected:</strong> {formData.intentions.map(intent => 
+                      intentionOptions.find(opt => opt.value === intent)?.label
+                    ).join(', ')}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Regional Preferences */}
+            <div>
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Regional Preferences <span className="text-simples-storm text-sm font-normal">(Optional)</span>
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                Which regions would you like to connect with? Great for diaspora connections and cultural exchange.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-3">
+                {regionOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => toggleArrayItem('region_preference', option.value)}
+                    className={`p-3 rounded-xl border-2 transition-all text-left ${
+                      formData.region_preference.includes(option.value)
+                        ? 'border-simples-tropical bg-simples-tropical/10 text-simples-tropical'
+                        : 'border-simples-silver hover:border-simples-tropical/50 text-simples-storm'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                        formData.region_preference.includes(option.value)
+                          ? 'border-simples-tropical bg-simples-tropical'
+                          : 'border-simples-silver'
+                      }`}>
+                        {formData.region_preference.includes(option.value) && (
+                          <X className="w-3 h-3 text-white transform rotate-45" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-xs text-simples-storm">{option.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 2: PERSONALITY & LIFESTYLE */}
+          <div className="bg-white rounded-3xl shadow-xl p-8">
+            <h2 className="text-2xl font-bold text-simples-midnight mb-6">Personality & Lifestyle</h2>
+            
+            {/* Your Vibe */}
+            <div className="mb-8">
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Your Vibe <span className="text-simples-storm text-sm font-normal">(Choose one)</span>
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                What's your general energy and approach to life? This helps match you with compatible personalities.
+              </p>
+              
+              <div className="space-y-3">
+                {vibeOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, vibe: option.value }))}
+                    className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                      formData.vibe === option.value
+                        ? 'border-simples-ocean bg-simples-ocean/10 text-simples-ocean'
+                        : 'border-simples-silver hover:border-simples-ocean/50 text-simples-storm'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        formData.vibe === option.value
+                          ? 'border-simples-ocean bg-simples-ocean'
+                          : 'border-simples-silver'
+                      }`}>
+                        {formData.vibe === option.value && <div className="w-2 h-2 bg-white rounded-full" />}
+                      </div>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-sm text-simples-storm">{option.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Life Phase */}
+            <div className="mb-8">
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Life Phase <span className="text-simples-storm text-sm font-normal">(Choose one)</span>
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                Where are you in life right now? This helps match you with people in similar life stages.
+              </p>
+              
+              <div className="space-y-3">
+                {lifePhaseOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, life_phase: option.value }))}
+                    className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                      formData.life_phase === option.value
+                        ? 'border-simples-lavender bg-simples-lavender/10 text-simples-lavender'
+                        : 'border-simples-silver hover:border-simples-lavender/50 text-simples-storm'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        formData.life_phase === option.value
+                          ? 'border-simples-lavender bg-simples-lavender'
+                          : 'border-simples-silver'
+                      }`}>
+                        {formData.life_phase === option.value && <div className="w-2 h-2 bg-white rounded-full" />}
+                      </div>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-sm text-simples-storm">{option.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Communication Style */}
+            <div className="mb-8">
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Communication Style <span className="text-simples-storm text-sm font-normal">(Select all that apply)</span>
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                How do you prefer to communicate? This helps match you with people who share your communication preferences.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-3">
+                {communicationStyleOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => toggleArrayItem('communication_style', option.value)}
+                    className={`p-3 rounded-xl border-2 transition-all text-left ${
+                      formData.communication_style.includes(option.value)
+                        ? 'border-simples-sky bg-simples-sky/10 text-simples-sky'
+                        : 'border-simples-silver hover:border-simples-sky/50 text-simples-storm'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                        formData.communication_style.includes(option.value)
+                          ? 'border-simples-sky bg-simples-sky'
+                          : 'border-simples-silver'
+                      }`}>
+                        {formData.communication_style.includes(option.value) && (
+                          <X className="w-3 h-3 text-white transform rotate-45" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">{option.label}</div>
+                        <div className="text-xs text-simples-storm">{option.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Emotional Availability */}
+            <div>
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Emotional Availability <span className="text-simples-storm text-sm font-normal">(Choose one)</span>
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                How emotionally available are you for new connections? Be honest - this ensures better matches.
+              </p>
+              
+              <div className="space-y-3">
+                {emotionalAvailabilityOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, emotional_availability: option.value }))}
+                    className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                      formData.emotional_availability === option.value
+                        ? 'border-simples-rose bg-simples-rose/10 text-simples-rose'
+                        : 'border-simples-silver hover:border-simples-rose/50 text-simples-storm'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        formData.emotional_availability === option.value
+                          ? 'border-simples-rose bg-simples-rose'
+                          : 'border-simples-silver'
+                      }`}>
+                        {formData.emotional_availability === option.value && <div className="w-2 h-2 bg-white rounded-full" />}
+                      </div>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-sm text-simples-storm">{option.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <div className="bg-white rounded-3xl shadow-xl p-8">
             <h2 className="text-2xl font-bold text-simples-midnight mb-6">Interests *</h2>
@@ -838,6 +1224,86 @@ const EditProfile = () => {
               <p className="text-sm text-simples-storm mt-2">
                 Supported formats: MP4, WebM, OGG, MOV • Max 50MB
               </p>
+            </div>
+          </div>
+
+          {/* SECTION 3: COMPATIBILITY SCORES */}
+          <div className="bg-white rounded-3xl shadow-xl p-8">
+            <h2 className="text-2xl font-bold text-simples-midnight mb-6">Compatibility Scores</h2>
+            <p className="text-simples-storm mb-6">
+              These scores help fine-tune your matches based on your preferences and lifestyle.
+            </p>
+            
+            {/* Value Alignment */}
+            <div className="mb-8">
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Value Alignment Importance
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                How important are shared values to you? (1 = Not important, 10 = Extremely important)
+              </p>
+              
+              <div className="space-y-4">
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={formData.value_alignment_score}
+                  onChange={(e) => handleSliderChange('value_alignment_score', e.target.value)}
+                  className="w-full h-2 bg-simples-silver rounded-lg appearance-none cursor-pointer slider"
+                />
+                <div className="flex justify-between text-sm text-simples-storm">
+                  <span>1 - Not Important</span>
+                  <span className="font-bold text-simples-ocean text-lg">{formData.value_alignment_score}</span>
+                  <span>10 - Extremely Important</span>
+                </div>
+                <div className="p-3 bg-simples-ocean/5 rounded-xl">
+                  <p className="text-sm text-simples-ocean">
+                    <strong>Your setting:</strong> {
+                      formData.value_alignment_score <= 3 ? 'Values matter less than other factors' :
+                      formData.value_alignment_score <= 6 ? 'Values are somewhat important' :
+                      formData.value_alignment_score <= 8 ? 'Values are very important' :
+                      'Values are extremely important for compatibility'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Timezone Flexibility */}
+            <div>
+              <label className="block text-lg font-semibold text-simples-midnight mb-3">
+                Timezone Flexibility
+              </label>
+              <p className="text-sm text-simples-storm mb-4">
+                How flexible are you with different time zones? (1 = Need same timezone, 10 = Very flexible)
+              </p>
+              
+              <div className="space-y-4">
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={formData.timezone_overlap_score}
+                  onChange={(e) => handleSliderChange('timezone_overlap_score', e.target.value)}
+                  className="w-full h-2 bg-simples-silver rounded-lg appearance-none cursor-pointer slider"
+                />
+                <div className="flex justify-between text-sm text-simples-storm">
+                  <span>1 - Same Timezone Only</span>
+                  <span className="font-bold text-simples-tropical text-lg">{formData.timezone_overlap_score}</span>
+                  <span>10 - Very Flexible</span>
+                </div>
+                <div className="p-3 bg-simples-tropical/5 rounded-xl">
+                  <p className="text-sm text-simples-tropical">
+                    <strong>Your setting:</strong> {
+                      formData.timezone_overlap_score <= 3 ? 'Prefer people in similar timezones' :
+                      formData.timezone_overlap_score <= 6 ? 'Moderately flexible with timezones' :
+                      formData.timezone_overlap_score <= 8 ? 'Very flexible with timezones' :
+                      'Timezone differences don\'t matter to me'
+                    }
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
