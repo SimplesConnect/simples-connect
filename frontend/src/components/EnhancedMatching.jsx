@@ -118,9 +118,9 @@ const EnhancedMatching = () => {
   };
 
   const handleLike = async () => {
-    if (activeMatch) {
+    if (selectedMatch) {
       setSwipeDirection('like');
-      const result = await handleLikeAction(activeMatch.user_id);
+      const result = await handleLikeAction(selectedMatch.user_id);
       if (result.isMatch) {
         setSwipeDirection('match');
         setTimeout(() => setSwipeDirection(null), 2000);
@@ -131,17 +131,17 @@ const EnhancedMatching = () => {
   };
 
   const handlePass = async () => {
-    if (activeMatch) {
+    if (selectedMatch) {
       setSwipeDirection('pass');
-      await handlePassAction(activeMatch.user_id);
+      await handlePassAction(selectedMatch.user_id);
       setTimeout(() => setSwipeDirection(null), 300);
     }
   };
 
   const handleSuperLike = async () => {
-    if (activeMatch) {
+    if (selectedMatch) {
       setSwipeDirection('super');
-      const result = await handleSuperLikeAction(activeMatch.user_id);
+      const result = await handleSuperLikeAction(selectedMatch.user_id);
       if (result.isMatch) {
         setSwipeDirection('match');
         setTimeout(() => setSwipeDirection(null), 2000);
@@ -151,7 +151,7 @@ const EnhancedMatching = () => {
     }
   };
 
-  const activeMatch = potentialMatches[currentMatchIndex];
+  const selectedMatch = potentialMatches[currentMatchIndex];
 
   // Match score color helper
   const getMatchScoreColor = (score) => {
@@ -178,7 +178,7 @@ const EnhancedMatching = () => {
     );
   }
 
-  if (!activeMatch) {
+  if (!selectedMatch) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-simples-cloud to-white flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
@@ -220,10 +220,10 @@ const EnhancedMatching = () => {
           
           {/* Profile Image */}
           <div className="relative h-96 bg-gradient-to-br from-simples-ocean to-simples-sky">
-            {activeMatch.profile_picture_url ? (
+            {selectedMatch.profile_picture_url ? (
               <img 
-                src={activeMatch.profile_picture_url} 
-                alt={activeMatch.full_name}
+                src={selectedMatch.profile_picture_url} 
+                alt={selectedMatch.full_name}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -234,15 +234,15 @@ const EnhancedMatching = () => {
             
             {/* Match Score Badge */}
             <div className="absolute top-4 right-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-bold ${getMatchScoreColor(activeMatch.match_score)}`}>
-                {activeMatch.match_score}% Match
+              <div className={`px-3 py-1 rounded-full text-sm font-bold ${getMatchScoreColor(selectedMatch.match_score)}`}>
+                {selectedMatch.match_score}% Match
               </div>
             </div>
 
             {/* Match Label */}
             <div className="absolute top-4 left-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-bold ${getMatchLabelColor(activeMatch.match_label)}`}>
-                {activeMatch.match_label}
+              <div className={`px-3 py-1 rounded-full text-sm font-bold ${getMatchLabelColor(selectedMatch.match_label)}`}>
+                {selectedMatch.match_label}
               </div>
             </div>
           </div>
@@ -251,20 +251,20 @@ const EnhancedMatching = () => {
           <div className="p-6">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-simples-midnight">
-                {activeMatch.full_name}
+                {selectedMatch.full_name}
               </h2>
-              {activeMatch.location && (
+              {selectedMatch.location && (
                 <div className="flex items-center gap-1 text-simples-storm mt-1">
                   <MapPin className="w-4 h-4" />
-                  <span className="text-sm">{activeMatch.location}</span>
+                  <span className="text-sm">{selectedMatch.location}</span>
                 </div>
               )}
             </div>
 
             {/* Bio */}
-            {activeMatch.bio && (
+            {selectedMatch.bio && (
               <p className="text-simples-storm mb-4 leading-relaxed">
-                {activeMatch.bio}
+                {selectedMatch.bio}
               </p>
             )}
 
@@ -272,35 +272,35 @@ const EnhancedMatching = () => {
             
             {/* Vibe & Life Phase */}
             <div className="mb-4 flex flex-wrap gap-2">
-              {activeMatch.vibe && (
+              {selectedMatch.vibe && (
                 <div className="flex items-center gap-1 px-3 py-1 bg-simples-sky/20 text-simples-sky rounded-full text-xs font-medium">
                   <Zap size={12} />
-                  <span className="capitalize">{activeMatch.vibe}</span>
+                  <span className="capitalize">{selectedMatch.vibe}</span>
                 </div>
               )}
-              {activeMatch.life_phase && (
+              {selectedMatch.life_phase && (
                 <div className="flex items-center gap-1 px-3 py-1 bg-simples-lavender/20 text-simples-lavender rounded-full text-xs font-medium">
                   <Target size={12} />
-                  <span className="capitalize">{activeMatch.life_phase.replace('_', ' ')}</span>
+                  <span className="capitalize">{selectedMatch.life_phase.replace('_', ' ')}</span>
                 </div>
               )}
-              {activeMatch.emotional_availability && (
+              {selectedMatch.emotional_availability && (
                 <div className="flex items-center gap-1 px-3 py-1 bg-simples-rose/20 text-simples-rose rounded-full text-xs font-medium">
                   <Heart size={12} />
-                  <span className="capitalize">{activeMatch.emotional_availability}</span>
+                  <span className="capitalize">{selectedMatch.emotional_availability}</span>
                 </div>
               )}
             </div>
 
             {/* Shared Intentions */}
-            {activeMatch.shared_intentions && activeMatch.shared_intentions.length > 0 && (
+            {selectedMatch.shared_intentions && selectedMatch.shared_intentions.length > 0 && (
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-simples-midnight mb-2 flex items-center gap-1">
                   <Target size={14} />
                   You both want:
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {activeMatch.shared_intentions.map((intention) => (
+                  {selectedMatch.shared_intentions.map((intention) => (
                     <span key={intention} className="px-3 py-1 bg-gradient-to-r from-simples-ocean/20 to-simples-sky/20 text-simples-ocean rounded-full text-xs font-medium border border-simples-ocean/30">
                       {intention.replace('_', ' ')}
                     </span>
@@ -310,14 +310,14 @@ const EnhancedMatching = () => {
             )}
 
             {/* Shared Interests */}
-            {activeMatch.shared_interests && activeMatch.shared_interests.length > 0 && (
+            {selectedMatch.shared_interests && selectedMatch.shared_interests.length > 0 && (
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-simples-midnight mb-2 flex items-center gap-1">
                   <Sparkles size={14} />
                   Shared interests:
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {activeMatch.shared_interests.map((interest) => (
+                  {selectedMatch.shared_interests.map((interest) => (
                     <span key={interest} className="px-3 py-1 bg-simples-tropical/20 text-simples-tropical rounded-full text-xs font-medium">
                       {interest}
                     </span>
@@ -327,14 +327,14 @@ const EnhancedMatching = () => {
             )}
 
             {/* Communication Style */}
-            {activeMatch.communication_style && activeMatch.communication_style.length > 0 && (
+            {selectedMatch.communication_style && selectedMatch.communication_style.length > 0 && (
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-simples-midnight mb-2 flex items-center gap-1">
                   <MessageCircle size={14} />
                   Communication style:
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {activeMatch.communication_style.map((style) => (
+                  {selectedMatch.communication_style.map((style) => (
                     <span key={style} className="px-3 py-1 bg-simples-silver text-simples-storm rounded-full text-xs font-medium">
                       {style.replace('_', ' ')}
                     </span>
@@ -381,18 +381,18 @@ const EnhancedMatching = () => {
               </div>
               <h3 className="text-xl font-bold text-simples-midnight mb-2">It's a Match!</h3>
               <p className="text-simples-storm mb-4">
-                You and {activeMatch.full_name} liked each other!
+                You and {selectedMatch.full_name} liked each other!
               </p>
               <button 
                 onClick={() => navigate('/messages', {
                   state: {
                     selectedMatch: {
-                      id: activeMatch.user_id,
+                      id: selectedMatch.user_id,
                       matchId: null, // Will be resolved from the match that was just created
-                      name: activeMatch.full_name,
-                      photo: activeMatch.profile_picture_url || 'https://images.unsplash.com/photo-1494790108755-2616b612b29c?w=150&h=150&fit=crop',
-                      userId: activeMatch.user_id,
-                      otherUserId: activeMatch.user_id
+                      name: selectedMatch.full_name,
+                      photo: selectedMatch.profile_picture_url || 'https://images.unsplash.com/photo-1494790108755-2616b612b29c?w=150&h=150&fit=crop',
+                      userId: selectedMatch.user_id,
+                      otherUserId: selectedMatch.user_id
                     }
                   }
                 })}
