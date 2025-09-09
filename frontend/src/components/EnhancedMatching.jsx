@@ -4,6 +4,7 @@ import { Heart, Users, MessageCircle, Sparkles, Clock, MapPin, Target, Zap, X, S
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { useEnhancedMatching } from '../hooks/useEnhancedMatching';
 
 const EnhancedMatching = () => {
   const { user } = useAuth();
@@ -29,39 +30,33 @@ const EnhancedMatching = () => {
     fetchMatchingOptions();
   }, []);
 
-  // Fetch potential matches
+  // Use enhanced matching hook
+  const {
+    currentProfile: currentMatch,
+    hasMoreProfiles,
+    loading: matchingLoading,
+    error: matchingError,
+    handleLike: handleLikeAction,
+    handlePass: handlePassAction,
+    handleSuperLike: handleSuperLikeAction,
+    fetchPotentialMatches,
+    profilesRemaining
+  } = useEnhancedMatching();
+
+  // Override loading state
   useEffect(() => {
-    const fetchPotentialMatches = async () => {
-      if (!user) return;
-      
-      setLoading(true);
-      try {
-        console.log('Fetching potential matches for user:', user.id);
-        
-        const { data: matches, error } = await supabase.rpc('find_potential_matches', {
-          current_user_id: user.id,
-          match_limit: 20
-        });
+    setLoading(matchingLoading);
+  }, [matchingLoading]);
 
-        if (error) {
-          console.error('Error fetching matches:', error);
-          setPotentialMatches([]);
-        } else {
-          console.log('Fetched potential matches:', matches);
-          setPotentialMatches(matches || []);
-        }
-      } catch (error) {
-        console.error('Error in fetchPotentialMatches:', error);
-        setPotentialMatches([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user) {
-      fetchPotentialMatches();
+  // Set potential matches from hook
+  useEffect(() => {
+    if (currentMatch) {
+      setPotentialMatches([currentMatch]);
+      setCurrentMatchIndex(0);
+    } else {
+      setPotentialMatches([]);
     }
-  }, [user]);
+  }, [currentMatch]);
 
   // Handle swipe interactions
   const handleInteraction = async (targetUserId, interactionType) => {
@@ -122,33 +117,37 @@ const EnhancedMatching = () => {
     }
   };
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (currentMatch) {
       setSwipeDirection('like');
-      setTimeout(() => {
-        handleInteraction(currentMatch.user_id, 'like');
-        setSwipeDirection(null);
-      }, 300);
+      const result = await handleLikeAction(currentMatch.user_id);
+      if (result.isMatch) {
+        setSwipeDirection('match');
+        setTimeout(() => setSwipeDirection(null), 2000);
+      } else {
+        setTimeout(() => setSwipeDirection(null), 300);
+      }
     }
   };
 
-  const handlePass = () => {
+  const handlePass = async () => {
     if (currentMatch) {
       setSwipeDirection('pass');
-      setTimeout(() => {
-        handleInteraction(currentMatch.user_id, 'pass');
-        setSwipeDirection(null);
-      }, 300);
+      await handlePassAction(currentMatch.user_id);
+      setTimeout(() => setSwipeDirection(null), 300);
     }
   };
 
-  const handleSuperLike = () => {
+  const handleSuperLike = async () => {
     if (currentMatch) {
       setSwipeDirection('super');
-      setTimeout(() => {
-        handleInteraction(currentMatch.user_id, 'super_like');
-        setSwipeDirection(null);
-      }, 300);
+      const result = await handleSuperLikeAction(currentMatch.user_id);
+      if (result.isMatch) {
+        setSwipeDirection('match');
+        setTimeout(() => setSwipeDirection(null), 2000);
+      } else {
+        setTimeout(() => setSwipeDirection(null), 300);
+      }
     }
   };
 
@@ -205,9 +204,9 @@ const EnhancedMatching = () => {
         
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-simples-midnight">Discover</h1>
+          <h1 className="text-2xl font-bold text-simples-midnight">Enhanced Discover</h1>
           <div className="text-sm text-simples-storm">
-            {currentMatchIndex + 1} of {potentialMatches.length}
+            {profilesRemaining} profiles remaining
           </div>
         </div>
 
@@ -269,15 +268,57 @@ const EnhancedMatching = () => {
               </p>
             )}
 
-            {/* Removed enhanced profile fields - database columns don't exist yet */}
+            {/* Enhanced Profile Fields */}
+            
+            {/* Vibe & Life Phase */}
+            <div className="mb-4 flex flex-wrap gap-2">
+              {currentMatch.vibe && (
+                <div className="flex items-center gap-1 px-3 py-1 bg-simples-sky/20 text-simples-sky rounded-full text-xs font-medium">
+                  <Zap size={12} />
+                  <span className="capitalize">{currentMatch.vibe}</span>
+                </div>
+              )}
+              {currentMatch.life_phase && (
+                <div className="flex items-center gap-1 px-3 py-1 bg-simples-lavender/20 text-simples-lavender rounded-full text-xs font-medium">
+                  <Target size={12} />
+                  <span className="capitalize">{currentMatch.life_phase.replace('_', ' ')}</span>
+                </div>
+              )}
+              {currentMatch.emotional_availability && (
+                <div className="flex items-center gap-1 px-3 py-1 bg-simples-rose/20 text-simples-rose rounded-full text-xs font-medium">
+                  <Heart size={12} />
+                  <span className="capitalize">{currentMatch.emotional_availability}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Shared Intentions */}
+            {currentMatch.shared_intentions && currentMatch.shared_intentions.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold text-simples-midnight mb-2 flex items-center gap-1">
+                  <Target size={14} />
+                  You both want:
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {currentMatch.shared_intentions.map((intention) => (
+                    <span key={intention} className="px-3 py-1 bg-gradient-to-r from-simples-ocean/20 to-simples-sky/20 text-simples-ocean rounded-full text-xs font-medium border border-simples-ocean/30">
+                      {intention.replace('_', ' ')}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Shared Interests */}
             {currentMatch.shared_interests && currentMatch.shared_interests.length > 0 && (
               <div className="mb-4">
-                <h3 className="text-sm font-semibold text-simples-midnight mb-2">Shared Interests:</h3>
+                <h3 className="text-sm font-semibold text-simples-midnight mb-2 flex items-center gap-1">
+                  <Sparkles size={14} />
+                  Shared interests:
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {currentMatch.shared_interests.map((interest) => (
-                    <span key={interest} className="px-3 py-1 bg-simples-ocean/20 text-simples-ocean rounded-full text-xs font-medium">
+                    <span key={interest} className="px-3 py-1 bg-simples-tropical/20 text-simples-tropical rounded-full text-xs font-medium">
                       {interest}
                     </span>
                   ))}
@@ -285,7 +326,22 @@ const EnhancedMatching = () => {
               </div>
             )}
 
-            {/* Removed Communication Style - database column doesn't exist */}
+            {/* Communication Style */}
+            {currentMatch.communication_style && currentMatch.communication_style.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold text-simples-midnight mb-2 flex items-center gap-1">
+                  <MessageCircle size={14} />
+                  Communication style:
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {currentMatch.communication_style.map((style) => (
+                    <span key={style} className="px-3 py-1 bg-simples-silver text-simples-storm rounded-full text-xs font-medium">
+                      {style.replace('_', ' ')}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
